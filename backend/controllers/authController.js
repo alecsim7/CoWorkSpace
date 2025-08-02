@@ -2,7 +2,7 @@ const pool = require('../db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = 'co-workspace-secret'; // puoi spostarlo in .env
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // ✅ Registrazione
 exports.register = async (req, res) => {
