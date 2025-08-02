@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<mxfile>
+  <diagram name="ER Diagram">
+    <mxGraphModel>
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="2" value="&lt;b&gt;Utente&lt;/b&gt;&lt;br/&gt;id&lt;br/&gt;nome&lt;br/&gt;email&lt;br/&gt;password&lt;br/&gt;ruolo" style="shape=swimlane;startSize=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="160" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="3" value="&lt;b&gt;Sede&lt;/b&gt;&lt;br/&gt;id&lt;br/&gt;nome&lt;br/&gt;città&lt;br/&gt;indirizzo&lt;br/&gt;gestore_id" style="shape=swimlane;startSize=20;" vertex="1" parent="1">
+          <mxGeometry x="280" y="40" width="160" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="4" value="&lt;b&gt;Spazio&lt;/b&gt;&lt;br/&gt;id&lt;br/&gt;sede_id&lt;br/&gt;tipo_spazio&lt;br/&gt;servizi&lt;br/&gt;prezzo_ora" style="shape=swimlane;startSize=20;" vertex="1" parent="1">
+          <mxGeometry x="520" y="40" width="160" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="5" value="&lt;b&gt;Disponibilità&lt;/b&gt;&lt;br/&gt;id&lt;br/&gt;spazio_id&lt;br/&gt;data&lt;br/&gt;ora_inizio&lt;br/&gt;ora_fine" style="shape=swimlane;startSize=20;" vertex="1" parent="1">
+          <mxGeometry x="760" y="40" width="160" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="6" value="&lt;b&gt;Prenotazione&lt;/b&gt;&lt;br/&gt;id&lt;br/&gt;utente_id&lt;br/&gt;spazio_id&lt;br/&gt;data&lt;br/&gt;ora_inizio&lt;br/&gt;ora_fine" style="shape=swimlane;startSize=20;" vertex="1" parent="1">
+          <mxGeometry x="280" y="160" width="160" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="7" value="&lt;b&gt;Pagamento&lt;/b&gt;&lt;br/&gt;id&lt;br/&gt;prenotazione_id&lt;br/&gt;importo&lt;br/&gt;esito&lt;br/&gt;timestamp" style="shape=swimlane;startSize=20;" vertex="1" parent="1">
+          <mxGeometry x="520" y="160" width="160" height="25" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
