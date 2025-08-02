@@ -34,7 +34,7 @@ exports.creaPrenotazione = async (req, res) => {
 
 // ✅ Visualizza prenotazioni utente con info su spazi e sedi
 exports.visualizzaPrenotazioni = async (req, res) => {
-  const { utente_id } = req.params;
+  const utente_id = req.utente.id;
 
   try {
     const result = await pool.query(

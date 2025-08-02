@@ -28,7 +28,7 @@ $(document).ready(function () {
 
   // Carica prenotazioni utente (puoi spostare questo in dashboard se vuoi)
   $.ajax({
-    url: `http://localhost:3000/api/prenotazioni/${utente.id}`,
+    url: 'http://localhost:3000/api/prenotazioni',
     method: 'GET',
     headers: { Authorization: `Bearer ${token}` },
     success: function (data) {
