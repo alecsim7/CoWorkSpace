@@ -6,7 +6,7 @@ const { verificaToken } = require('../middleware/authMiddleware');
 // ✅ Creazione prenotazione (solo utenti autenticati)
 router.post('/prenotazioni', verificaToken, prenotazioniController.creaPrenotazione);
 
-// ✅ Visualizza prenotazioni di un utente (solo se autenticato)
-router.get('/prenotazioni/:utente_id', verificaToken, prenotazioniController.visualizzaPrenotazioni);
+// ✅ Visualizza prenotazioni dell'utente autenticato
+router.get('/prenotazioni', verificaToken, prenotazioniController.visualizzaPrenotazioni);
 
 module.exports = router;

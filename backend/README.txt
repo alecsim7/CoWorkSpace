@@ -59,7 +59,7 @@
 
 👤 Utente:
 - GET    /api/utente/:id          → Profilo utente
-- GET    /api/prenotazioni/:id    → Prenotazioni utente
+- GET    /api/prenotazioni        → Prenotazioni utente
 
 🏢 Sedi e spazi:
 - GET    /api/sedi                → Elenco sedi
