@@ -6,17 +6,22 @@ const requiredEnvVars = ['DB_USER', 'DB_PASSWORD', 'DB_HOST', 'DB_PORT', 'DB_NAM
 
 requiredEnvVars.forEach((envVar) => {
   const value = process.env[envVar];
-  if (value === undefined || value === '') {
+  if (typeof value !== 'string' || value.trim() === '') {
     throw new Error(`${envVar} is missing`);
   }
 });
+
+const port = parseInt(process.env.DB_PORT, 10);
+if (Number.isNaN(port)) {
+  throw new Error('DB_PORT must be a number');
+}
 
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
-  port: Number(process.env.DB_PORT),
+  port,
 });
 
 module.exports = pool;
