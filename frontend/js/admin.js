@@ -2,8 +2,8 @@ $(document).ready(function () {
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente'));
 
-  if (!token || !utente || utente.ruolo !== 'amministratore') {
-    alert("Accesso negato. Solo amministratori possono entrare.");
+  if (!token || !utente || utente.ruolo !== 'admin') {
+    alert("Accesso negato. Solo admin possono entrare.");
     window.location.href = "index.html";
     return;
   }

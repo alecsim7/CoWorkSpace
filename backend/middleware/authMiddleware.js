@@ -19,8 +19,8 @@ exports.verificaToken = (req, res, next) => {
 
 // Middleware per autorizzazione ruolo admin
 exports.verificaAdmin = (req, res, next) => {
-  if (req.utente?.ruolo !== 'amministratore') {
-    return res.status(403).json({ message: 'Accesso negato: solo amministratori' });
+  if (req.utente?.ruolo !== 'admin') {
+    return res.status(403).json({ message: 'Accesso negato: solo admin' });
   }
   next();
 };
