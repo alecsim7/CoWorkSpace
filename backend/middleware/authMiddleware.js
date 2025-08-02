@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'co-workspace-secret';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.verificaToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
