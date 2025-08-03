@@ -16,7 +16,8 @@ exports.effettuaPagamento = async (req, res) => {
 
     // Recupera la prenotazione e verifica appartenenza all'utente
     const prenRes = await pool.query(
-      'SELECT importo, utente_id FROM prenotazioni WHERE id = $1',
+      // RIMOSSO: importo dalla SELECT
+      'SELECT utente_id, spazio_id, data, orario_inizio, orario_fine FROM prenotazioni WHERE id = $1',
       [prenotazione_id]
     );
 
@@ -24,6 +25,25 @@ exports.effettuaPagamento = async (req, res) => {
       await pool.query('ROLLBACK');
       return res.status(404).json({ message: 'Prenotazione non trovata' });
     }
+
+    // Calcola importo usando la tabella spazi e orari della prenotazione
+    const spazio_id = prenRes.rows[0].spazio_id;
+    const data = prenRes.rows[0].data;
+    const orario_inizio = prenRes.rows[0].orario_inizio;
+    const orario_fine = prenRes.rows[0].orario_fine;
+
+    const prezzoRes = await pool.query(
+      'SELECT prezzo_orario FROM spazi WHERE id = $1',
+      [spazio_id]
+    );
+    if (prezzoRes.rows.length === 0) {
+      await pool.query('ROLLBACK');
+      return res.status(404).json({ message: 'Spazio non trovato' });
+    }
+    const start = new Date(`1970-01-01T${orario_inizio}`);
+    const end = new Date(`1970-01-01T${orario_fine}`);
+    const ore = (end - start) / (1000 * 60 * 60);
+    const importo = Number(prezzoRes.rows[0].prezzo_orario) * ore;
 
     // Controlla se esiste già un pagamento per questa prenotazione
     const pagRes = await pool.query(
@@ -35,8 +55,6 @@ exports.effettuaPagamento = async (req, res) => {
       await pool.query('ROLLBACK');
       return res.status(400).json({ message: 'Prenotazione già pagata' });
     }
-
-    const importo = prenRes.rows[0].importo;
 
     await pool.query(
       `INSERT INTO pagamenti (prenotazione_id, importo, metodo, timestamp)

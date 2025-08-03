@@ -133,7 +133,7 @@ exports.prenotazioniNonPagate = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT p.*, s.nome AS nome_spazio, s.prezzo_ora AS prezzo_orario, sede.nome AS nome_sede, pag.id AS pagamento_id
+      `SELECT p.*, s.nome AS nome_spazio, sede.nome AS nome_sede, s.prezzo_orario, pag.id AS pagamento_id
        FROM prenotazioni p
        JOIN spazi s ON p.spazio_id = s.id
        JOIN sedi sede ON s.sede_id = sede.id
@@ -145,7 +145,7 @@ exports.prenotazioniNonPagate = async (req, res) => {
 
     res.json({ prenotazioni: result.rows });
   } catch (err) {
-    console.error('Errore recupero prenotazioni non pagate:', err);
-    res.status(500).json({ message: 'Errore del server' });
+    console.error('Errore recupero prenotazioni non pagate:', err); // Log dettagliato
+    res.status(500).json({ message: 'Errore del server', error: err.message });
   }
 };

@@ -14,9 +14,9 @@ $(document).ready(function () {
     method: 'GET',
     headers: { Authorization: `Bearer ${token}` },
     success: function (res) {
-      // Il backend ritorna solo prenotazioni senza pagamento ma, per
-      // maggiore robustezza, filtriamo eventuali casi anomali in cui
-      // pagamento_id sia undefined oppure 0.
+      // DEBUG: Mostra la risposta ricevuta dal backend
+      console.log('Risposta prenotazioni non pagate:', res);
+
       const prenotazioni = (res.prenotazioni || []).filter(
         p => !p.pagamento_id
       );
@@ -28,12 +28,29 @@ $(document).ready(function () {
       }
 
       prenotazioni.forEach(p => {
-        const importo = parseFloat(p.importo);
-        const testoImporto = isNaN(importo)
-          ? 'Importo non disponibile'
-          : `€${importo.toFixed(2)}`;
-        const testo = `#${p.id} - ${p.nome_spazio} ${p.data} ${p.ora_inizio}-${p.ora_fine} (${testoImporto})`;
-        const dataImporto = isNaN(importo) ? '' : importo;
+        // Calcola sempre l'importo usando prezzo_orario, orario_inizio e orario_fine
+        let importo = null;
+        // Usa i nomi delle proprietà esattamente come arrivano dal backend
+        // Debug: mostra la prenotazione per capire i nomi delle proprietà
+        console.log('Prenotazione:', p);
+
+        // Supporta sia orario_inizio/orario_fine che ora_inizio/ora_fine
+        const inizio = p.orario_inizio || p.ora_inizio;
+        const fine = p.orario_fine || p.ora_fine;
+        const prezzoOrario = p.prezzo_orario;
+
+        if (prezzoOrario && inizio && fine) {
+          const start = new Date(`1970-01-01T${inizio}:00`);
+          const end = new Date(`1970-01-01T${fine}:00`);
+          const ore = (end - start) / (1000 * 60 * 60);
+          importo = parseFloat(prezzoOrario) * ore;
+        }
+
+        const testoImporto = (importo !== null && !isNaN(importo))
+          ? `€${importo.toFixed(2)}`
+          : 'Importo non disponibile';
+        const testo = `#${p.id} - ${p.nome_spazio} ${p.data} ${inizio}-${fine} (${testoImporto})`;
+        const dataImporto = (importo !== null && !isNaN(importo)) ? importo : '';
         $('#prenotazione').append(
           `<option value="${p.id}" data-importo="${dataImporto}">${testo}</option>`
         );
@@ -52,8 +69,10 @@ $(document).ready(function () {
         })
         .trigger('change');
     },
-    error: function () {
-      $('#alertPagamento').html('<div class="alert alert-danger">Errore nel recupero delle prenotazioni.</div>');
+    error: function (xhr) {
+      // Mostra dettagli dell'errore per debug
+      console.error('Errore AJAX:', xhr.status, xhr.responseText);
+      $('#alertPagamento').html(`<div class="alert alert-danger">Errore nel recupero delle prenotazioni. (${xhr.status})</div>`);
     }
   });
 
