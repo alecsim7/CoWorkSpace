@@ -80,7 +80,7 @@
 - POST   /api/prenotazioni              → Crea prenotazione
 
 💳 Pagamento:
-- POST   /api/pagamento                 → Simulazione pagamento
+- POST   /api/pagamento                 → Simulazione pagamento (utente_id, importo, metodo)
 
 🛠️ Admin:
 - GET    /api/admin/utenti              → Lista utenti
