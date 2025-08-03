@@ -23,3 +23,25 @@ exports.validateLogin = (req, res, next) => {
 
   next();
 };
+
+exports.validateUpdateProfilo = (req, res, next) => {
+  const { nome, password } = req.body;
+
+  if (!nome && !password) {
+    return res
+      .status(400)
+      .json({ message: 'Fornire almeno nome o password' });
+  }
+
+  if (nome && (typeof nome !== 'string' || nome.trim() === '')) {
+    return res.status(400).json({ message: 'Nome non valido' });
+  }
+
+  if (password && (typeof password !== 'string' || password.length < 6)) {
+    return res
+      .status(400)
+      .json({ message: 'Password non valida (min 6 caratteri)' });
+  }
+
+  next();
+};
