@@ -15,8 +15,6 @@ $(document).ready(function () {
     window.location.href = "index.html";
   });
 
-  caricaPrenotazioni();
-
   // Cerca disponibilità spazi
   $('#formRicerca').submit(function (e) {
     e.preventDefault();
@@ -102,7 +100,6 @@ $(document).ready(function () {
               $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> confermata e pagamento di €${importo} effettuato!</div>`);
               $('#formRicerca')[0].reset();
               $('#risultatiSpazi').empty();
-              caricaPrenotazioni();
             },
             error: function (xhr) {
               $('#prenotazioneAlert').html(`<div class="alert alert-danger">❌ Errore: ${xhr.responseJSON?.message || 'Prenotazione fallita'}</div>`);
@@ -115,40 +112,4 @@ $(document).ready(function () {
       }
     });
   });
-  function caricaPrenotazioni() {
-    $('#listaPrenotazioni').empty();
-
-    $.ajax({
-      url: 'http://localhost:3000/api/prenotazioni',
-      method: 'GET',
-      headers: { Authorization: `Bearer ${token}` },
-      success: function (res) {
-        const prenotazioni = res.prenotazioni || [];
-        if (prenotazioni.length === 0) {
-          $('#listaPrenotazioni').html('<p class="text-center">Nessuna prenotazione</p>');
-          return;
-        }
-
-        prenotazioni.forEach(p => {
-          const card = `
-            <div class="col-md-4">
-              <div class="card h-100 shadow-sm">
-                <div class="card-body d-flex flex-column">
-                  <h5 class="card-title">${p.nome_spazio}</h5>
-                  <p class="mb-1"><strong>Data:</strong> ${p.data}</p>
-                  <p class="mb-1"><strong>Orario:</strong> ${p.orario_inizio} - ${p.orario_fine}</p>
-                  <p class="mb-1"><strong>Sede:</strong> ${p.nome_sede}</p>
-                </div>
-              </div>
-            </div>
-          `;
-          $('#listaPrenotazioni').append(card);
-        });
-
-      },
-      error: function () {
-        $('#listaPrenotazioni').html('<p class="text-center text-danger">Errore nel recupero delle prenotazioni</p>');
-      }
-    });
-  }
 });
