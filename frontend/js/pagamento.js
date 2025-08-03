@@ -17,10 +17,8 @@ $(document).ready(function () {
       // DEBUG: Mostra la risposta ricevuta dal backend
       console.log('Risposta prenotazioni non pagate:', res);
 
-      const prenotazioni = (res.prenotazioni || []).filter(
-        p => !p.pagamento_id
-      );
-
+      const prenotazioni = res.prenotazioni || [];
+      // NON filtrare per !p.pagamento_id, la query backend già restituisce solo quelle non pagate
       if (prenotazioni.length === 0) {
         $('#alertPagamento').html('<div class="alert alert-info">Nessuna prenotazione da pagare.</div>');
         $('#formPagamento').hide();
@@ -28,29 +26,29 @@ $(document).ready(function () {
       }
 
       prenotazioni.forEach(p => {
-        // Calcola sempre l'importo usando prezzo_orario, orario_inizio e orario_fine
-        let importo = null;
-        // Usa i nomi delle proprietà esattamente come arrivano dal backend
-        // Debug: mostra la prenotazione per capire i nomi delle proprietà
+        // DEBUG: Mostra la prenotazione per capire i dati ricevuti
         console.log('Prenotazione:', p);
 
-        // Supporta sia orario_inizio/orario_fine che ora_inizio/ora_fine
-        const inizio = p.orario_inizio || p.ora_inizio;
-        const fine = p.orario_fine || p.ora_fine;
+        // Usa sempre il calcolo con prezzo_orario, orario_inizio, orario_fine
+        let importo = null;
         const prezzoOrario = p.prezzo_orario;
+        // Prendi solo l'orario (es: "09:00:00") dai campi orario_inizio/fine
+        const inizio = p.orario_inizio ? p.orario_inizio.slice(0,5) : '';
+        const fine = p.orario_fine ? p.orario_fine.slice(0,5) : '';
 
         if (prezzoOrario && inizio && fine) {
-          const start = new Date(`1970-01-01T${inizio}:00`);
-          const end = new Date(`1970-01-01T${fine}:00`);
-          const ore = (end - start) / (1000 * 60 * 60);
+          // Calcola le ore come differenza tra orario_inizio e orario_fine
+          const [hStart, mStart] = inizio.split(':').map(Number);
+          const [hEnd, mEnd] = fine.split(':').map(Number);
+          const ore = (hEnd + mEnd/60) - (hStart + mStart/60);
           importo = parseFloat(prezzoOrario) * ore;
         }
 
-        const testoImporto = (importo !== null && !isNaN(importo))
+        const testoImporto = (importo !== null && !isNaN(importo) && importo > 0)
           ? `€${importo.toFixed(2)}`
           : 'Importo non disponibile';
         const testo = `#${p.id} - ${p.nome_spazio} ${p.data} ${inizio}-${fine} (${testoImporto})`;
-        const dataImporto = (importo !== null && !isNaN(importo)) ? importo : '';
+        const dataImporto = (importo !== null && !isNaN(importo) && importo > 0) ? importo : '';
         $('#prenotazione').append(
           `<option value="${p.id}" data-importo="${dataImporto}">${testo}</option>`
         );

@@ -22,7 +22,7 @@ exports.ricercaDisponibilita = async (req, res) => {
 
   try {
     const result = await pool.query(`
-      SELECT s.id AS spazio_id, s.nome AS nome_spazio, s.descrizione, s.prezzo_ora AS prezzo_orario, sede.nome AS nome_sede
+      SELECT s.id AS spazio_id, s.nome AS nome_spazio, s.descrizione, s.prezzo_orario, sede.nome AS nome_sede
       FROM spazi s
       JOIN sedi sede ON s.sede_id = sede.id
       WHERE s.id NOT IN (

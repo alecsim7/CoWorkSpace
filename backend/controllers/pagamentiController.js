@@ -33,7 +33,7 @@ exports.effettuaPagamento = async (req, res) => {
     const orario_fine = prenRes.rows[0].orario_fine;
 
     const prezzoRes = await pool.query(
-      'SELECT prezzo_ora AS prezzo_orario FROM spazi WHERE id = $1',
+      'SELECT prezzo_orario FROM spazi WHERE id = $1',
       [spazio_id]
     );
     if (prezzoRes.rows.length === 0) {
@@ -57,17 +57,18 @@ exports.effettuaPagamento = async (req, res) => {
     }
 
     await pool.query(
-      `INSERT INTO pagamenti (prenotazione_id, importo, metodo, timestamp)
-       VALUES ($1, $2, $3, NOW())`,
-      [prenotazione_id, importo, metodo]
+      // RIMOSSO: metodo dalla query e dai valori
+      `INSERT INTO pagamenti (prenotazione_id, importo, timestamp)
+       VALUES ($1, $2, NOW())`,
+      [prenotazione_id, importo]
     );
 
     await pool.query('COMMIT');
 
     res.status(201).json({
       message: 'Pagamento registrato',
-      pagamento: { prenotazione_id, importo, metodo }
-
+      pagamento: { prenotazione_id, importo }
+      // RIMOSSO: metodo
     });
   } catch (err) {
     await pool.query('ROLLBACK');

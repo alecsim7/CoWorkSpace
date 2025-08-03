@@ -4,8 +4,6 @@ const pool = require('../db');
 exports.creaPrenotazione = async (req, res) => {
   const { spazio_id, data, orario_inizio, orario_fine } = req.body;
 
-  // L'ID dell'utente autenticato viene letto dal token e non dal body
-
   try {
     await pool.query('BEGIN');
 
@@ -24,7 +22,7 @@ exports.creaPrenotazione = async (req, res) => {
 
     // 2. Calcola importo da pagare
     const prezzoRes = await pool.query(
-      'SELECT prezzo_ora AS prezzo_orario FROM spazi WHERE id = $1',
+      'SELECT prezzo_orario FROM spazi WHERE id = $1',
       [spazio_id]
     );
 
@@ -38,24 +36,26 @@ exports.creaPrenotazione = async (req, res) => {
     const ore = (end - start) / (1000 * 60 * 60);
     const importo = Number(prezzoRes.rows[0].prezzo_orario) * ore;
 
-    // 3. Inserisci prenotazione
+    // 3. Inserisci prenotazione (senza colonna importo)
     const result = await pool.query(
-      `INSERT INTO prenotazioni (utente_id, spazio_id, data, orario_inizio, orario_fine, importo)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [req.utente.id, spazio_id, data, orario_inizio, orario_fine, importo]
+      `INSERT INTO prenotazioni (utente_id, spazio_id, data, orario_inizio, orario_fine)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [req.utente.id, spazio_id, data, orario_inizio, orario_fine]
     );
 
     await pool.query('COMMIT');
 
+    // Restituisci l'importo calcolato nella risposta, NON nella tabella
     res.status(201).json({
       message: 'Prenotazione effettuata',
-      prenotazione: result.rows[0]
+      prenotazione: result.rows[0],
+      importo
     });
 
   } catch (err) {
     await pool.query('ROLLBACK');
     console.error('Errore prenotazione:', err);
-    res.status(500).json({ message: 'Errore del server' });
+    res.status(500).json({ message: 'Errore del server', error: err.message });
   }
 };
 
@@ -133,7 +133,7 @@ exports.prenotazioniNonPagate = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT p.*, s.nome AS nome_spazio, sede.nome AS nome_sede, s.prezzo_ora AS prezzo_orario, pag.id AS pagamento_id
+      `SELECT p.*, s.nome AS nome_spazio, sede.nome AS nome_sede, s.prezzo_orario, pag.id AS pagamento_id, pag.importo AS importo
        FROM prenotazioni p
        JOIN spazi s ON p.spazio_id = s.id
        JOIN sedi sede ON s.sede_id = sede.id
@@ -145,7 +145,7 @@ exports.prenotazioniNonPagate = async (req, res) => {
 
     res.json({ prenotazioni: result.rows });
   } catch (err) {
-    console.error('Errore recupero prenotazioni non pagate:', err); // Log dettagliato
-    res.status(500).json({ message: 'Errore del server', error: err.message });
+    console.error('Errore recupero prenotazioni non pagate:', err);
+    res.status(500).json({ message: 'Errore del server' });
   }
 };

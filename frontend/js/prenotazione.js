@@ -96,15 +96,18 @@ $(document).ready(function () {
               orario_fine
             }),
             success: function (res) {
-              const importo = parseFloat(res.prenotazione?.importo);
+              // DEBUG: Mostra la risposta ricevuta dal backend
+              console.log('Risposta prenotazione:', res);
+              const importo = parseFloat(res.importo ?? res.prenotazione?.importo);
               const msgImporto = isNaN(importo) ? '' : ` Importo: €${importo.toFixed(2)}`;
               $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> registrata!${msgImporto}</div>`);
               $('#formRicerca')[0].reset();
               $('#risultatiSpazi').empty();
             },
             error: function (xhr) {
-              // Mostra solo errore generico, non pagamento
-              $('#prenotazioneAlert').html(`<div class="alert alert-danger">❌ Errore: ${xhr.responseJSON?.message || 'Prenotazione fallita'}</div>`);
+              // Mostra dettagli dell'errore per debug
+              console.error('Errore AJAX:', xhr.status, xhr.responseText);
+              $('#prenotazioneAlert').html(`<div class="alert alert-danger">❌ Errore: ${xhr.responseJSON?.message || xhr.responseText || 'Prenotazione fallita'}</div>`);
             }
           });
         });
