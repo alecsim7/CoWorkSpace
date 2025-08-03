@@ -33,7 +33,7 @@ exports.effettuaPagamento = async (req, res) => {
     const orario_fine = prenRes.rows[0].orario_fine;
 
     const prezzoRes = await pool.query(
-      'SELECT prezzo_orario FROM spazi WHERE id = $1',
+      'SELECT prezzo_ora AS prezzo_orario FROM spazi WHERE id = $1',
       [spazio_id]
     );
     if (prezzoRes.rows.length === 0) {
