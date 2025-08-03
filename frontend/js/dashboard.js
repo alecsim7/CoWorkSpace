@@ -17,14 +17,24 @@ $(document).ready(function () {
   function caricaPrenotazioni() {
     $('#listaPrenotazioni').empty();
 
+    console.log('Token inviato:', token); // DEBUG: verifica token
+
     $.ajax({
       url: 'http://localhost:3000/api/prenotazioni',
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function (data) {
-        const prenotazioni = data.prenotazioni || [];
+        console.log('Risposta prenotazioni:', data); // DEBUG: verifica cosa arriva dal backend
+
+        // Controllo struttura risposta
+        if (!data || !Array.isArray(data.prenotazioni)) {
+          $('#listaPrenotazioni').append('<li class="list-group-item text-danger">Risposta inattesa dal server.</li>');
+          return;
+        }
+
+        const prenotazioni = data.prenotazioni;
         if (prenotazioni.length === 0) {
-          $('#listaPrenotazioni').append('<li class="list-group-item">Nessuna prenotazione trovata.</li>');
+          $('#listaPrenotazioni').append('<li class="list-group-item">Nessuna prenotazione trovata per il tuo account.</li>');
           return;
         }
 
@@ -70,13 +80,14 @@ $(document).ready(function () {
               caricaPrenotazioni();
             },
             error: function (xhr) {
-              $('#dashboardAlert').html(`<div class="alert alert-danger">${xhr.responseJSON?.message || 'Errore durante l\\'aggiornamento'}</div>`);
+              $('#dashboardAlert').html(`<div class="alert alert-danger">${xhr.responseJSON?.message || 'Errore durante l\'aggiornamento'}</div>`);
             }
           });
         });
       },
-      error: function () {
-        $('#listaPrenotazioni').append('<li class="list-group-item text-danger">Errore nel caricamento.</li>');
+      error: function (xhr) {
+        console.error('Errore AJAX:', xhr.status, xhr.responseText); // DEBUG: errore dettagliato
+        $('#listaPrenotazioni').append(`<li class="list-group-item text-danger">Errore nel caricamento (${xhr.status}): ${xhr.responseText}</li>`);
       }
     });
   }
