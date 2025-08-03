@@ -41,7 +41,8 @@ CREATE TABLE Prenotazione (
   spazio_id INTEGER NOT NULL REFERENCES Spazio(id) ON DELETE CASCADE,
   data DATE NOT NULL,
   ora_inizio TIME NOT NULL,
-  ora_fine TIME NOT NULL
+  ora_fine TIME NOT NULL,
+  importo NUMERIC(7,2) NOT NULL
 );
 
 -- Pagamento
@@ -49,5 +50,6 @@ CREATE TABLE Pagamento (
   id SERIAL PRIMARY KEY,
   prenotazione_id INTEGER NOT NULL REFERENCES Prenotazione(id) ON DELETE CASCADE,
   importo NUMERIC(7,2) NOT NULL,
+  metodo VARCHAR(20) NOT NULL CHECK (metodo IN ('paypal','satispay','carta','bancomat')),
   timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

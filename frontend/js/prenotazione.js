@@ -104,7 +104,7 @@ $(document).ready(function () {
               orario_fine
             }),
             success: function () {
-              $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> confermata e pagamento di €${importo} effettuato!</div>`);
+              $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> registrata. Importo da pagare: €${importo}.</div>`);
               $('#formRicerca')[0].reset();
               $('#risultatiSpazi').empty();
             },
