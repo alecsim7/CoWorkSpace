@@ -46,7 +46,7 @@ exports.creaPrenotazione = async (req, res) => {
     // 4. Registra pagamento con data/ora corrente
     await pool.query(
       `INSERT INTO pagamenti (prenotazione_id, importo, timestamp)
-       VALUES ($1, $2, CURRENT_TIMESTAMP)`,
+       VALUES ($1, $2, NOW())`,
       [result.rows[0].id, importo]
     );
 
