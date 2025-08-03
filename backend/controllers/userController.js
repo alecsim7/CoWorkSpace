@@ -1,7 +1,8 @@
 const pool = require('../db');
 const bcrypt = require('bcrypt');
 
-// Visualizza il profilo utente
+// [DEPRECATO] Visualizza il profilo utente tramite ID
+// Utilizzare invece la rotta autenticata `/api/utente/me`
 exports.getProfilo = async (req, res) => {
   const { id } = req.params;
 
