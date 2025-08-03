@@ -15,6 +15,8 @@ $(document).ready(function () {
     window.location.href = "index.html";
   });
 
+  caricaPrenotazioni();
+
   // Cerca disponibilità spazi
   $('#formRicerca').submit(function (e) {
     e.preventDefault();
@@ -61,7 +63,7 @@ $(document).ready(function () {
                   <p class="card-text flex-grow-1">${spazio.descrizione}</p>
                   <p class="mb-1"><strong>Sede:</strong> ${spazio.nome_sede}</p>
                   <p><strong>Prezzo orario:</strong> €${prezzoFormattato}</p>
-                  <button class="btn btn-success mt-auto btnPrenota" data-id="${spazio.spazio_id}" data-nome="${spazio.nome_spazio}">Prenota</button>
+                  <button class="btn btn-success mt-auto btnPrenota" data-id="${spazio.spazio_id}" data-nome="${spazio.nome_spazio}" data-prezzo="${prezzo}">Prenota</button>
                 </div>
               </div>
             </div>
@@ -73,6 +75,16 @@ $(document).ready(function () {
         $('.btnPrenota').click(function () {
           const spazio_id = $(this).data('id');
           const nome_spazio = $(this).data('nome');
+          const prezzo = parseFloat($(this).data('prezzo'));
+
+          const start = new Date(`1970-01-01T${orario_inizio}:00`);
+          const end = new Date(`1970-01-01T${orario_fine}:00`);
+          const ore = (end - start) / (1000 * 60 * 60);
+          const importo = (prezzo * ore).toFixed(2);
+
+          if (!confirm(`Confermi la prenotazione di ${nome_spazio} per €${importo}?`)) {
+            return;
+          }
 
           $.ajax({
             url: 'http://localhost:3000/api/prenotazioni',
@@ -87,9 +99,10 @@ $(document).ready(function () {
               orario_fine
             }),
             success: function () {
-              $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> confermata!</div>`);
+              $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> confermata e pagamento di €${importo} effettuato!</div>`);
               $('#formRicerca')[0].reset();
               $('#risultatiSpazi').empty();
+              caricaPrenotazioni();
             },
             error: function (xhr) {
               $('#prenotazioneAlert').html(`<div class="alert alert-danger">❌ Errore: ${xhr.responseJSON?.message || 'Prenotazione fallita'}</div>`);
@@ -102,4 +115,69 @@ $(document).ready(function () {
       }
     });
   });
+  function caricaPrenotazioni() {
+    $('#listaPrenotazioni').empty();
+
+    $.ajax({
+      url: 'http://localhost:3000/api/prenotazioni',
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+      success: function (res) {
+        const prenotazioni = res.prenotazioni || [];
+        if (prenotazioni.length === 0) {
+          $('#listaPrenotazioni').html('<p class="text-center">Nessuna prenotazione</p>');
+          return;
+        }
+
+        prenotazioni.forEach(p => {
+          const card = `
+            <div class="col-md-4">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title">${p.nome_spazio}</h5>
+                  <p class="mb-1"><strong>Data:</strong> ${p.data}</p>
+                  <p class="mb-1"><strong>Orario:</strong> ${p.orario_inizio} - ${p.orario_fine}</p>
+                  <p class="mb-1"><strong>Sede:</strong> ${p.nome_sede}</p>
+                  <button class="btn btn-warning mt-auto btnModifica" data-id="${p.id}" data-data="${p.data}" data-inizio="${p.orario_inizio}" data-fine="${p.orario_fine}">Modifica</button>
+                </div>
+              </div>
+            </div>
+          `;
+          $('#listaPrenotazioni').append(card);
+        });
+
+        $('.btnModifica').click(function () {
+          const id = $(this).data('id');
+          const dataAttuale = $(this).data('data');
+          const inizioAttuale = $(this).data('inizio');
+          const fineAttuale = $(this).data('fine');
+
+          const nuovaData = prompt('Nuova data (YYYY-MM-DD)', dataAttuale);
+          if (!nuovaData) return;
+          const nuovoInizio = prompt('Nuovo orario di inizio (HH:MM)', inizioAttuale);
+          if (!nuovoInizio) return;
+          const nuovoFine = prompt('Nuovo orario di fine (HH:MM)', fineAttuale);
+          if (!nuovoFine) return;
+
+          $.ajax({
+            url: `http://localhost:3000/api/prenotazioni/${id}`,
+            method: 'PUT',
+            contentType: 'application/json',
+            headers: { Authorization: `Bearer ${token}` },
+            data: JSON.stringify({ data: nuovaData, orario_inizio: nuovoInizio, orario_fine: nuovoFine }),
+            success: function () {
+              $('#prenotazioneAlert').html('<div class="alert alert-success">Prenotazione aggiornata</div>');
+              caricaPrenotazioni();
+            },
+            error: function (xhr) {
+              $('#prenotazioneAlert').html(`<div class="alert alert-danger">${xhr.responseJSON?.message || 'Errore durante l\'aggiornamento'}</div>`);
+            }
+          });
+        });
+      },
+      error: function () {
+        $('#listaPrenotazioni').html('<p class="text-center text-danger">Errore nel recupero delle prenotazioni</p>');
+      }
+    });
+  }
 });

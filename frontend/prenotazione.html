@@ -9,14 +9,20 @@
 </head>
 <body class="bg-light">
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm py-3">
-    <div class="container">
+    <div class="container d-flex align-items-center">
       <a class="navbar-brand fw-bold" href="index.html">CoWorkSpace</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+
+      <div class="d-flex align-items-center text-white ms-3">
+        <span id="nomeUtente" class="fw-bold"></span>
+        <span id="ruoloUtente" class="ms-2 fst-italic"></span>
+      </div>
+
+      <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-<ul id="menuLinks" class="navbar-nav gap-3"></ul>
+        <ul id="menuLinks" class="navbar-nav gap-3"></ul>
       </div>
     </div>
   </nav>
@@ -42,6 +48,9 @@
     <div id="prenotazioneAlert"></div>
 
     <div id="risultatiSpazi" class="row gy-4 justify-content-center"></div>
+
+    <h2 class="mt-5 text-center">Le tue prenotazioni</h2>
+    <div id="listaPrenotazioni" class="row gy-3 justify-content-center"></div>
 
     <button id="logoutBtn" class="btn btn-danger logout-bottom-right">Logout</button>
   </main>
