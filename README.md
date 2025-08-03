@@ -61,6 +61,20 @@ Le pagine statiche sono nella cartella `frontend`.
   npx serve frontend
   ```
 
+### Configurazione dell'endpoint API
+
+Lo script `frontend/js/prenotazione.js` usa la variabile globale `API_BASE` per determinare l'URL delle API. Il valore predefinito è `/api`, ma può essere sovrascritto:
+
+- **Variabile d'ambiente:** imposta `API_BASE` prima di servire il frontend (es. `API_BASE=https://example.com/api npx serve frontend`) e fai in modo che il server esponga tale valore come `window.API_BASE`.
+- **Script inline:** definisci `window.API_BASE` prima di includere `prenotazione.js`:
+
+  ```html
+  <script>
+    window.API_BASE = 'https://example.com/api';
+  </script>
+  <script src="js/prenotazione.js"></script>
+  ```
+
 ---
 
 Consulta la [specifica API](docs/api-spec.md) e la [documentazione del database](database/README-db.md) per maggiori dettagli sul progetto.
