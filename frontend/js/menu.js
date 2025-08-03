@@ -7,6 +7,7 @@ $(document).ready(function () {
     menu.append('<li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>');
   } else {
     menu.append('<li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>');
+    menu.append('<li class="nav-item"><a class="nav-link" href="sedi.html">Sedi</a></li>');
 
     if (utente.ruolo === 'cliente') {
       menu.append('<li class="nav-item"><a class="nav-link" href="prenotazione.html">Prenotazioni</a></li>');
