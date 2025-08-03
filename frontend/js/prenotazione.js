@@ -2,8 +2,8 @@ $(document).ready(function () {
   const token = localStorage.getItem('token');
 
   if (!token) {
-    alert("Effettua il login per accedere alla dashboard.");
-    window.location.href = "index.html";
+    $('#authAlert').html('<div class="alert alert-warning">Effettua il login per accedere alla dashboard.</div>');
+    setTimeout(() => { window.location.href = "index.html"; }, 2000);
     return;
   }
 
