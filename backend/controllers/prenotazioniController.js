@@ -125,3 +125,26 @@ exports.modificaPrenotazione = async (req, res) => {
     res.status(500).json({ message: 'Errore del server' });
   }
 };
+
+// ✅ Recupera prenotazioni dell'utente non ancora pagate
+exports.prenotazioniNonPagate = async (req, res) => {
+  const utente_id = req.utente.id;
+
+  try {
+    const result = await pool.query(
+      `SELECT p.*, s.nome AS nome_spazio, sede.nome AS nome_sede, pag.id AS pagamento_id
+       FROM prenotazioni p
+       JOIN spazi s ON p.spazio_id = s.id
+       JOIN sedi sede ON s.sede_id = sede.id
+       LEFT JOIN pagamenti pag ON pag.prenotazione_id = p.id
+       WHERE p.utente_id = $1 AND (pag.id IS NULL OR pag.id = 0)
+       ORDER BY data, orario_inizio`,
+      [utente_id]
+    );
+
+    res.json({ prenotazioni: result.rows });
+  } catch (err) {
+    console.error('Errore recupero prenotazioni non pagate:', err);
+    res.status(500).json({ message: 'Errore del server' });
+  }
+};
