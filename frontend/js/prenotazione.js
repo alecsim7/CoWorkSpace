@@ -56,12 +56,47 @@ $(document).ready(function () {
         },
         body: JSON.stringify({ data, orario_inizio, orario_fine })
       });
-      if (!res.ok) throw new Error();
-      const response = await res.json();
-      const spazi = response.risultati || [];
+      // DEBUG: Mostra la risposta grezza e i parametri
+      const responseText = await res.text();
+      console.log('Risposta grezza disponibilità:', responseText);
+      console.log('Parametri ricerca:', { data, orario_inizio, orario_fine });
 
+      let response;
+      try {
+        response = JSON.parse(responseText);
+      } catch (e) {
+        $('#prenotazioneAlert').html('<div class="alert alert-danger">Risposta non valida dal server.</div>');
+        hideSpinner();
+        return;
+      }
+
+      // AGGIUNGI DEBUG: Mostra eventuali errori dal backend
+      if (response.error) {
+        $('#prenotazioneAlert').html(`<div class="alert alert-danger">Errore backend: ${response.error}</div>`);
+        hideSpinner();
+        return;
+      }
+
+      const spazi = response.risultati || [];
+      console.log('Spazi disponibili:', spazi);
+
+      // AGGIUNGI DEBUG: Mostra la risposta backend completa
       if (spazi.length === 0) {
-        $('#prenotazioneAlert').html('<div class="alert alert-warning">Nessuno spazio disponibile per l\'orario selezionato.</div>');
+        $('#prenotazioneAlert').html(
+          `<div class="alert alert-warning">
+            Nessuno spazio disponibile per l'orario selezionato.<br>
+            <strong>Parametri:</strong> ${JSON.stringify({ data, orario_inizio, orario_fine })}<br>
+            <strong>Risposta backend:</strong> <pre>${JSON.stringify(response, null, 2)}</pre>
+            <strong>Nota:</strong> La risposta dal backend è vuota.<br>
+            <strong>Azioni:</strong> 
+            <ul>
+              <li>Verifica che nel backend la rotta <code>/api/disponibilita</code> restituisca risultati per questi parametri.</li>
+              <li>Controlla che ci siano spazi inseriti nel database e che non siano già prenotati per la fascia oraria/data scelta.</li>
+              <li>Prova a cambiare data/orario oppure verifica la logica di disponibilità nel backend.</li>
+              <li>Se usi filtri lato backend, assicurati che non siano troppo restrittivi.</li>
+            </ul>
+          </div>`
+        );
         hideSpinner();
         return;
       }
@@ -108,7 +143,9 @@ $(document).ready(function () {
       });
 
     } catch (err) {
-      $('#prenotazioneAlert').html('<div class="alert alert-danger">Errore durante la ricerca.</div>');
+      // Mostra dettagli dell'errore in console per debug
+      console.error('Errore ricerca disponibilità:', err);
+      $('#prenotazioneAlert').html(`<div class="alert alert-danger">Errore durante la ricerca.<br>${err.message || JSON.stringify(err)}</div>`);
       hideSpinner();
     }
   });
