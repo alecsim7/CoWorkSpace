@@ -15,4 +15,7 @@ router.get('/prenotazioni/non-pagate', verificaToken, prenotazioniController.pre
 // ✅ Modifica una prenotazione esistente
 router.put('/prenotazioni/:id', verificaToken, prenotazioniController.modificaPrenotazione);
 
+// ✅ Elimina una prenotazione esistente
+router.delete('/prenotazioni/:id', verificaToken, prenotazioniController.eliminaPrenotazione);
+
 module.exports = router;

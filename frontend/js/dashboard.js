@@ -51,6 +51,7 @@ $(document).ready(function () {
               <div class="mt-2 mt-md-0 d-flex flex-column flex-md-row align-items-md-center">
                 ⏰ <strong>Orario:</strong> ${oraInizio} - ${oraFine}
                 <button class="btn btn-sm btn-warning ms-md-3 mt-2 mt-md-0 btnModifica" data-id="${p.id}" data-data="${p.data}" data-inizio="${p.orario_inizio}" data-fine="${p.orario_fine}">Modifica</button>
+                <button class="btn btn-sm btn-danger ms-md-2 mt-2 mt-md-0 btnElimina" data-id="${p.id}">Elimina</button>
               </div>
             </li>
           `);
@@ -81,6 +82,24 @@ $(document).ready(function () {
             },
             error: function (xhr) {
               $('#dashboardAlert').html(`<div class="alert alert-danger">${xhr.responseJSON?.message || 'Errore durante l\'aggiornamento'}</div>`);
+            }
+          });
+        });
+
+        $('.btnElimina').click(function () {
+          const id = $(this).data('id');
+          if (!confirm('Sei sicuro di voler annullare questa prenotazione?')) return;
+
+          $.ajax({
+            url: `http://localhost:3000/api/prenotazioni/${id}`,
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+            success: function () {
+              $('#dashboardAlert').html('<div class="alert alert-success">Prenotazione eliminata</div>');
+              caricaPrenotazioni();
+            },
+            error: function (xhr) {
+              $('#dashboardAlert').html(`<div class="alert alert-danger">${xhr.responseJSON?.message || 'Errore durante l\'eliminazione'}</div>`);
             }
           });
         });

@@ -69,11 +69,12 @@ Filtri disponibili su `/api/sedi`:
 |--------|------------------------|--------------------------------------------------|
 | POST   | `/api/prenotazioni`    | Crea una nuova prenotazione (calcola e restituisce l'importo) |
 | GET    | `/api/prenotazioni`    | Elenca tutte le prenotazioni dell’utente loggato|
-| DELETE | `/api/prenotazioni/:id`| Annulla una prenotazione                         |
+| DELETE | `/api/prenotazioni/:id`| Annulla una prenotazione dell’utente loggato     |
 
 **Body POST /api/prenotazioni:** `spazio_id`, `data`, `orario_inizio`, `orario_fine`
 
 > **Nota di sicurezza:** l'ID dell'utente viene dedotto dal token di autenticazione e non va inviato nel body. Qualsiasi `utente_id` manipolato o incluso nella richiesta viene ignorato e la prenotazione sarà sempre associata all'utente autenticato.
+> Solo il proprietario può modificare o eliminare la propria prenotazione.
 
 ---
 
