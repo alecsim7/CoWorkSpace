@@ -1,3 +1,5 @@
+const API_BASE = window.API_BASE || '/api';
+
 $(document).ready(function () {
   const token = localStorage.getItem('token');
 
@@ -46,7 +48,7 @@ $(document).ready(function () {
     showSpinner();
 
     try {
-      const res = await fetch('http://localhost:3000/api/disponibilita', {
+      const res = await fetch(`${API_BASE}/disponibilita`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -123,7 +125,7 @@ $(document).ready(function () {
     modal.hide();
     showSpinner();
     try {
-      const res = await fetch('http://localhost:3000/api/prenotazioni', {
+      const res = await fetch(`${API_BASE}/prenotazioni`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
