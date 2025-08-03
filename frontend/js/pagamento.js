@@ -29,9 +29,13 @@ $(document).ready(function () {
 
       prenotazioni.forEach(p => {
         const importo = parseFloat(p.importo);
-        const testo = `#${p.id} - ${p.nome_spazio} ${p.data} ${p.ora_inizio}-${p.ora_fine} (€${importo.toFixed(2)})`;
+        const testoImporto = isNaN(importo)
+          ? 'Importo non disponibile'
+          : `€${importo.toFixed(2)}`;
+        const testo = `#${p.id} - ${p.nome_spazio} ${p.data} ${p.ora_inizio}-${p.ora_fine} (${testoImporto})`;
+        const dataImporto = isNaN(importo) ? '' : importo;
         $('#prenotazione').append(
-          `<option value="${p.id}" data-importo="${importo}">${testo}</option>`
+          `<option value="${p.id}" data-importo="${dataImporto}">${testo}</option>`
         );
       });
 
