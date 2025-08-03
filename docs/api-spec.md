@@ -30,8 +30,13 @@ Le rotte che richiedono autenticazione devono includere un token/sessione nel cl
 
 | Metodo | Endpoint           | Descrizione                                                     |
 |--------|--------------------|-----------------------------------------------------------------|
-| GET    | `/api/sedi`        | Visualizza tutte le sedi disponibili (con filtri opzionali)     |
+| GET    | `/api/sedi`        | Visualizza tutte le sedi disponibili (filtri: `citta`, `tipo`, `servizio`) |
 | GET    | `/api/sedi/:id`    | Visualizza i dettagli di una singola sede                       |
+
+Filtri disponibili su `/api/sedi`:
+- `citta`: filtra per città della sede
+- `tipo`: tipologia di spazio (es. scrivania, ufficio, sala)
+- `servizio`: testo da ricercare tra i servizi dello spazio
 
 ---
 
