@@ -22,7 +22,7 @@ CREATE TABLE spazi (
   sede_id INTEGER NOT NULL REFERENCES sedi(id) ON DELETE CASCADE,
   tipo_spazio VARCHAR(20) CHECK (tipo_spazio IN ('scrivania', 'ufficio', 'sala')) NOT NULL,
   servizi TEXT,
-  prezzo_ora NUMERIC(6,2) NOT NULL
+  prezzo_orario NUMERIC(6,2) NOT NULL
 );
 
 -- Disponibilita
@@ -41,8 +41,7 @@ CREATE TABLE prenotazioni (
   spazio_id INTEGER NOT NULL REFERENCES spazi(id) ON DELETE CASCADE,
   data DATE NOT NULL,
   orario_inizio TIME NOT NULL,
-  orario_fine TIME NOT NULL,
-  importo NUMERIC(7,2) NOT NULL
+  orario_fine TIME NOT NULL
 );
 
 -- Pagamenti

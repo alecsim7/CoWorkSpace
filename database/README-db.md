@@ -59,7 +59,7 @@ Definisce un'unità prenotabile all'interno di una sede (es. sala, scrivania, uf
 | `sede_id`     | INTEGER      | FK → `Sede(id)`                          |
 | `tipo_spazio` | VARCHAR(20)  | Tipo: `scrivania`, `ufficio`, `sala`     |
 | `servizi`     | TEXT         | Servizi inclusi (es. WiFi, stampante)    |
-| `prezzo_ora`  | NUMERIC(6,2) | Prezzo orario dello spazio               |
+| `prezzo_orario`  | NUMERIC(6,2) | Prezzo orario dello spazio               |
 
 ---
 
@@ -89,7 +89,6 @@ Rappresenta una prenotazione effettuata da un utente su uno spazio.
 | `data`        | DATE   | Data della prenotazione              |
 | `orario_inizio`  | TIME   | Ora di inizio                        |
 | `orario_fine`    | TIME   | Ora di fine                          |
-| `importo`     | NUMERIC(7,2) | Importo calcolato al momento della prenotazione |
 
 ---
 
