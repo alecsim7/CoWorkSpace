@@ -22,7 +22,7 @@ exports.creaPrenotazione = async (req, res) => {
 
     // 2. Calcola importo da pagare
     const prezzoRes = await pool.query(
-      'SELECT prezzo_ora FROM spazi WHERE id = $1',
+      'SELECT prezzo_orario FROM spazi WHERE id = $1',
       [spazio_id]
     );
 
@@ -34,7 +34,7 @@ exports.creaPrenotazione = async (req, res) => {
     const start = new Date(`1970-01-01T${orario_inizio}`);
     const end = new Date(`1970-01-01T${orario_fine}`);
     const ore = (end - start) / (1000 * 60 * 60);
-    const importo = Number(prezzoRes.rows[0].prezzo_ora) * ore;
+    const importo = Number(prezzoRes.rows[0].prezzo_orario) * ore;
 
     // 3. Inserisci prenotazione
     const result = await pool.query(
@@ -45,8 +45,8 @@ exports.creaPrenotazione = async (req, res) => {
 
     // 4. Registra pagamento
     await pool.query(
-      `INSERT INTO pagamenti (prenotazione_id, importo, esito, timestamp)
-       VALUES ($1, $2, 'OK', NOW())`,
+      `INSERT INTO pagamenti (prenotazione_id, importo)
+       VALUES ($1, $2)`,
       [result.rows[0].id, importo]
     );
 
