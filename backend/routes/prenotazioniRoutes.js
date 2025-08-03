@@ -9,6 +9,9 @@ router.post('/prenotazioni', verificaToken, prenotazioniController.creaPrenotazi
 // ✅ Visualizza prenotazioni dell'utente autenticato
 router.get('/prenotazioni', verificaToken, prenotazioniController.visualizzaPrenotazioni);
 
+// ✅ Prenotazioni dell'utente non ancora pagate
+router.get('/prenotazioni/non-pagate', verificaToken, prenotazioniController.prenotazioniNonPagate);
+
 // ✅ Modifica una prenotazione esistente
 router.put('/prenotazioni/:id', verificaToken, prenotazioniController.modificaPrenotazione);
 

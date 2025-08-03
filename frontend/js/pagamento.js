@@ -10,15 +10,15 @@ $(document).ready(function () {
 
   // Carica prenotazioni non ancora pagate
   $.ajax({
-    url: 'http://localhost:3000/api/prenotazioni',
+    url: 'http://localhost:3000/api/prenotazioni/non-pagate',
     method: 'GET',
     headers: { Authorization: `Bearer ${token}` },
     success: function (res) {
-      // Mostra solo le prenotazioni non ancora pagate. In alcuni casi
-      // pagamento_id può essere undefined oppure 0: controlliamo
-      // esplicitamente valori nulli/undefined.
+      // Il backend ritorna solo prenotazioni senza pagamento ma, per
+      // maggiore robustezza, filtriamo eventuali casi anomali in cui
+      // pagamento_id sia undefined oppure 0.
       const prenotazioni = (res.prenotazioni || []).filter(
-        p => p.pagamento_id == null
+        p => !p.pagamento_id
       );
 
       if (prenotazioni.length === 0) {
