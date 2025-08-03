@@ -31,9 +31,19 @@
 
     <form id="formPagamento" class="mb-3">
       <div class="mb-3">
-        <label for="importo" class="form-label">Importo (€)</label>
-        <input type="number" step="0.01" min="0" id="importo" class="form-control" required />
+        <label for="prenotazione" class="form-label">Prenotazione</label>
+        <select id="prenotazione" class="form-select" required></select>
       </div>
+      <div class="mb-3">
+        <label for="metodo" class="form-label">Metodo di pagamento</label>
+        <select id="metodo" class="form-select" required>
+          <option value="paypal">PayPal</option>
+          <option value="satispay">SatisPay</option>
+          <option value="carta">Carta di Credito</option>
+          <option value="bancomat">Bancomat</option>
+        </select>
+      </div>
+      <p id="importoDaPagare" class="fw-bold"></p>
       <button type="submit" class="btn btn-primary">Effettua Pagamento</button>
     </form>
 
