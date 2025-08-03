@@ -59,6 +59,8 @@ Filtri disponibili su `/api/sedi`:
 
 **Body POST /api/prenotazioni:** `spazio_id`, `data`, `orario_inizio`, `orario_fine`
 
+> **Nota di sicurezza:** l'ID dell'utente viene dedotto dal token di autenticazione e non va inviato nel body. Qualsiasi `utente_id` manipolato o incluso nella richiesta viene ignorato e la prenotazione sarà sempre associata all'utente autenticato.
+
 ---
 
 ## 💳 Pagamenti
