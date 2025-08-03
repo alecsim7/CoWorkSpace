@@ -14,7 +14,12 @@ $(document).ready(function () {
     method: 'GET',
     headers: { Authorization: `Bearer ${token}` },
     success: function (res) {
-      const prenotazioni = (res.prenotazioni || []).filter(p => !p.pagamento_id);
+      // Mostra solo le prenotazioni non ancora pagate. In alcuni casi
+      // pagamento_id può essere undefined oppure 0: controlliamo
+      // esplicitamente valori nulli/undefined.
+      const prenotazioni = (res.prenotazioni || []).filter(
+        p => p.pagamento_id == null
+      );
 
       if (prenotazioni.length === 0) {
         $('#alertPagamento').html('<div class="alert alert-info">Nessuna prenotazione da pagare.</div>');
@@ -23,14 +28,25 @@ $(document).ready(function () {
       }
 
       prenotazioni.forEach(p => {
-        const testo = `#${p.id} - ${p.nome_spazio} ${p.data} ${p.ora_inizio}-${p.ora_fine} (€${parseFloat(p.importo).toFixed(2)})`;
-        $('#prenotazione').append(`<option value="${p.id}" data-importo="${p.importo}">${testo}</option>`);
+        const importo = parseFloat(p.importo);
+        const testo = `#${p.id} - ${p.nome_spazio} ${p.data} ${p.ora_inizio}-${p.ora_fine} (€${importo.toFixed(2)})`;
+        $('#prenotazione').append(
+          `<option value="${p.id}" data-importo="${importo}">${testo}</option>`
+        );
       });
 
-      $('#prenotazione').change(function () {
-        const imp = $('#prenotazione option:selected').data('importo');
-        $('#importoDaPagare').text(`Importo: €${parseFloat(imp).toFixed(2)}`);
-      }).trigger('change');
+      $('#prenotazione')
+        .change(function () {
+          const imp = parseFloat(
+            $('#prenotazione option:selected').data('importo')
+          );
+          if (!isNaN(imp)) {
+            $('#importoDaPagare').text(`Importo: €${imp.toFixed(2)}`);
+          } else {
+            $('#importoDaPagare').text('Importo non disponibile');
+          }
+        })
+        .trigger('change');
     },
     error: function () {
       $('#alertPagamento').html('<div class="alert alert-danger">Errore nel recupero delle prenotazioni.</div>');
