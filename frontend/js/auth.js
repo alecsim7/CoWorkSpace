@@ -96,12 +96,12 @@ $(function () {
     const utente = JSON.parse(localStorage.getItem('utente'));
     if (utente && utente.nome) {
       $('#authButtons').hide();
-      $('#mainNavbar').addClass('show');
+      $('#mainNavbar').show();
       $('#nomeUtente').text(utente.nome);
       $('#ruoloUtente').text(utente.ruolo ? `(${utente.ruolo})` : '');
     } else {
       $('#authButtons').show();
-      $('#mainNavbar').removeClass('show');
+      $('#mainNavbar').hide();
       $('#nomeUtente').text('');
       $('#ruoloUtente').text('');
     }
