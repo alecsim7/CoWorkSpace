@@ -1,14 +1,24 @@
+const fs = require('fs');
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
 const { Pool } = require('pg');
 
-const requiredEnvVars = ['DB_USER', 'DB_PASSWORD', 'DB_HOST', 'DB_PORT', 'DB_NAME'];
+// Load environment variables from backend/.env if present
+const envPath = path.join(__dirname, '.env');
+if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
+} else {
+  console.warn(`⚠️  Missing ${envPath}. Using process environment variables.`);
+}
 
-requiredEnvVars.forEach((envVar) => {
-  if (!process.env[envVar]) {
-    throw new Error(`${envVar} is missing`);
-  }
-});
+// Ensure the required variables are available
+const requiredEnvVars = ['DB_USER', 'DB_PASSWORD', 'DB_HOST', 'DB_PORT', 'DB_NAME'];
+const missing = requiredEnvVars.filter((envVar) => !process.env[envVar]);
+if (missing.length > 0) {
+  throw new Error(
+    `Missing environment variables: ${missing.join(', ')}. ` +
+    'Create backend/.env (see backend/.env.example) and set them.'
+  );
+}
 
 const pool = new Pool({
   user: process.env.DB_USER,
