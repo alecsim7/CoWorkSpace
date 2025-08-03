@@ -41,7 +41,8 @@ CREATE TABLE Prenotazione (
   spazio_id INTEGER NOT NULL REFERENCES Spazio(id) ON DELETE CASCADE,
   data DATE NOT NULL,
   ora_inizio TIME NOT NULL,
-  ora_fine TIME NOT NULL
+  ora_fine TIME NOT NULL,
+  importo NUMERIC(7,2) NOT NULL
 );
 
 -- Pagamento

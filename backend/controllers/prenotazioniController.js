@@ -1,6 +1,6 @@
 const pool = require('../db');
 
-// ✅ Crea una prenotazione con pagamento immediato
+// ✅ Crea una prenotazione e calcola l'importo da pagare
 exports.creaPrenotazione = async (req, res) => {
   const { utente_id, spazio_id, data, orario_inizio, orario_fine, metodo_pagamento } = req.body;
 
@@ -41,26 +41,22 @@ exports.creaPrenotazione = async (req, res) => {
     const ore = (end - start) / (1000 * 60 * 60);
     const importo = Number(prezzoRes.rows[0].prezzo_orario) * ore;
 
-    // 3. Inserisci prenotazione
+    // 3. Inserisci prenotazione con l'importo calcolato
     const result = await pool.query(
-      `INSERT INTO prenotazioni (utente_id, spazio_id, data, orario_inizio, orario_fine)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [utente_id, spazio_id, data, orario_inizio, orario_fine]
-    );
 
-    // 4. Registra pagamento con data/ora corrente
-    await pool.query(
-      `INSERT INTO pagamenti (prenotazione_id, importo, metodo, timestamp)
-       VALUES ($1, $2, $3, NOW())`,
-      [result.rows[0].id, importo, metodo_pagamento]
+      `INSERT INTO prenotazioni (utente_id, spazio_id, data, orario_inizio, orario_fine, importo)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [utente_id, spazio_id, data, orario_inizio, orario_fine, importo]
+
     );
 
     await pool.query('COMMIT');
 
     res.status(201).json({
-      message: 'Prenotazione e pagamento effettuati',
-      prenotazione: result.rows[0],
-      pagamento: { importo, metodo: metodo_pagamento }
+
+      message: 'Prenotazione registrata',
+      prenotazione: result.rows[0]
+
     });
 
   } catch (err) {
@@ -76,10 +72,11 @@ exports.visualizzaPrenotazioni = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT p.*, s.nome AS nome_spazio, sede.nome AS nome_sede
+      `SELECT p.*, s.nome AS nome_spazio, sede.nome AS nome_sede, pag.id AS pagamento_id
        FROM prenotazioni p
        JOIN spazi s ON p.spazio_id = s.id
        JOIN sedi sede ON s.sede_id = sede.id
+       LEFT JOIN pagamenti pag ON pag.prenotazione_id = p.id
        WHERE p.utente_id = $1
        ORDER BY data, orario_inizio`,
       [utente_id]

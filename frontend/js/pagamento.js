@@ -8,33 +8,59 @@ $(document).ready(function () {
     return;
   }
 
+  // Carica prenotazioni non ancora pagate
+  $.ajax({
+    url: 'http://localhost:3000/api/prenotazioni',
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+    success: function (res) {
+      const prenotazioni = (res.prenotazioni || []).filter(p => !p.pagamento_id);
+
+      if (prenotazioni.length === 0) {
+        $('#alertPagamento').html('<div class="alert alert-info">Nessuna prenotazione da pagare.</div>');
+        $('#formPagamento').hide();
+        return;
+      }
+
+      prenotazioni.forEach(p => {
+        const testo = `#${p.id} - ${p.nome_spazio} ${p.data} ${p.ora_inizio}-${p.ora_fine} (€${parseFloat(p.importo).toFixed(2)})`;
+        $('#prenotazione').append(`<option value="${p.id}" data-importo="${p.importo}">${testo}</option>`);
+      });
+
+      $('#prenotazione').change(function () {
+        const imp = $('#prenotazione option:selected').data('importo');
+        $('#importoDaPagare').text(`Importo: €${parseFloat(imp).toFixed(2)}`);
+      }).trigger('change');
+    },
+    error: function () {
+      $('#alertPagamento').html('<div class="alert alert-danger">Errore nel recupero delle prenotazioni.</div>');
+    }
+  });
+
   // Gestione submit form pagamento
   $('#formPagamento').submit(function (e) {
     e.preventDefault();
 
-    const importo = parseFloat($('#importo').val());
+    const prenotazione_id = parseInt($('#prenotazione').val());
     const metodo = $('#metodo').val();
 
-    if (isNaN(importo) || importo <= 0 || !metodo) {
-      $('#alertPagamento').html('<div class="alert alert-warning">Inserisci tutti i dati richiesti.</div>');
-      return;
-    }
 
     $.ajax({
       url: 'http://localhost:3000/api/pagamento',
       method: 'POST',
       contentType: 'application/json',
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      data: JSON.stringify({
-        utente_id: utente.id,
-        importo: importo,
-        metodo: metodo
-      }),
+
+      headers: { Authorization: `Bearer ${token}` },
+      data: JSON.stringify({ prenotazione_id, metodo }),
+
       success: function (res) {
         $('#alertPagamento').html(`<div class="alert alert-success">✅ ${res.message}</div>`);
+        $('#prenotazione option:selected').remove();
         $('#formPagamento')[0].reset();
+        $('#importoDaPagare').empty();
+        if ($('#prenotazione option').length === 0) {
+          $('#formPagamento').hide();
+        }
       },
       error: function (xhr) {
         $('#alertPagamento').html(`<div class="alert alert-danger">❌ ${xhr.responseJSON?.message || 'Errore nel pagamento'}</div>`);

@@ -89,6 +89,7 @@ Rappresenta una prenotazione effettuata da un utente su uno spazio.
 | `data`        | DATE   | Data della prenotazione              |
 | `ora_inizio`  | TIME   | Ora di inizio                        |
 | `ora_fine`    | TIME   | Ora di fine                          |
+| `importo`     | NUMERIC(7,2) | Importo calcolato al momento della prenotazione |
 
 ---
 

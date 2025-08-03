@@ -112,7 +112,8 @@ $(document).ready(function () {
               metodo_pagamento: metodo_pagamento.toLowerCase()
             }),
             success: function () {
-              $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> confermata e pagamento di €${importo} effettuato con ${metodo_pagamento}!</div>`);
+              $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> registrata. Importo da pagare: €${importo}.</div>`);
+
               $('#formRicerca')[0].reset();
               $('#risultatiSpazi').empty();
             },
