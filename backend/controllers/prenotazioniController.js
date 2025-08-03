@@ -2,7 +2,12 @@ const pool = require('../db');
 
 // ✅ Crea una prenotazione e calcola l'importo da pagare
 exports.creaPrenotazione = async (req, res) => {
-  const { utente_id, spazio_id, data, orario_inizio, orario_fine } = req.body;
+  const { utente_id, spazio_id, data, orario_inizio, orario_fine, metodo_pagamento } = req.body;
+
+  const metodiValidi = ['paypal', 'satispay', 'carta', 'bancomat'];
+  if (!metodiValidi.includes(metodo_pagamento)) {
+    return res.status(400).json({ message: 'Metodo di pagamento non valido' });
+  }
 
   try {
     await pool.query('BEGIN');
@@ -38,16 +43,20 @@ exports.creaPrenotazione = async (req, res) => {
 
     // 3. Inserisci prenotazione con l'importo calcolato
     const result = await pool.query(
+
       `INSERT INTO prenotazioni (utente_id, spazio_id, data, orario_inizio, orario_fine, importo)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [utente_id, spazio_id, data, orario_inizio, orario_fine, importo]
+
     );
 
     await pool.query('COMMIT');
 
     res.status(201).json({
+
       message: 'Prenotazione registrata',
       prenotazione: result.rows[0]
+
     });
 
   } catch (err) {

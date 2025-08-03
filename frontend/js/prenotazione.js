@@ -91,6 +91,13 @@ $(document).ready(function () {
             return;
           }
 
+          const metodo_pagamento = prompt('Metodo di pagamento (paypal/satispay/carta/bancomat)?', 'paypal');
+          const metodiValidi = ['paypal', 'satispay', 'carta', 'bancomat'];
+          if (!metodo_pagamento || !metodiValidi.includes(metodo_pagamento.toLowerCase())) {
+            alert('Metodo di pagamento non valido');
+            return;
+          }
+
           $.ajax({
             url: 'http://localhost:3000/api/prenotazioni',
             method: 'POST',
@@ -101,10 +108,12 @@ $(document).ready(function () {
               spazio_id,
               data,
               orario_inizio,
-              orario_fine
+              orario_fine,
+              metodo_pagamento: metodo_pagamento.toLowerCase()
             }),
             success: function () {
               $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> registrata. Importo da pagare: €${importo}.</div>`);
+
               $('#formRicerca')[0].reset();
               $('#risultatiSpazi').empty();
             },

@@ -5,6 +5,7 @@ exports.effettuaPagamento = async (req, res) => {
   const { prenotazione_id, metodo } = req.body;
   const utente_id = req.utente.id;
 
+
   const metodiValidi = ['paypal', 'satispay', 'carta', 'bancomat'];
   if (!metodiValidi.includes(metodo)) {
     return res.status(400).json({ message: 'Metodo di pagamento non valido' });
@@ -48,6 +49,7 @@ exports.effettuaPagamento = async (req, res) => {
     res.status(201).json({
       message: 'Pagamento registrato',
       pagamento: { prenotazione_id, importo, metodo }
+
     });
   } catch (err) {
     await pool.query('ROLLBACK');

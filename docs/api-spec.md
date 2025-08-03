@@ -65,6 +65,7 @@ Filtri disponibili su `/api/sedi`:
 |--------|---------------------|----------------------------------------|
 | POST   | `/api/pagamento`    | Esegue il pagamento di una prenotazione (`prenotazione_id`, `metodo`) |
 
+
 ---
 
 ## 📊 Dashboard Gestore

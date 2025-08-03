@@ -44,12 +44,15 @@ $(document).ready(function () {
     const prenotazione_id = parseInt($('#prenotazione').val());
     const metodo = $('#metodo').val();
 
+
     $.ajax({
       url: 'http://localhost:3000/api/pagamento',
       method: 'POST',
       contentType: 'application/json',
+
       headers: { Authorization: `Bearer ${token}` },
       data: JSON.stringify({ prenotazione_id, metodo }),
+
       success: function (res) {
         $('#alertPagamento').html(`<div class="alert alert-success">✅ ${res.message}</div>`);
         $('#prenotazione option:selected').remove();
