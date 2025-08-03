@@ -24,6 +24,20 @@ Le rotte che richiedono autenticazione devono includere un token/sessione nel cl
 | GET    | `/api/utente/me`  | Recupera i dati del profilo dell’utente loggato |
 | PUT    | `/api/utente/me`  | Aggiorna i dati del proprio profilo utente   |
 
+**Body PUT /api/utente/me:**
+
+- `nome` e/o `password` (almeno uno dei due campi)
+- richiede token di autenticazione nel header `Authorization`
+
+**Risposte:**
+
+- `200 OK` profilo aggiornato
+- `400 Bad Request` body mancante o non valido
+- `401 Unauthorized` token assente o non valido
+- `500 Internal Server Error`
+
+> La precedente rotta `GET /profilo/:id` è **deprecata**.
+
 ---
 
 ## 🏢 Sedi
