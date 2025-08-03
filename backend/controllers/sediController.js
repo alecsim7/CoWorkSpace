@@ -1,16 +1,35 @@
 const pool = require('../db');
 
-// Recupera sedi con filtro opzionale per città
+// Recupera sedi con filtri opzionali per città, tipo spazio e servizi
 exports.getSedi = async (req, res) => {
   try {
-    const { citta } = req.query;
+    const { citta, tipo, servizio } = req.query;
 
-    let query = 'SELECT * FROM sedi';
-    let params = [];
+    let query = 'SELECT DISTINCT s.* FROM sedi s';
+    const where = [];
+    const params = [];
+
+    if (tipo || servizio) {
+      query += ' JOIN spazi sp ON s.id = sp.sede_id';
+    }
 
     if (citta) {
-      query += ' WHERE citta = $1';
       params.push(citta);
+      where.push(`s.citta = $${params.length}`);
+    }
+
+    if (tipo) {
+      params.push(tipo);
+      where.push(`sp.tipo_spazio = $${params.length}`);
+    }
+
+    if (servizio) {
+      params.push(`%${servizio}%`);
+      where.push(`sp.servizi ILIKE $${params.length}`);
+    }
+
+    if (where.length > 0) {
+      query += ' WHERE ' + where.join(' AND ');
     }
 
     const result = await pool.query(query, params);
@@ -49,5 +68,28 @@ exports.aggiungiSede = async (req, res) => {
   } catch (err) {
     console.error('Errore inserimento sede:', err);
     res.status(500).json({ message: 'Errore server durante inserimento sede' });
+  }
+};
+
+// Recupera dettagli di una singola sede con i relativi spazi
+exports.getSedeById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const sedeResult = await pool.query('SELECT * FROM sedi WHERE id = $1', [id]);
+
+    if (sedeResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Sede non trovata' });
+    }
+
+    const spaziResult = await pool.query('SELECT * FROM spazi WHERE sede_id = $1', [id]);
+
+    const sede = sedeResult.rows[0];
+    sede.spazi = spaziResult.rows;
+
+    res.json(sede);
+  } catch (err) {
+    console.error('Errore recupero sede:', err);
+    res.status(500).json({ message: 'Errore del server' });
   }
 };
