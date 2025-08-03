@@ -21,19 +21,28 @@ exports.ricercaDisponibilita = async (req, res) => {
   const { data, orario_inizio, orario_fine } = req.body;
 
   try {
-    const result = await pool.query(`
-      SELECT s.id AS spazio_id, s.nome AS nome_spazio, s.descrizione, s.prezzo_orario, sede.nome AS nome_sede
-      FROM spazi s
-      JOIN sedi sede ON s.sede_id = sede.id
-      WHERE s.id NOT IN (
-        SELECT spazio_id FROM prenotazioni
-        WHERE data = $1
-        AND NOT (
-          orario_fine <= $2 OR
-          orario_inizio >= $3
-        )
-      )
-    `, [data, orario_inizio, orario_fine]);
+    const result = await pool.query(
+      `SELECT DISTINCT s.id AS spazio_id,
+              s.nome AS nome_spazio,
+              s.descrizione,
+              s.prezzo_orario,
+              sede.nome AS nome_sede
+       FROM spazi s
+       JOIN sedi sede ON s.sede_id = sede.id
+       JOIN disponibilita d ON s.id = d.spazio_id
+       WHERE d.data = $1
+         AND d.orario_inizio <= $2
+         AND d.orario_fine >= $3
+         AND s.id NOT IN (
+           SELECT spazio_id FROM prenotazioni
+           WHERE data = $1
+           AND NOT (
+             orario_fine <= $2 OR
+             orario_inizio >= $3
+           )
+         )`,
+      [data, orario_inizio, orario_fine]
+    );
 
     res.json({ risultati: result.rows });
   } catch (err) {

@@ -34,6 +34,10 @@ CREATE TABLE disponibilita (
   orario_fine TIME NOT NULL
 );
 
+-- Indexes to improve availability searches
+CREATE INDEX IF NOT EXISTS idx_disponibilita_spazio_data ON disponibilita (spazio_id, data);
+CREATE INDEX IF NOT EXISTS idx_disponibilita_data_orari ON disponibilita (data, orario_inizio, orario_fine);
+
 -- Prenotazioni
 CREATE TABLE prenotazioni (
   id SERIAL PRIMARY KEY,
