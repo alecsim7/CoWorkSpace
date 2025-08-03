@@ -48,5 +48,6 @@ CREATE TABLE Prenotazione (
 CREATE TABLE Pagamento (
   id SERIAL PRIMARY KEY,
   prenotazione_id INTEGER NOT NULL REFERENCES Prenotazione(id) ON DELETE CASCADE,
-  importo NUMERIC(7,2) NOT NULL
+  importo NUMERIC(7,2) NOT NULL,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
