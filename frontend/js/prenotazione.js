@@ -8,55 +8,11 @@ $(document).ready(function () {
     return;
   }
 
-  function formatDate(dateStr) {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('it-IT', { year: 'numeric', month: '2-digit', day: '2-digit' });
-  }
-
-  function formatTime(timeStr) {
-    if (!timeStr) return '';
-    const [h, m] = timeStr.split(':');
-    return `${h.padStart(2,'0')}:${m.padStart(2,'0')}`;
-  }
-
   // Logout button
   $('#logoutBtn').click(function () {
     localStorage.removeItem('token');
     localStorage.removeItem('utente');
     window.location.href = "index.html";
-  });
-
-  // Carica prenotazioni utente (puoi spostare questo in dashboard se vuoi)
-  $.ajax({
-    url: 'http://localhost:3000/api/prenotazioni',
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
-    success: function (data) {
-      const prenotazioni = data.prenotazioni || [];
-      if (prenotazioni.length === 0) {
-        $('#listaPrenotazioni').append('<li class="list-group-item">Nessuna prenotazione trovata.</li>');
-      } else {
-        prenotazioni.forEach(p => {
-          const dataFormattata = formatDate(p.data);
-          const oraInizio = formatTime(p.orario_inizio);
-          const oraFine = formatTime(p.orario_fine);
-          $('#listaPrenotazioni').append(`
-            <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start">
-              <div>
-                📍 <strong>Spazio:</strong> ${p.nome_spazio} <br>
-                🗓️ <strong>Data:</strong> ${dataFormattata}
-              </div>
-              <div class="mt-2 mt-md-0">
-                ⏰ <strong>Orario:</strong> ${oraInizio} - ${oraFine}
-              </div>
-            </li>
-          `);
-        });
-      }
-    },
-    error: function () {
-      $('#listaPrenotazioni').append(`<li class="list-group-item text-danger">Errore nel caricamento.</li>`);
-    }
   });
 
   // Cerca disponibilità spazi
