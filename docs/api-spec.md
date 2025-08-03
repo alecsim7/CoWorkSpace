@@ -53,7 +53,7 @@ Filtri disponibili su `/api/sedi`:
 
 | Metodo | Endpoint               | Descrizione                                      |
 |--------|------------------------|--------------------------------------------------|
-| POST   | `/api/prenotazioni`    | Crea una nuova prenotazione                      |
+| POST   | `/api/prenotazioni`    | Crea una nuova prenotazione con pagamento (richiede `metodo`) |
 | GET    | `/api/prenotazioni`    | Elenca tutte le prenotazioni dell’utente loggato|
 | DELETE | `/api/prenotazioni/:id`| Annulla una prenotazione                         |
 
@@ -63,7 +63,7 @@ Filtri disponibili su `/api/sedi`:
 
 | Metodo | Endpoint            | Descrizione                            |
 |--------|---------------------|----------------------------------------|
-| POST   | `/api/pagamenti`    | Simula il pagamento di una prenotazione|
+| POST   | `/api/pagamento`    | Simula il pagamento (`utente_id`, `importo`, `metodo`)|
 
 ---
 

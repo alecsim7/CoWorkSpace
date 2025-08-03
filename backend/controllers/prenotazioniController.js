@@ -2,7 +2,12 @@ const pool = require('../db');
 
 // ✅ Crea una prenotazione con pagamento immediato
 exports.creaPrenotazione = async (req, res) => {
-  const { utente_id, spazio_id, data, orario_inizio, orario_fine } = req.body;
+  const { utente_id, spazio_id, data, orario_inizio, orario_fine, metodo_pagamento } = req.body;
+
+  const metodiValidi = ['paypal', 'satispay', 'carta', 'bancomat'];
+  if (!metodiValidi.includes(metodo_pagamento)) {
+    return res.status(400).json({ message: 'Metodo di pagamento non valido' });
+  }
 
   try {
     await pool.query('BEGIN');
@@ -45,9 +50,9 @@ exports.creaPrenotazione = async (req, res) => {
 
     // 4. Registra pagamento con data/ora corrente
     await pool.query(
-      `INSERT INTO pagamenti (prenotazione_id, importo, timestamp)
-       VALUES ($1, $2, NOW())`,
-      [result.rows[0].id, importo]
+      `INSERT INTO pagamenti (prenotazione_id, importo, metodo, timestamp)
+       VALUES ($1, $2, $3, NOW())`,
+      [result.rows[0].id, importo, metodo_pagamento]
     );
 
     await pool.query('COMMIT');
@@ -55,7 +60,7 @@ exports.creaPrenotazione = async (req, res) => {
     res.status(201).json({
       message: 'Prenotazione e pagamento effettuati',
       prenotazione: result.rows[0],
-      pagamento: { importo }
+      pagamento: { importo, metodo: metodo_pagamento }
     });
 
   } catch (err) {

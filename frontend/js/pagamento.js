@@ -13,9 +13,10 @@ $(document).ready(function () {
     e.preventDefault();
 
     const importo = parseFloat($('#importo').val());
+    const metodo = $('#metodo').val();
 
-    if (isNaN(importo) || importo <= 0) {
-      $('#alertPagamento').html('<div class="alert alert-warning">Inserisci un importo valido.</div>');
+    if (isNaN(importo) || importo <= 0 || !metodo) {
+      $('#alertPagamento').html('<div class="alert alert-warning">Inserisci tutti i dati richiesti.</div>');
       return;
     }
 
@@ -28,7 +29,8 @@ $(document).ready(function () {
       },
       data: JSON.stringify({
         utente_id: utente.id,
-        importo: importo
+        importo: importo,
+        metodo: metodo
       }),
       success: function (res) {
         $('#alertPagamento').html(`<div class="alert alert-success">✅ ${res.message}</div>`);

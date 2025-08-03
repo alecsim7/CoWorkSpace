@@ -49,5 +49,6 @@ CREATE TABLE Pagamento (
   id SERIAL PRIMARY KEY,
   prenotazione_id INTEGER NOT NULL REFERENCES Prenotazione(id) ON DELETE CASCADE,
   importo NUMERIC(7,2) NOT NULL,
+  metodo VARCHAR(20) NOT NULL CHECK (metodo IN ('paypal','satispay','carta','bancomat')),
   timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

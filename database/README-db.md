@@ -101,6 +101,7 @@ Dati relativi al pagamento associato a una prenotazione.
 | `id`              | SERIAL       | Identificativo del pagamento         |
 | `prenotazione_id` | INTEGER      | FK → `Prenotazione(id)`              |
 | `importo`         | NUMERIC(7,2) | Importo totale                       |
+| `metodo`          | VARCHAR(20)  | Metodo usato (`paypal`, `satispay`, `carta`, `bancomat`) |
 | `timestamp`       | TIMESTAMP    | Data e ora del pagamento             |
 
 
