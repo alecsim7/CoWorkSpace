@@ -53,6 +53,12 @@ $(document).ready(function () {
           const prezzo = parseFloat(spazio.prezzo_orario);
           const prezzoFormattato = isNaN(prezzo) ? "N/A" : prezzo.toFixed(2);
 
+          // Calcolo prezzo totale per la fascia oraria selezionata
+          const start = new Date(`1970-01-01T${orario_inizio}:00`);
+          const end = new Date(`1970-01-01T${orario_fine}:00`);
+          const ore = (end - start) / (1000 * 60 * 60);
+          const prezzoTotale = isNaN(prezzo) ? "N/A" : (prezzo * ore).toFixed(2);
+
           const card = `
             <div class="col-md-4 mb-3">
               <div class="card h-100 shadow-sm">
@@ -61,6 +67,7 @@ $(document).ready(function () {
                   <p class="card-text flex-grow-1">${spazio.descrizione}</p>
                   <p class="mb-1"><strong>Sede:</strong> ${spazio.nome_sede}</p>
                   <p><strong>Prezzo orario:</strong> €${prezzoFormattato}</p>
+                  <p><strong>Prezzo totale per la fascia selezionata:</strong> €${prezzoTotale}</p>
                   <button class="btn btn-success mt-auto btnPrenota" data-id="${spazio.spazio_id}" data-nome="${spazio.nome_spazio}" data-prezzo="${prezzo}">Prenota</button>
                 </div>
               </div>
