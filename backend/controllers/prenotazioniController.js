@@ -24,7 +24,7 @@ exports.creaPrenotazione = async (req, res) => {
 
     // 2. Calcola importo da pagare
     const prezzoRes = await pool.query(
-      'SELECT prezzo_orario FROM spazi WHERE id = $1',
+      'SELECT prezzo_ora AS prezzo_orario FROM spazi WHERE id = $1',
       [spazio_id]
     );
 
@@ -133,7 +133,7 @@ exports.prenotazioniNonPagate = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT p.*, s.nome AS nome_spazio, s.prezzo_orario, sede.nome AS nome_sede, pag.id AS pagamento_id
+      `SELECT p.*, s.nome AS nome_spazio, s.prezzo_ora AS prezzo_orario, sede.nome AS nome_sede, pag.id AS pagamento_id
        FROM prenotazioni p
        JOIN spazi s ON p.spazio_id = s.id
        JOIN sedi sede ON s.sede_id = sede.id
