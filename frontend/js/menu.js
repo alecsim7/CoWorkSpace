@@ -9,14 +9,16 @@ $(document).ready(function () {
     menu.append('<li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>');
     menu.append('<li class="nav-item"><a class="nav-link" href="sedi.html">Sedi</a></li>');
 
-    if (utente.ruolo === 'cliente') {
+    const ruolo = (utente.ruolo || '').toLowerCase();
+
+    if (ruolo === 'cliente') {
       menu.append('<li class="nav-item"><a class="nav-link" href="prenotazione.html">Prenotazioni</a></li>');
       menu.append('<li class="nav-item"><a class="nav-link" href="pagamento.html">Pagamenti</a></li>');
     }
-    if (utente.ruolo === 'gestore') {
+    if (ruolo === 'gestore') {
       menu.append('<li class="nav-item"><a class="nav-link" href="gestore.html">Gestore</a></li>');
     }
-    if (utente.ruolo === 'admin') {
+    if (ruolo === 'admin') {
       menu.append('<li class="nav-item"><a class="nav-link" href="admin.html">Admin</a></li>');
     }
 
