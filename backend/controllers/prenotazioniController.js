@@ -149,3 +149,25 @@ exports.prenotazioniNonPagate = async (req, res) => {
     res.status(500).json({ message: 'Errore del server' });
   }
 };
+
+// ✅ Elimina una prenotazione dell'utente
+exports.eliminaPrenotazione = async (req, res) => {
+  const { id } = req.params;
+  const utente_id = req.utente.id;
+
+  try {
+    const result = await pool.query(
+      'DELETE FROM prenotazioni WHERE id = $1 AND utente_id = $2 RETURNING id',
+      [id, utente_id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Prenotazione non trovata' });
+    }
+
+    res.json({ message: 'Prenotazione eliminata' });
+  } catch (err) {
+    console.error('Errore eliminazione prenotazione:', err);
+    res.status(500).json({ message: 'Errore del server' });
+  }
+};

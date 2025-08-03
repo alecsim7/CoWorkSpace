@@ -78,6 +78,9 @@
 
 📆 Prenotazioni:
   - POST   /api/prenotazioni              → Crea prenotazione (l'utente è dedotto dal token, l'importo è calcolato)
+  - GET    /api/prenotazioni              → Prenotazioni utente
+  - PUT    /api/prenotazioni/:id          → Modifica prenotazione
+  - DELETE /api/prenotazioni/:id          → Annulla prenotazione (solo proprietario)
 
 💳 Pagamento:
   - POST   /api/pagamento                 → Pagamento prenotazione (`prenotazione_id`, `metodo`; importo letto dalla prenotazione)
