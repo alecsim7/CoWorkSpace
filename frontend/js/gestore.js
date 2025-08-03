@@ -29,6 +29,52 @@ $(document).ready(function () {
 
   caricaSedi();
 
+  // Carica spazi del gestore con immagini
+  function caricaSpazi() {
+    $.ajax({
+      url: `http://localhost:3000/api/sedi/gestore/${utente.id}`,
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+      success: function (sedi) {
+        const container = $('#spaziContainer');
+        container.empty();
+
+        if (!Array.isArray(sedi) || sedi.length === 0) {
+          container.html('<div class="alert alert-info">Nessuna sede disponibile.</div>');
+          return;
+        }
+
+        sedi.forEach(sede => {
+          $.getJSON(`http://localhost:3000/api/spazi/${sede.id}`, function (spazi) {
+            if (!Array.isArray(spazi) || spazi.length === 0) {
+              container.append(`<div class="col-12 alert alert-secondary">Nessuno spazio per ${sede.nome}</div>`);
+              return;
+            }
+
+            spazi.forEach(spazio => {
+              container.append(`
+                <div class="col-md-4">
+                  <div class="card h-100 shadow-sm">
+                    ${spazio.image_url ? `<img src="${spazio.image_url}" class="spazio-thumb card-img-top" alt="${spazio.nome}" />` : ''}
+                    <div class="card-body">
+                      <h5 class="card-title">${spazio.nome}</h5>
+                      <p class="card-text">${spazio.descrizione || ''}</p>
+                    </div>
+                  </div>
+                </div>
+              `);
+            });
+          });
+        });
+      },
+      error: function () {
+        $('#spaziContainer').html('<div class="alert alert-danger">Errore nel caricamento degli spazi.</div>');
+      }
+    });
+  }
+
+  caricaSpazi();
+
   // Visualizza riepilogo prenotazioni
   function caricaRiepilogo() {
     $.ajax({
@@ -48,10 +94,17 @@ $(document).ready(function () {
         data.riepilogo.forEach(r => {
           container.append(`
             <div class="card mb-2">
-              <div class="card-body">
-                🏢 <strong>${r.nome_sede || 'N/D'}</strong> – 🪑 ${r.nome_spazio || 'N/D'}<br>
-                📅 ${r.data || 'N/D'} ⏰ ${r.orario_inizio || 'N/D'} - ${r.orario_fine || 'N/D'}<br>
-                👤 Prenotato da: ${r.nome_utente || 'N/D'}
+              <div class="row g-0 align-items-center">
+                <div class="col-md-3 text-center p-2">
+                  ${r.image_url ? `<img src="${r.image_url}" class="spazio-thumb" alt="${r.nome_spazio || 'Spazio'}" />` : ''}
+                </div>
+                <div class="col-md-9">
+                  <div class="card-body">
+                    🏢 <strong>${r.nome_sede || 'N/D'}</strong> – 🪑 ${r.nome_spazio || 'N/D'}<br>
+                    📅 ${r.data || 'N/D'} ⏰ ${r.orario_inizio || 'N/D'} - ${r.orario_fine || 'N/D'}<br>
+                    👤 Prenotato da: ${r.nome_utente || 'N/D'}
+                  </div>
+                </div>
               </div>
             </div>
           `);
