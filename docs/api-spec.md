@@ -53,9 +53,11 @@ Filtri disponibili su `/api/sedi`:
 
 | Metodo | Endpoint               | Descrizione                                      |
 |--------|------------------------|--------------------------------------------------|
-| POST   | `/api/prenotazioni`    | Crea una nuova prenotazione (restituisce l'importo da pagare) |
+| POST   | `/api/prenotazioni`    | Crea una nuova prenotazione (calcola e restituisce l'importo) |
 | GET    | `/api/prenotazioni`    | Elenca tutte le prenotazioni dell’utente loggato|
 | DELETE | `/api/prenotazioni/:id`| Annulla una prenotazione                         |
+
+**Body POST /api/prenotazioni:** `spazio_id`, `data`, `orario_inizio`, `orario_fine`
 
 ---
 
@@ -63,7 +65,7 @@ Filtri disponibili su `/api/sedi`:
 
 | Metodo | Endpoint            | Descrizione                            |
 |--------|---------------------|----------------------------------------|
-| POST   | `/api/pagamento`    | Esegue il pagamento di una prenotazione (`prenotazione_id`, `metodo`) |
+| POST   | `/api/pagamento`    | Esegue il pagamento di una prenotazione (`prenotazione_id`, `metodo`) – l'importo è letto dalla prenotazione |
 
 
 ---

@@ -77,10 +77,10 @@
 - POST   /api/disponibilita/ricerca     → Ricerca spazi disponibili
 
 📆 Prenotazioni:
-- POST   /api/prenotazioni              → Crea prenotazione
+  - POST   /api/prenotazioni              → Crea prenotazione (l'utente è dedotto dal token, l'importo è calcolato)
 
 💳 Pagamento:
-- POST   /api/pagamento                 → Pagamento prenotazione (prenotazione_id, metodo)
+  - POST   /api/pagamento                 → Pagamento prenotazione (`prenotazione_id`, `metodo`; importo letto dalla prenotazione)
 
 🛠️ Admin:
 - GET    /api/admin/utenti              → Lista utenti

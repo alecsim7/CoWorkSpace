@@ -91,14 +91,15 @@ $(document).ready(function () {
             contentType: 'application/json',
             headers: { Authorization: `Bearer ${token}` },
             data: JSON.stringify({
-              utente_id: utente.id,
               spazio_id,
               data,
               orario_inizio,
               orario_fine
             }),
-            success: function () {
-              $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> registrata!</div>`);
+            success: function (res) {
+              const importo = parseFloat(res.prenotazione?.importo);
+              const msgImporto = isNaN(importo) ? '' : ` Importo: €${importo.toFixed(2)}`;
+              $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> registrata!${msgImporto}</div>`);
               $('#formRicerca')[0].reset();
               $('#risultatiSpazi').empty();
             },

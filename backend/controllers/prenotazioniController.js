@@ -2,7 +2,8 @@ const pool = require('../db');
 
 // ✅ Crea una prenotazione e calcola l'importo da pagare
 exports.creaPrenotazione = async (req, res) => {
-  const { utente_id, spazio_id, data, orario_inizio, orario_fine } = req.body;
+  const { spazio_id, data, orario_inizio, orario_fine } = req.body;
+  const utente_id = req.utente.id;
 
   try {
     await pool.query('BEGIN');
@@ -38,9 +39,9 @@ exports.creaPrenotazione = async (req, res) => {
 
     // 3. Inserisci prenotazione
     const result = await pool.query(
-      `INSERT INTO prenotazioni (utente_id, spazio_id, data, orario_inizio, orario_fine)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [utente_id, spazio_id, data, orario_inizio, orario_fine]
+      `INSERT INTO prenotazioni (utente_id, spazio_id, data, orario_inizio, orario_fine, importo)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [utente_id, spazio_id, data, orario_inizio, orario_fine, importo]
     );
 
     await pool.query('COMMIT');
