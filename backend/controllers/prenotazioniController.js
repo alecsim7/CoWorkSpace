@@ -3,7 +3,8 @@ const pool = require('../db');
 // ✅ Crea una prenotazione e calcola l'importo da pagare
 exports.creaPrenotazione = async (req, res) => {
   const { spazio_id, data, orario_inizio, orario_fine } = req.body;
-  const utente_id = req.utente.id;
+
+  // L'ID dell'utente autenticato viene letto dal token e non dal body
 
   try {
     await pool.query('BEGIN');
@@ -41,7 +42,7 @@ exports.creaPrenotazione = async (req, res) => {
     const result = await pool.query(
       `INSERT INTO prenotazioni (utente_id, spazio_id, data, orario_inizio, orario_fine, importo)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [utente_id, spazio_id, data, orario_inizio, orario_fine, importo]
+      [req.utente.id, spazio_id, data, orario_inizio, orario_fine, importo]
     );
 
     await pool.query('COMMIT');

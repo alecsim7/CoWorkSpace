@@ -1,8 +1,7 @@
 $(document).ready(function () {
   const token = localStorage.getItem('token');
-  const utente = JSON.parse(localStorage.getItem('utente'));
 
-  if (!token || !utente) {
+  if (!token) {
     alert("Effettua il login per accedere alla dashboard.");
     window.location.href = "index.html";
     return;
