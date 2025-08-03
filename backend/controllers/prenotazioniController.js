@@ -143,19 +143,7 @@ exports.prenotazioniNonPagate = async (req, res) => {
       [utente_id]
     );
 
-    const prenotazioni = result.rows.map(p => {
-      let importo = parseFloat(p.importo);
-      if (isNaN(importo)) {
-        const start = new Date(`1970-01-01T${p.orario_inizio}`);
-        const end = new Date(`1970-01-01T${p.orario_fine}`);
-        const ore = (end - start) / (1000 * 60 * 60);
-        importo = parseFloat(p.prezzo_orario) * ore;
-      }
-      const { prezzo_orario, ...rest } = p;
-      return { ...rest, importo };
-    });
-
-    res.json({ prenotazioni });
+    res.json({ prenotazioni: result.rows });
   } catch (err) {
     console.error('Errore recupero prenotazioni non pagate:', err);
     res.status(500).json({ message: 'Errore del server' });
