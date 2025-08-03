@@ -101,7 +101,6 @@ Dati relativi al pagamento associato a una prenotazione.
 | `id`              | SERIAL       | Identificativo del pagamento         |
 | `prenotazione_id` | INTEGER      | FK → `Prenotazione(id)`              |
 | `importo`         | NUMERIC(7,2) | Importo totale                       |
-| `esito`           | VARCHAR(10)  | Esito pagamento: `OK`, `KO`          |
 | `timestamp`       | TIMESTAMP    | Data e ora del pagamento             |
 
 ---
@@ -119,7 +118,7 @@ Dati relativi al pagamento associato a una prenotazione.
 ## 📌 Note
 
 - Le password vengono salvate in formato **hash** (es. con `bcrypt`)
-- I valori come `ruolo`, `tipo_spazio` ed `esito` sono validati con `CHECK(...)`
+- I valori come `ruolo` e `tipo_spazio` sono validati con `CHECK(...)`
 - Le chiavi esterne usano `ON DELETE CASCADE` per mantenere coerenza
 
 ---

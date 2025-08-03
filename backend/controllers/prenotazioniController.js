@@ -45,8 +45,8 @@ exports.creaPrenotazione = async (req, res) => {
 
     // 4. Registra pagamento
     await pool.query(
-      `INSERT INTO pagamenti (prenotazione_id, importo, esito, timestamp)
-       VALUES ($1, $2, 'OK', NOW())`,
+      `INSERT INTO pagamenti (prenotazione_id, importo, timestamp)
+       VALUES ($1, $2, NOW())`,
       [result.rows[0].id, importo]
     );
 
