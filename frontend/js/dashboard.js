@@ -8,9 +8,6 @@ $(document).ready(function () {
     return;
   }
 
-  $('#nomeUtente').text(utente.nome);
-  $('#ruoloUtente').text(`(${utente.ruolo})`);
-
   $('#logoutBtn').click(function () {
     localStorage.removeItem('token');
     localStorage.removeItem('utente');

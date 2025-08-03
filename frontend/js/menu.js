@@ -5,6 +5,8 @@ $(document).ready(function () {
 
   if (!utente) {
     menu.append('<li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>');
+    $('#nomeUtente').text('');
+    $('#ruoloUtente').text('');
   } else {
     menu.append('<li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>');
     menu.append('<li class="nav-item"><a class="nav-link" href="sedi.html">Sedi</a></li>');
@@ -22,6 +24,9 @@ $(document).ready(function () {
       menu.append('<li class="nav-item"><a class="nav-link" href="admin.html">Admin</a></li>');
     }
 
+    $('#nomeUtente').text(utente.nome || '');
+    $('#ruoloUtente').text(utente.ruolo ? `(${utente.ruolo})` : '');
+
     menu.append('<li class="nav-item"><a class="nav-link" href="#" id="logoutLink">Logout</a></li>');
 
     $('#logoutLink').click(function (e) {
@@ -30,5 +35,10 @@ $(document).ready(function () {
       localStorage.removeItem('utente');
       window.location.href = 'index.html';
     });
+  }
+
+  const navbar = $('.navbar');
+  if (!navbar.is('#mainNavbar')) {
+    navbar.addClass('show');
   }
 });
