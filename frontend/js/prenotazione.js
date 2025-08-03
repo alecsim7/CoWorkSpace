@@ -138,7 +138,6 @@ $(document).ready(function () {
                   <p class="mb-1"><strong>Data:</strong> ${p.data}</p>
                   <p class="mb-1"><strong>Orario:</strong> ${p.orario_inizio} - ${p.orario_fine}</p>
                   <p class="mb-1"><strong>Sede:</strong> ${p.nome_sede}</p>
-                  <button class="btn btn-warning mt-auto btnModifica" data-id="${p.id}" data-data="${p.data}" data-inizio="${p.orario_inizio}" data-fine="${p.orario_fine}">Modifica</button>
                 </div>
               </div>
             </div>
@@ -146,34 +145,6 @@ $(document).ready(function () {
           $('#listaPrenotazioni').append(card);
         });
 
-        $('.btnModifica').click(function () {
-          const id = $(this).data('id');
-          const dataAttuale = $(this).data('data');
-          const inizioAttuale = $(this).data('inizio');
-          const fineAttuale = $(this).data('fine');
-
-          const nuovaData = prompt('Nuova data (YYYY-MM-DD)', dataAttuale);
-          if (!nuovaData) return;
-          const nuovoInizio = prompt('Nuovo orario di inizio (HH:MM)', inizioAttuale);
-          if (!nuovoInizio) return;
-          const nuovoFine = prompt('Nuovo orario di fine (HH:MM)', fineAttuale);
-          if (!nuovoFine) return;
-
-          $.ajax({
-            url: `http://localhost:3000/api/prenotazioni/${id}`,
-            method: 'PUT',
-            contentType: 'application/json',
-            headers: { Authorization: `Bearer ${token}` },
-            data: JSON.stringify({ data: nuovaData, orario_inizio: nuovoInizio, orario_fine: nuovoFine }),
-            success: function () {
-              $('#prenotazioneAlert').html('<div class="alert alert-success">Prenotazione aggiornata</div>');
-              caricaPrenotazioni();
-            },
-            error: function (xhr) {
-              $('#prenotazioneAlert').html(`<div class="alert alert-danger">${xhr.responseJSON?.message || 'Errore durante l\'aggiornamento'}</div>`);
-            }
-          });
-        });
       },
       error: function () {
         $('#listaPrenotazioni').html('<p class="text-center text-danger">Errore nel recupero delle prenotazioni</p>');

@@ -41,8 +41,15 @@ $(function () {
         localStorage.setItem('token', response.token);
         localStorage.setItem('utente', JSON.stringify(response.utente));
 
-        // Redirect alla dashboard
-        window.location.href = "dashboard.html";
+        // Redirect in base al ruolo
+        const ruolo = (response.utente.ruolo || '').toLowerCase();
+        if (ruolo === 'gestore') {
+          window.location.href = 'gestore.html';
+        } else if (ruolo === 'admin') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'dashboard.html';
+        }
       },
       error: function (xhr) {
         const msg = xhr.responseJSON?.message || 'Errore nel login.';
