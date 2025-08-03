@@ -89,6 +89,7 @@ Rappresenta una prenotazione effettuata da un utente su uno spazio.
 | `data`        | DATE   | Data della prenotazione              |
 | `ora_inizio`  | TIME   | Ora di inizio                        |
 | `ora_fine`    | TIME   | Ora di fine                          |
+| `importo`     | NUMERIC(7,2) | Importo calcolato al momento della prenotazione |
 
 ---
 
@@ -101,6 +102,7 @@ Dati relativi al pagamento associato a una prenotazione.
 | `id`              | SERIAL       | Identificativo del pagamento         |
 | `prenotazione_id` | INTEGER      | FK → `Prenotazione(id)`              |
 | `importo`         | NUMERIC(7,2) | Importo totale                       |
+| `metodo`          | VARCHAR(20)  | Metodo usato (`paypal`, `satispay`, `carta`, `bancomat`) |
 | `timestamp`       | TIMESTAMP    | Data e ora del pagamento             |
 
 
