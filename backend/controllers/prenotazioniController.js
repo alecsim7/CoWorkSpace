@@ -1,17 +1,8 @@
 const pool = require('../db');
-const dayjs = require('dayjs');
 
 // ✅ Crea una prenotazione e calcola l'importo da pagare
 exports.creaPrenotazione = async (req, res) => {
   const { spazio_id, data, orario_inizio, orario_fine } = req.body;
-
-  const start = dayjs(`1970-01-01T${orario_inizio}`);
-  const end = dayjs(`1970-01-01T${orario_fine}`);
-  const durata = end.diff(start, 'minute');
-
-  if (!start.isValid() || !end.isValid() || durata <= 0) {
-    return res.status(400).json({ message: 'Intervallo orario non valido' });
-  }
 
   try {
     await pool.query('BEGIN');
@@ -40,7 +31,9 @@ exports.creaPrenotazione = async (req, res) => {
       return res.status(404).json({ message: 'Spazio non trovato' });
     }
 
-    const ore = durata / 60;
+    const start = new Date(`1970-01-01T${orario_inizio}`);
+    const end = new Date(`1970-01-01T${orario_fine}`);
+    const ore = (end - start) / (1000 * 60 * 60);
     const importo = Number(prezzoRes.rows[0].prezzo_orario) * ore;
 
     // 3. Inserisci prenotazione (senza colonna importo)
