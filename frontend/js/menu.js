@@ -12,6 +12,7 @@ $(document).ready(function () {
 
     // Link comuni a tutti gli utenti autenticati
     menu.append('<li class="nav-item"><a class="nav-link" href="sedi.html">Sedi</a></li>');
+    menu.append('<li class="nav-item"><a class="nav-link" href="profilo.html">Profilo</a></li>');
 
     // Link specifici per ruolo
     if (ruolo === 'cliente') {
