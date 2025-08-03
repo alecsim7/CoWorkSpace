@@ -55,10 +55,10 @@ $(function () {
   $('#registerForm').submit(function (e) {
     e.preventDefault();
 
-    const nome = $('#registerNome').val().trim();
-    const email = $('#registerEmail').val().trim();
-    const password = $('#registerPassword').val();
-    const ruolo = $('#registerRuolo').val();
+    const nome = $('#regNome').val().trim();
+    const email = $('#regEmail').val().trim();
+    const password = $('#regPassword').val();
+    const ruolo = $('#regRuolo').val();
 
     $('#registerAlert').remove();
 
