@@ -80,21 +80,8 @@ $(document).ready(function () {
         $('.btnPrenota').click(function () {
           const spazio_id = $(this).data('id');
           const nome_spazio = $(this).data('nome');
-          const prezzo = parseFloat($(this).data('prezzo'));
 
-          const start = new Date(`1970-01-01T${orario_inizio}:00`);
-          const end = new Date(`1970-01-01T${orario_fine}:00`);
-          const ore = (end - start) / (1000 * 60 * 60);
-          const importo = (prezzo * ore).toFixed(2);
-
-          if (!confirm(`Confermi la prenotazione di ${nome_spazio} per €${importo}?`)) {
-            return;
-          }
-
-          const metodo_pagamento = prompt('Metodo di pagamento (paypal/satispay/carta/bancomat)?', 'paypal');
-          const metodiValidi = ['paypal', 'satispay', 'carta', 'bancomat'];
-          if (!metodo_pagamento || !metodiValidi.includes(metodo_pagamento.toLowerCase())) {
-            alert('Metodo di pagamento non valido');
+          if (!confirm(`Confermi la prenotazione di ${nome_spazio}?`)) {
             return;
           }
 
@@ -108,16 +95,15 @@ $(document).ready(function () {
               spazio_id,
               data,
               orario_inizio,
-              orario_fine,
-              metodo_pagamento: metodo_pagamento.toLowerCase()
+              orario_fine
             }),
             success: function () {
-              $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> registrata. Importo da pagare: €${importo}.</div>`);
-
+              $('#prenotazioneAlert').html(`<div class="alert alert-success">✅ Prenotazione per <strong>${nome_spazio}</strong> registrata!</div>`);
               $('#formRicerca')[0].reset();
               $('#risultatiSpazi').empty();
             },
             error: function (xhr) {
+              // Mostra solo errore generico, non pagamento
               $('#prenotazioneAlert').html(`<div class="alert alert-danger">❌ Errore: ${xhr.responseJSON?.message || 'Prenotazione fallita'}</div>`);
             }
           });
