@@ -9,4 +9,7 @@ router.post('/prenotazioni', verificaToken, prenotazioniController.creaPrenotazi
 // ✅ Visualizza prenotazioni dell'utente autenticato
 router.get('/prenotazioni', verificaToken, prenotazioniController.visualizzaPrenotazioni);
 
+// ✅ Modifica una prenotazione esistente
+router.put('/prenotazioni/:id', verificaToken, prenotazioniController.modificaPrenotazione);
+
 module.exports = router;
