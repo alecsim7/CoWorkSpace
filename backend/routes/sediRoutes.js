@@ -9,6 +9,9 @@ router.post('/', verificaToken, sediController.aggiungiSede);
 // Recupera sedi per gestore (protetto)
 router.get('/gestore/:id', verificaToken, sediController.getSediGestore);
 
+// Dettaglio di una singola sede
+router.get('/:id', sediController.getSedeById);
+
 // Recupera sedi filtrabili (per client/guest)
 router.get('/', sediController.getSedi);
 
