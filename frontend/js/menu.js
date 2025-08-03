@@ -8,12 +8,14 @@ $(document).ready(function () {
     $('#nomeUtente').text('');
     $('#ruoloUtente').text('');
   } else {
-    menu.append('<li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>');
-    menu.append('<li class="nav-item"><a class="nav-link" href="sedi.html">Sedi</a></li>');
-
     const ruolo = (utente.ruolo || '').toLowerCase();
 
+    // Link comuni a tutti gli utenti autenticati
+    menu.append('<li class="nav-item"><a class="nav-link" href="sedi.html">Sedi</a></li>');
+
+    // Link specifici per ruolo
     if (ruolo === 'cliente') {
+      menu.append('<li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>');
       menu.append('<li class="nav-item"><a class="nav-link" href="prenotazione.html">Prenotazioni</a></li>');
       menu.append('<li class="nav-item"><a class="nav-link" href="pagamento.html">Pagamenti</a></li>');
     }
