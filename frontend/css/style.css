@@ -147,6 +147,7 @@ h1.main-title {
   flex-direction: column;
   border-radius: 12px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
 #risultatiSpazi .card:hover {
@@ -409,8 +410,35 @@ button.btn-lg {
   margin-bottom: 1.5rem;
 }
 
-#riepilogoContainer .card {
+  #riepilogoContainer .card {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   border-radius: 12px;
   margin-bottom: 10px;
+}
+
+.spazio-img {
+  height: 160px;
+  object-fit: cover;
+}
+
+.card-icons i {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.btnPrenota {
+  font-weight: 700;
+}
+
+#loadingSpinner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
 }
