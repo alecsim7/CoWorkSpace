@@ -30,14 +30,18 @@
 3. Installa i pacchetti:
    npm install
 
-4. Avvia PostgreSQL e crea il database:
+4. Configura le variabili d'ambiente:
+   cp .env.example .env
+   # modifica .env con le credenziali del tuo database
+
+5. Avvia PostgreSQL e crea il database:
    psql -U postgres
    CREATE DATABASE coworkspace;
 
-5. Esegui il server:
+6. Esegui il server:
    node server.js
 
-6. Il backend sarà disponibile su:
+7. Il backend sarà disponibile su:
    http://localhost:3000
 
 -------------------------------------------
