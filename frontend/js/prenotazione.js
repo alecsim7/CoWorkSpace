@@ -17,11 +17,11 @@ $(document).ready(function () {
   });
 
   function showSpinner() {
-    $('#loadingSpinner').show();
+    $('#loadingSpinner').removeClass('d-none');
   }
 
   function hideSpinner() {
-    $('#loadingSpinner').hide();
+    $('#loadingSpinner').addClass('d-none');
   }
 
   // Cerca disponibilità spazi
