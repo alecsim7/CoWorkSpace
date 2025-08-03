@@ -22,7 +22,7 @@ exports.aggiungiSpazio = async (req, res) => {
 
   try {
     const result = await pool.query(
-      'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_ora, capienza) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [sede_id, nome, descrizione, prezzo_orario, capienza]
     );
     res.status(201).json({ spazio: result.rows[0] });
