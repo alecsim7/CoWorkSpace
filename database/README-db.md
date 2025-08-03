@@ -103,6 +103,7 @@ Dati relativi al pagamento associato a una prenotazione.
 | `importo`         | NUMERIC(7,2) | Importo totale                       |
 | `timestamp`       | TIMESTAMP    | Data e ora del pagamento             |
 
+
 ---
 
 ## 🧭 Relazioni principali

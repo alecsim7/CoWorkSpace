@@ -20,7 +20,7 @@
         <mxCell id="6" value="&lt;b&gt;Prenotazione&lt;/b&gt;&lt;br/&gt;id&lt;br/&gt;utente_id&lt;br/&gt;spazio_id&lt;br/&gt;data&lt;br/&gt;ora_inizio&lt;br/&gt;ora_fine" style="shape=swimlane;startSize=20;" vertex="1" parent="1">
           <mxGeometry x="280" y="160" width="160" height="25" as="geometry"/>
         </mxCell>
-        <mxCell id="7" value="&lt;b&gt;Pagamento&lt;/b&gt;&lt;br/&gt;id&lt;br/&gt;prenotazione_id&lt;br/&gt;importo&lt;br/&gt;timestamp" style="shape=swimlane;startSize=20;" vertex="1" parent="1">
+value="Pagamento<br/>id<br/>prenotazione_id<br/>importo<br/>timestamp"
           <mxGeometry x="520" y="160" width="160" height="25" as="geometry"/>
         </mxCell>
       </root>
