@@ -72,8 +72,8 @@ Contiene le fasce orarie disponibili per ogni spazio.
 | `id`         | SERIAL | Identificativo della disponibilità   |
 | `spazio_id`  | INTEGER| FK → `Spazio(id)`                    |
 | `data`       | DATE   | Data della disponibilità             |
-| `ora_inizio` | TIME   | Ora di inizio                        |
-| `ora_fine`   | TIME   | Ora di fine                          |
+| `orario_inizio` | TIME   | Ora di inizio                        |
+| `orario_fine`   | TIME   | Ora di fine                          |
 
 ---
 
@@ -87,8 +87,8 @@ Rappresenta una prenotazione effettuata da un utente su uno spazio.
 | `utente_id`   | INTEGER| FK → `Utente(id)`                    |
 | `spazio_id`   | INTEGER| FK → `Spazio(id)`                    |
 | `data`        | DATE   | Data della prenotazione              |
-| `ora_inizio`  | TIME   | Ora di inizio                        |
-| `ora_fine`    | TIME   | Ora di fine                          |
+| `orario_inizio`  | TIME   | Ora di inizio                        |
+| `orario_fine`    | TIME   | Ora di fine                          |
 | `importo`     | NUMERIC(7,2) | Importo calcolato al momento della prenotazione |
 
 ---
