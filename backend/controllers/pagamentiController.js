@@ -76,3 +76,34 @@ exports.effettuaPagamento = async (req, res) => {
     res.status(500).json({ message: 'Errore del server durante il pagamento' });
   }
 };
+
+// 2. Storico pagamenti
+exports.storicoPagamenti = async (req, res) => {
+  const utente_id = req.utente.id;
+
+  try {
+    const result = await pool.query(
+      `SELECT
+        p.created_at AS data_pagamento,
+        p.metodo_pagamento,
+        p.importo,
+        pr.data AS data_prenotazione,
+        pr.orario_inizio,
+        pr.orario_fine,
+        s.nome AS nome_spazio
+      FROM pagamenti p
+      JOIN prenotazioni pr ON p.prenotazione_id = pr.id
+      JOIN spazi s ON pr.spazio_id = s.id
+      WHERE pr.utente_id = $1
+      ORDER BY p.created_at DESC`,
+      [utente_id]
+    );
+
+    res.json({ pagamenti: result.rows });
+  } catch (err) {
+    console.error('Errore query:', err);
+    res
+      .status(500)
+      .json({ message: 'Errore nel recupero dello storico pagamenti' });
+  }
+};
