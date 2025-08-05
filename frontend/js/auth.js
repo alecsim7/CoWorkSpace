@@ -103,12 +103,12 @@ $(function () {
     const utente = JSON.parse(localStorage.getItem('utente'));
     if (utente && utente.nome) {
       $('#authButtons').hide();
-      $('#mainNavbar').show();
+      $('#mainNavbar').addClass('show');
       $('#nomeUtente').text(utente.nome);
       $('#ruoloUtente').text(utente.ruolo ? `(${utente.ruolo})` : '');
     } else {
       $('#authButtons').show();
-      $('#mainNavbar').hide();
+      $('#mainNavbar').removeClass('show');
       $('#nomeUtente').text('');
       $('#ruoloUtente').text('');
     }
