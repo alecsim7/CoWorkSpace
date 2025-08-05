@@ -27,17 +27,31 @@
   </nav>
 
   <main class="container py-5">
-    <h1 class="mb-4">👩‍💼 Pannello Amministratore - <span id="adminNome"></span></h1>
+    <h1 class="main-title text-center mb-5">Pannello Amministratore</h1>
 
-    <section>
-      <h3>Utenti Registrati</h3>
-      <ul id="listaUtenti" class="list-group mb-4"></ul>
-    </section>
+    <!-- Sezione Utenti -->
+    <div class="card shadow-sm mb-5">
+      <div class="card-header">
+        <h2 class="h5 mb-0">Utenti Registrati</h2>
+      </div>
+      <div class="card-body">
+        <ul id="listaUtenti" class="list-group">
+          <!-- Contenuto generato da JS -->
+        </ul>
+      </div>
+    </div>
 
-    <section>
-      <h3>Sedi</h3>
-      <ul id="listaSedi" class="list-group mb-4"></ul>
-    </section>
+    <!-- Sezione Sedi -->
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h2 class="h5 mb-0">Sedi Registrate</h2>
+      </div>
+      <div class="card-body">
+        <ul id="listaSedi" class="list-group">
+          <!-- Contenuto generato da JS -->
+        </ul>
+      </div>
+    </div>
   </main>
 
   <footer class="footer text-center py-3 bg-light text-muted mt-auto">

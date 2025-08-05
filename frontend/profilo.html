@@ -24,20 +24,28 @@
     </div>
   </nav>
 
-  <main class="container py-5" style="max-width: 500px;">
-    <h2 class="mb-4">Aggiorna Profilo</h2>
-    <div id="profiloAlert"></div>
-    <form id="profiloForm">
-      <div class="mb-3">
-        <label for="nuovoNome" class="form-label">Nuovo Nome</label>
-        <input type="text" id="nuovoNome" class="form-control" />
+  <main class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+          <div class="card-body p-4 p-md-5">
+            <h2 class="card-title text-center mb-4">Aggiorna Profilo</h2>
+            <div id="profiloAlert"></div>
+            <form id="profiloForm">
+              <div class="mb-3">
+                <label for="nuovoNome" class="form-label">Nuovo Nome</label>
+                <input type="text" id="nuovoNome" class="form-control form-control-lg" />
+              </div>
+              <div class="mb-3">
+                <label for="nuovaPassword" class="form-label">Nuova Password</label>
+                <input type="password" id="nuovaPassword" class="form-control form-control-lg" placeholder="Lascia vuoto per non cambiare" />
+              </div>
+              <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Aggiorna</button>
+            </form>
+          </div>
+        </div>
       </div>
-      <div class="mb-3">
-        <label for="nuovaPassword" class="form-label">Nuova Password</label>
-        <input type="password" id="nuovaPassword" class="form-control" />
-      </div>
-      <button type="submit" class="btn btn-primary w-100">Aggiorna</button>
-    </form>
+    </div>
   </main>
 
   <footer class="footer text-center py-3 bg-light text-muted mt-auto">

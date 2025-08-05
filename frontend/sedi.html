@@ -27,27 +27,38 @@
   </nav>
 
   <main class="container py-5">
-    <h1 class="main-title">Catalogo Sedi</h1>
+    <h1 class="main-title text-center mb-4">Catalogo Sedi</h1>
 
-    <form id="formFiltri" class="row g-3 mb-4">
-      <div class="col-md-4">
-        <input type="text" id="filtroCitta" list="cittaOptions" class="form-control" placeholder="Città" />
-        <datalist id="cittaOptions"></datalist>
+    <!-- Sezione Filtri -->
+    <div class="card shadow-sm mb-5">
+      <div class="card-body p-4">
+        <h5 class="card-title mb-3">Filtra la tua ricerca</h5>
+        <form id="formFiltri" class="row g-3 align-items-end">
+          <div class="col-md">
+            <label for="filtroCitta" class="form-label">Città</label>
+            <input type="text" id="filtroCitta" list="cittaOptions" class="form-control form-control-lg" placeholder="Qualsiasi città" />
+            <datalist id="cittaOptions"></datalist>
+          </div>
+          <div class="col-md">
+            <label for="filtroTipo" class="form-label">Tipo Spazio</label>
+            <input type="text" id="filtroTipo" list="tipoOptions" class="form-control form-control-lg" placeholder="Qualsiasi tipo" />
+            <datalist id="tipoOptions"></datalist>
+          </div>
+          <div class="col-md">
+            <label for="filtroServizio" class="form-label">Servizio</label>
+            <input type="text" id="filtroServizio" list="serviziOptions" class="form-control form-control-lg" placeholder="Qualsiasi servizio" />
+            <datalist id="serviziOptions"></datalist>
+          </div>
+          <div class="col-md-auto">
+            <button type="submit" class="btn btn-primary btn-lg w-100">Filtra</button>
+          </div>
+        </form>
       </div>
-      <div class="col-md-4">
-        <input type="text" id="filtroTipo" list="tipoOptions" class="form-control" placeholder="Tipo spazio" />
-        <datalist id="tipoOptions"></datalist>
-      </div>
-      <div class="col-md-4">
-        <input type="text" id="filtroServizio" list="serviziOptions" class="form-control" placeholder="Servizio" />
-        <datalist id="serviziOptions"></datalist>
-      </div>
-      <div class="col-12">
-        <button type="submit" class="btn btn-primary">Filtra</button>
-      </div>
-    </form>
+    </div>
 
-    <div id="listaSedi" class="row gy-4"></div>
+    <div id="listaSedi" class="row gy-4">
+      <!-- Le card delle sedi verranno inserite qui da sedi.js -->
+    </div>
   </main>
 
   <footer class="footer text-center py-3 bg-light text-muted mt-auto">

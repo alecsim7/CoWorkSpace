@@ -29,19 +29,23 @@
     </div>
   </nav>
 
-  <header class="hero d-flex align-items-center justify-content-center text-center py-5 bg-primary text-white">
-    <div>
-      <h1 class="main-title">Benvenuto nella tua Dashboard</h1>
-      <p class="lead text-white-75">Visualizza e gestisci le tue prenotazioni</p>
-    </div>
-  </header>
-
   <main class="container py-5">
-    <section>
-      <h2 class="mb-4">Le tue prenotazioni</h2>
-      <div id="dashboardAlert"></div>
-      <ul id="listaPrenotazioni" class="list-group shadow-sm"></ul>
-    </section>
+    <h1 class="main-title text-center mb-4">La tua Dashboard</h1>
+    <p class="lead text-center text-muted mb-5" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+      Qui puoi visualizzare e gestire tutte le tue prenotazioni.
+    </p>
+
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h2 class="h5 mb-0">Le tue prenotazioni</h2>
+      </div>
+      <div class="card-body">
+        <div id="dashboardAlert"></div>
+        <ul id="listaPrenotazioni" class="list-group list-group-flush">
+          <!-- Contenuto generato da JS -->
+        </ul>
+      </div>
+    </div>
   </main>
 
   <footer class="footer text-center py-3 bg-light text-muted mt-auto">
