@@ -193,7 +193,7 @@ $(document).ready(function () {
     const metodo = $('#metodo').val();
 
     $.ajax({
-      url: 'http://localhost:3000/api/pagamento',
+        url: 'http://localhost:3000/api/pagamenti/pagamento',
       method: 'POST',
       contentType: 'application/json',
 
