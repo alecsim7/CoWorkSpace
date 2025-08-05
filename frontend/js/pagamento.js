@@ -143,7 +143,7 @@ $(document).ready(function () {
         }
 
         pagamenti.forEach(p => {
-          const data = new Date(p.data_pagamento).toLocaleString('it-IT', {
+          const data = new Date(p.timestamp).toLocaleString('it-IT', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
@@ -159,7 +159,7 @@ $(document).ready(function () {
               <td>${p.nome_spazio}</td>
               <td>${dataPrenotazione} ${p.orario_inizio.slice(0,5)}-${p.orario_fine.slice(0,5)}</td>
               <td>€${parseFloat(p.importo).toFixed(2)}</td>
-              <td>${p.metodo_pagamento}</td>
+              <td>${p.metodo}</td>
             </tr>
           `);
         });
