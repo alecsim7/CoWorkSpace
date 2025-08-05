@@ -20,6 +20,8 @@ CREATE TABLE sedi (
 CREATE TABLE spazi (
   id SERIAL PRIMARY KEY,
   sede_id INTEGER NOT NULL REFERENCES sedi(id) ON DELETE CASCADE,
+  nome VARCHAR(100) NOT NULL,
+  descrizione TEXT,
   tipo_spazio VARCHAR(20) CHECK (tipo_spazio IN ('scrivania', 'ufficio', 'sala')) NOT NULL,
   servizi TEXT,
   prezzo_orario NUMERIC(6,2) NOT NULL
