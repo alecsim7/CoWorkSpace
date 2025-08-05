@@ -6,7 +6,8 @@ exports.getSpaziPerSede = async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT * FROM spazi WHERE sede_id = $1',
+      `SELECT id, sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi
+       FROM spazi WHERE sede_id = $1`,
       [sede_id]
     );
     res.json(result.rows);
@@ -18,13 +19,21 @@ exports.getSpaziPerSede = async (req, res) => {
 
 // Aggiunta nuovo spazio (gestore)
 exports.aggiungiSpazio = async (req, res) => {
-  const { sede_id, nome, descrizione, prezzo_orario, capienza } = req.body;
+  const {
+    sede_id,
+    nome,
+    descrizione,
+    prezzo_orario,
+    capienza,
+    tipo_spazio,
+    servizi,
+  } = req.body;
 
   try {
     const result = await pool.query(
-      `INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [sede_id, nome, descrizione, prezzo_orario, capienza]
+      `INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
