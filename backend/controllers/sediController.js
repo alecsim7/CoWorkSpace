@@ -40,6 +40,33 @@ exports.getSedi = async (req, res) => {
   }
 };
 
+// Restituisce liste di valori per filtri pubblici
+exports.getOpzioni = async (req, res) => {
+  try {
+    const cittaResult = await pool.query('SELECT DISTINCT citta FROM sedi');
+    const tipoResult = await pool.query('SELECT DISTINCT tipo_spazio FROM spazi');
+    const serviziResult = await pool.query('SELECT servizi FROM spazi WHERE servizi IS NOT NULL');
+
+    const serviziSet = new Set();
+    serviziResult.rows.forEach(row => {
+      row.servizi
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+        .forEach(s => serviziSet.add(s));
+    });
+
+    res.json({
+      citta: cittaResult.rows.map(r => r.citta),
+      tipi: tipoResult.rows.map(r => r.tipo_spazio),
+      servizi: Array.from(serviziSet),
+    });
+  } catch (err) {
+    console.error('Errore nel recupero opzioni sedi:', err);
+    res.status(500).json({ message: 'Errore del server' });
+  }
+};
+
 // Recupera sedi di un gestore
 exports.getSediGestore = async (req, res) => {
   const { id } = req.params;
