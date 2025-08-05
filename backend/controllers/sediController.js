@@ -20,7 +20,7 @@ exports.getSedi = async (req, res) => {
 
     if (tipo) {
       params.push(tipo);
-      where.push(`sp.tipo_spazio = $${params.length}`);
+      where.push(`sp.tipologia = $${params.length}`);
     }
 
     if (servizio) {
@@ -44,7 +44,7 @@ exports.getSedi = async (req, res) => {
 exports.getOpzioni = async (req, res) => {
   try {
     const cittaResult = await pool.query('SELECT DISTINCT citta FROM sedi');
-    const tipoResult = await pool.query('SELECT DISTINCT tipo_spazio FROM spazi');
+    const tipoResult = await pool.query('SELECT DISTINCT tipologia FROM spazi');
     const serviziResult = await pool.query('SELECT servizi FROM spazi WHERE servizi IS NOT NULL');
 
     const serviziSet = new Set();
@@ -58,7 +58,7 @@ exports.getOpzioni = async (req, res) => {
 
     res.json({
       citta: cittaResult.rows.map(r => r.citta),
-      tipi: tipoResult.rows.map(r => r.tipo_spazio),
+      tipi: tipoResult.rows.map(r => r.tipologia),
       servizi: Array.from(serviziSet),
     });
   } catch (err) {
