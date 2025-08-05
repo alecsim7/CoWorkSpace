@@ -59,10 +59,17 @@ $(document).ready(function () {
         dettagliDiv.html('<div class="text-muted">Nessuno spazio disponibile.</div>');
       } else {
         const list = $('<ul class="list-group"></ul>');
+        const formatter = new Intl.NumberFormat('it-IT', {
+          style: 'currency',
+          currency: 'EUR'
+        });
         sede.spazi.forEach(sp => {
-          const prezzo = parseFloat(sp.prezzo_ora);
-          const prezzoFmt = isNaN(prezzo) ? 'N/A' : prezzo.toFixed(2);
-          list.append(`<li class="list-group-item">${sp.nome} – ${sp.tipo_spazio} (€${prezzoFmt})</li>`);
+          const prezzo = parseFloat(sp.prezzo_orario);
+          const prezzoFmt = isNaN(prezzo) ? 'N/A' : formatter.format(prezzo);
+          const tipo = sp.tipo_spazio || sp.tipo || '';
+          list.append(
+            `<li class="list-group-item">${sp.nome} – ${tipo} (${prezzoFmt})</li>`
+          );
         });
         dettagliDiv.html(list);
       }
