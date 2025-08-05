@@ -27,29 +27,63 @@
     </nav>
 
     <div class="container py-5">
-    <h1>Pagamento</h1>
+      <h1>Pagamento</h1>
 
-    <form id="formPagamento" class="mb-3">
-      <div class="mb-3">
-        <label for="prenotazione" class="form-label">Prenotazione</label>
-        <select id="prenotazione" class="form-select" required></select>
+      <!-- Card riepilogo -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Riepilogo Prenotazione</h5>
+        </div>
+        <div class="card-body" id="riepilogoPrenotazione">
+          <!-- Popolato via JavaScript -->
+        </div>
       </div>
-      <div class="mb-3">
-        <label for="metodo" class="form-label">Metodo di pagamento</label>
-        <select id="metodo" class="form-select" required>
-          <option value="paypal">PayPal</option>
-          <option value="satispay">SatisPay</option>
-          <option value="carta">Carta di Credito</option>
-          <option value="bancomat">Bancomat</option>
-        </select>
+
+      <form id="formPagamento" class="mb-3">
+        <div class="mb-3">
+          <label for="prenotazione" class="form-label">Prenotazione</label>
+          <select id="prenotazione" class="form-select" required></select>
+        </div>
+        <div class="mb-3">
+          <label for="metodo" class="form-label">Metodo di pagamento</label>
+          <select id="metodo" class="form-select" required>
+            <option value="paypal">💳 PayPal</option>
+            <option value="satispay">📱 SatisPay</option>
+            <option value="carta">💳 Carta di Credito</option>
+            <option value="bancomat">💳 Bancomat</option>
+          </select>
+        </div>
+        <p id="importoDaPagare" class="fw-bold"></p>
+
+        <button type="submit" class="btn btn-primary position-relative">
+          Effettua Pagamento
+          <span class="spinner-border spinner-border-sm d-none ms-2" id="paymentSpinner" role="status"></span>
+        </button>
+      </form>
+
+      <div id="alertPagamento"></div>
+    </div>
+
+    <!-- Nuova sezione storico pagamenti -->
+    <div class="container py-4">
+      <h2>Storico Pagamenti</h2>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Spazio</th>
+              <th>Prenotazione</th>
+              <th>Importo</th>
+              <th>Metodo</th>
+            </tr>
+          </thead>
+          <tbody id="storicoPagamenti">
+            <!-- Popolato via JavaScript -->
+          </tbody>
+        </table>
       </div>
-      <p id="importoDaPagare" class="fw-bold"></p>
-
-      <button type="submit" class="btn btn-primary">Effettua Pagamento</button>
-    </form>
-
-    <div id="alertPagamento"></div>
-  </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

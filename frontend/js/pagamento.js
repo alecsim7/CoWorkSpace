@@ -8,16 +8,68 @@ $(document).ready(function () {
     return;
   }
 
-  // Carica prenotazioni non ancora pagate
+  let prenotazioni = []; // Variabile per memorizzare le prenotazioni
+
+  function mostraRiepilogoPrenotazione(prenotazione) {
+    const riepilogo = `
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Spazio:</strong> ${prenotazione.nome_spazio}</p>
+          <p><strong>Data:</strong> ${prenotazione.data}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Orario:</strong> ${prenotazione.orario_inizio.slice(0,5)} - ${prenotazione.orario_fine.slice(0,5)}</p>
+          <p><strong>Prezzo orario:</strong> €${prenotazione.prezzo_orario}</p>
+        </div>
+      </div>
+    `;
+    $('#riepilogoPrenotazione').html(riepilogo);
+  }
+
+  function calcolaImporto(prenotazione) {
+    if (!prenotazione.prezzo_orario || !prenotazione.orario_inizio || !prenotazione.orario_fine) {
+      return null;
+    }
+
+    const inizio = prenotazione.orario_inizio.slice(0,5);
+    const fine = prenotazione.orario_fine.slice(0,5);
+    const [hStart, mStart] = inizio.split(':').map(Number);
+    const [hEnd, mEnd] = fine.split(':').map(Number);
+    const ore = (hEnd + mEnd/60) - (hStart + mStart/60);
+    return parseFloat(prenotazione.prezzo_orario) * ore;
+  }
+
+  function aggiornaInterfaccia() {
+    if ($('#prenotazione option').length === 0) {
+      $('#alertPagamento').html('<div class="alert alert-info">Nessuna prenotazione da pagare.</div>');
+      $('#formPagamento').hide();
+    }
+  }
+
+  // Gestione cambio prenotazione
+  $('#prenotazione').change(function() {
+    const prenotazioneId = parseInt($(this).val());
+    const prenotazione = prenotazioni.find(p => p.id === prenotazioneId);
+    
+    if (prenotazione) {
+      mostraRiepilogoPrenotazione(prenotazione);
+      const importo = calcolaImporto(prenotazione);
+      $('#importoDaPagare').text(
+        importo ? `Importo totale da pagare: €${importo.toFixed(2)}` : 'Importo non disponibile'
+      );
+    }
+  });
+
+  // Caricamento prenotazioni
   $.ajax({
     url: 'http://localhost:3000/api/prenotazioni/non-pagate',
     method: 'GET',
     headers: { Authorization: `Bearer ${token}` },
-    success: function (res) {
+    success: function(res) {
+      prenotazioni = res.prenotazioni || [];
       // DEBUG: Mostra la risposta ricevuta dal backend
       console.log('Risposta prenotazioni non pagate:', res);
 
-      const prenotazioni = res.prenotazioni || [];
       // NON filtrare per !p.pagamento_id, la query backend già restituisce solo quelle non pagate
       if (prenotazioni.length === 0) {
         $('#alertPagamento').html('<div class="alert alert-info">Nessuna prenotazione da pagare.</div>');
@@ -74,13 +126,71 @@ $(document).ready(function () {
     }
   });
 
+  // Funzione per caricare e visualizzare lo storico pagamenti
+  function caricaStoricoPagamenti() {
+    $.ajax({
+      url: 'http://localhost:3000/api/pagamenti/storico',
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+      success: function(res) {
+        const pagamenti = res.pagamenti || [];
+        const tbody = $('#storicoPagamenti');
+        tbody.empty();
+        
+        if (pagamenti.length === 0) {
+          tbody.append('<tr><td colspan="5" class="text-center">Nessun pagamento effettuato</td></tr>');
+          return;
+        }
+
+        pagamenti.forEach(p => {
+          const data = new Date(p.data_pagamento).toLocaleString('it-IT', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          
+          const dataPrenotazione = new Date(p.data_prenotazione).toLocaleDateString('it-IT');
+          
+          tbody.append(`
+            <tr>
+              <td>${data}</td>
+              <td>${p.nome_spazio}</td>
+              <td>${dataPrenotazione} ${p.orario_inizio.slice(0,5)}-${p.orario_fine.slice(0,5)}</td>
+              <td>€${parseFloat(p.importo).toFixed(2)}</td>
+              <td>${p.metodo_pagamento}</td>
+            </tr>
+          `);
+        });
+      },
+      error: function(xhr) {
+        console.error('Errore caricamento storico:', xhr.status, xhr.responseText);
+        $('#storicoPagamenti').html(`
+          <tr>
+            <td colspan="5" class="text-center text-danger">
+              Errore nel caricamento dello storico pagamenti
+            </td>
+          </tr>
+        `);
+      }
+    });
+  }
+
+  // Carica lo storico all'avvio
+  caricaStoricoPagamenti();
+
   // Gestione submit form pagamento
   $('#formPagamento').submit(function (e) {
     e.preventDefault();
 
+    // Mostra spinner e disabilita il bottone
+    const $submitBtn = $(this).find('button[type="submit"]');
+    $submitBtn.prop('disabled', true);
+    $('#paymentSpinner').removeClass('d-none');
+    
     const prenotazione_id = parseInt($('#prenotazione').val());
     const metodo = $('#metodo').val();
-
 
     $.ajax({
       url: 'http://localhost:3000/api/pagamento',
@@ -91,16 +201,32 @@ $(document).ready(function () {
       data: JSON.stringify({ prenotazione_id, metodo }),
 
       success: function (res) {
-        $('#alertPagamento').html(`<div class="alert alert-success">✅ ${res.message}</div>`);
+        $('#alertPagamento').html(`
+          <div class="alert alert-success d-flex align-items-center">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            ${res.message}
+          </div>
+        `);
         $('#prenotazione option:selected').remove();
         $('#formPagamento')[0].reset();
         $('#importoDaPagare').empty();
         if ($('#prenotazione option').length === 0) {
           $('#formPagamento').hide();
         }
+        caricaStoricoPagamenti(); // Aggiorna lo storico
       },
       error: function (xhr) {
-        $('#alertPagamento').html(`<div class="alert alert-danger">❌ ${xhr.responseJSON?.message || 'Errore nel pagamento'}</div>`);
+        $('#alertPagamento').html(`
+          <div class="alert alert-danger d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            ${xhr.responseJSON?.message || 'Errore durante il pagamento'}
+          </div>
+        `);
+      },
+      complete: function() {
+        // Nascondi spinner e riabilita il bottone
+        $submitBtn.prop('disabled', false);
+        $('#paymentSpinner').addClass('d-none');
       }
     });
   });

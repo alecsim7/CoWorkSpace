@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS pagamenti (
+    id SERIAL PRIMARY KEY,
+    prenotazione_id INTEGER REFERENCES prenotazioni(id),
+    metodo_pagamento VARCHAR(50) NOT NULL,
+    importo DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
