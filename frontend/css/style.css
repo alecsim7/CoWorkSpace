@@ -39,7 +39,7 @@ main.container {
   margin: 0 auto;
 }
 
-h1.main-title {
+.main-title {
   color: #0d6efd;
   font-weight: 800;
   text-align: center;
