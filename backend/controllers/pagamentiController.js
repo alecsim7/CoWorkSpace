@@ -80,8 +80,8 @@ exports.storicoPagamenti = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT
-        p.timestamp AS data_pagamento,
-        p.metodo AS metodo_pagamento,
+        p.timestamp,
+        p.metodo,
         p.importo,
         pr.data AS data_prenotazione,
         pr.orario_inizio,
