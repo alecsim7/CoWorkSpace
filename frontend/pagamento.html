@@ -26,67 +26,83 @@
       </div>
     </nav>
 
-    <div class="container py-5">
-      <h1 class="main-title">Pagamento</h1>
+    <main class="container py-5">
+      <h1 class="main-title text-center mb-4">Pagamento</h1>
 
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <!-- Card per Pagamento e Riepilogo -->
+          <div class="card shadow-sm mb-5">
+            <div class="card-body p-4 p-md-5">
+              
+              <!-- Riepilogo Prenotazione -->
+              <div class="mb-4" id="riepilogoContainer">
+                <h5 class="card-title">Riepilogo Prenotazione</h5>
+                <div id="riepilogoPrenotazione" class="text-muted">
+                  Seleziona una prenotazione per vedere i dettagli.
+                </div>
+              </div>
 
-      <!-- Card riepilogo -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">Riepilogo Prenotazione</h5>
-        </div>
-        <div class="card-body" id="riepilogoPrenotazione">
-          <!-- Popolato via JavaScript -->
+              <!-- Form di Pagamento -->
+              <form id="formPagamento">
+                <h5 class="card-title">Dettagli Pagamento</h5>
+                <div class="mb-3">
+                  <label for="prenotazione" class="form-label">Seleziona Prenotazione da Pagare</label>
+                  <select id="prenotazione" class="form-select form-lg" required>
+                    <option value="">Caricamento...</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="metodo" class="form-label">Metodo di pagamento</label>
+                  <select id="metodo" class="form-select form-lg" required>
+                    <option value="paypal">💳 PayPal</option>
+                    <option value="satispay">📱 SatisPay</option>
+                    <option value="carta">💳 Carta di Credito</option>
+                    <option value="bancomat">💳 Bancomat</option>
+                  </select>
+                </div>
+                <p id="importoDaPagare" class="fw-bold fs-4 text-end"></p>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 position-relative">
+                  Paga Ora
+                  <span class="spinner-border spinner-border-sm d-none ms-2" id="paymentSpinner" role="status"></span>
+                </button>
+              </form>
+              
+              <div id="alertPagamento" class="mt-4"></div>
+            </div>
+          </div>
+
+          <!-- Storico Pagamenti -->
+          <div class="card shadow-sm">
+            <div class="card-header">
+              <h5 class="mb-0">Storico Pagamenti</h5>
+            </div>
+            <div class="card-body">
+              <p class="text-muted small mb-2">Sono mostrati solo gli ultimi cinque pagamenti.</p>
+              <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Spazio</th>
+                      <th>Prenotazione</th>
+                      <th>Importo</th>
+                      <th>Metodo</th>
+                    </tr>
+                  </thead>
+                  <tbody id="storicoPagamenti">
+                    <!-- Popolato via JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <form id="formPagamento" class="mb-3">
-        <div class="mb-3">
-          <label for="prenotazione" class="form-label">Prenotazione</label>
-          <select id="prenotazione" class="form-select form-lg" required></select>
-        </div>
-        <div class="mb-3">
-          <label for="metodo" class="form-label">Metodo di pagamento</label>
-          <select id="metodo" class="form-select form-lg" required>
-            <option value="paypal">💳 PayPal</option>
-            <option value="satispay">📱 SatisPay</option>
-            <option value="carta">💳 Carta di Credito</option>
-            <option value="bancomat">💳 Bancomat</option>
-          </select>
-        </div>
-        <p id="importoDaPagare" class="fw-bold"></p>
-
-        <button type="submit" class="btn btn-primary position-relative">
-          Effettua Pagamento
-          <span class="spinner-border spinner-border-sm d-none ms-2" id="paymentSpinner" role="status"></span>
-        </button>
-      </form>
-
-      <div id="alertPagamento"></div>
     </main>
 
     <!-- Nuova sezione storico pagamenti -->
-    <div class="container py-5">
-      <h2>Storico Pagamenti</h2>
-      <p class="text-muted small">Sono mostrati solo gli ultimi cinque pagamenti.</p>
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Spazio</th>
-              <th>Prenotazione</th>
-              <th>Importo</th>
-              <th>Metodo</th>
-            </tr>
-          </thead>
-          <tbody id="storicoPagamenti">
-            <!-- Popolato via JavaScript -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
     <footer class="footer text-center py-3 bg-light text-muted mt-auto">
       &copy; 2025 CoWorkSpace. Tutti i diritti riservati.
     </footer>
