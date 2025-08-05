@@ -5,7 +5,6 @@ exports.effettuaPagamento = async (req, res) => {
   const { prenotazione_id, metodo } = req.body;
   const utente_id = req.utente.id;
 
-
   const metodiValidi = ['paypal', 'satispay', 'carta', 'bancomat'];
   if (!metodiValidi.includes(metodo)) {
     return res.status(400).json({ message: 'Metodo di pagamento non valido' });
@@ -16,7 +15,6 @@ exports.effettuaPagamento = async (req, res) => {
 
     // Recupera la prenotazione e verifica appartenenza all'utente
     const prenRes = await pool.query(
-      // RIMOSSO: importo dalla SELECT
       'SELECT utente_id, spazio_id, data, orario_inizio, orario_fine FROM prenotazioni WHERE id = $1',
       [prenotazione_id]
     );
@@ -57,18 +55,16 @@ exports.effettuaPagamento = async (req, res) => {
     }
 
     await pool.query(
-      // RIMOSSO: metodo dalla query e dai valori
-      `INSERT INTO pagamenti (prenotazione_id, importo, timestamp)
-       VALUES ($1, $2, NOW())`,
-      [prenotazione_id, importo]
+      `INSERT INTO pagamenti (prenotazione_id, importo, metodo, timestamp)
+       VALUES ($1, $2, $3, NOW())`,
+      [prenotazione_id, importo, metodo]
     );
 
     await pool.query('COMMIT');
 
     res.status(201).json({
       message: 'Pagamento registrato',
-      pagamento: { prenotazione_id, importo }
-      // RIMOSSO: metodo
+      pagamento: { prenotazione_id, importo, metodo }
     });
   } catch (err) {
     await pool.query('ROLLBACK');
@@ -84,8 +80,8 @@ exports.storicoPagamenti = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT
-        p.created_at AS data_pagamento,
-        p.metodo_pagamento,
+        p.timestamp AS data_pagamento,
+        p.metodo AS metodo_pagamento,
         p.importo,
         pr.data AS data_prenotazione,
         pr.orario_inizio,
@@ -95,7 +91,7 @@ exports.storicoPagamenti = async (req, res) => {
       JOIN prenotazioni pr ON p.prenotazione_id = pr.id
       JOIN spazi s ON pr.spazio_id = s.id
       WHERE pr.utente_id = $1
-      ORDER BY p.created_at DESC`,
+      ORDER BY p.timestamp DESC`,
       [utente_id]
     );
 
