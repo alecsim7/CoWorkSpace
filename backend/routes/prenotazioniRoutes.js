@@ -4,18 +4,18 @@ const prenotazioniController = require('../controllers/prenotazioniController');
 const { verificaToken } = require('../middleware/authMiddleware');
 
 // ✅ Creazione prenotazione (solo utenti autenticati)
-router.post('/prenotazioni', verificaToken, prenotazioniController.creaPrenotazione);
+router.post('/', verificaToken, prenotazioniController.creaPrenotazione);
 
 // ✅ Visualizza prenotazioni dell'utente autenticato
-router.get('/prenotazioni', verificaToken, prenotazioniController.visualizzaPrenotazioni);
+router.get('/', verificaToken, prenotazioniController.visualizzaPrenotazioni);
 
 // ✅ Prenotazioni dell'utente non ancora pagate
-router.get('/prenotazioni/non-pagate', verificaToken, prenotazioniController.prenotazioniNonPagate);
+router.get('/non-pagate', verificaToken, prenotazioniController.prenotazioniNonPagate);
 
 // ✅ Modifica una prenotazione esistente
-router.put('/prenotazioni/:id', verificaToken, prenotazioniController.modificaPrenotazione);
+router.put('/:id', verificaToken, prenotazioniController.modificaPrenotazione);
 
 // ✅ Elimina una prenotazione esistente
-router.delete('/prenotazioni/:id', verificaToken, prenotazioniController.eliminaPrenotazione);
+router.delete('/:id', verificaToken, prenotazioniController.eliminaPrenotazione);
 
 module.exports = router;

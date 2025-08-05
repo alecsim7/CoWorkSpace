@@ -21,7 +21,7 @@ app.use('/api', require('./routes/authRoutes'));           // Login, registrazio
 app.use('/api', require('./routes/userRoutes'));           // Profilo utente
 app.use('/api/sedi', require('./routes/sediRoutes'));
 app.use('/api/spazi', require('./routes/spaziRoutes'));
-const prenotazioniRoutes = require('./routes/prenotazioni');
+const prenotazioniRoutes = require('./routes/prenotazioniRoutes');
 const pagamentiRoutes = require('./routes/pagamentiRoutes');
 
 app.use('/api/prenotazioni', prenotazioniRoutes);
