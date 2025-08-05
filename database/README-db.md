@@ -57,6 +57,8 @@ Definisce un'unità prenotabile all'interno di una sede (es. sala, scrivania, uf
 |---------------|--------------|------------------------------------------|
 | `id`          | SERIAL       | Identificativo dello spazio              |
 | `sede_id`     | INTEGER      | FK → `Sede(id)`                          |
+| `nome`        | VARCHAR(100) | Nome dello spazio                        |
+| `descrizione` | TEXT         | Descrizione dello spazio                 |
 | `tipo_spazio` | VARCHAR(20)  | Tipo: `scrivania`, `ufficio`, `sala`     |
 | `servizi`     | TEXT         | Servizi inclusi (es. WiFi, stampante)    |
 | `prezzo_orario`  | NUMERIC(6,2) | Prezzo orario dello spazio               |
