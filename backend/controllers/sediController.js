@@ -3,24 +3,19 @@ const pool = require('../db');
 // Recupera sedi con filtri opzionali per città, tipo spazio e servizi
 exports.getSedi = async (req, res) => {
   try {
-    const { citta, tipo, servizio } = req.query;
+    const { citta, servizio } = req.query;
 
     let query = 'SELECT DISTINCT s.* FROM sedi s';
     const where = [];
     const params = [];
 
-    if (tipo || servizio) {
+    if (servizio) {
       query += ' JOIN spazi sp ON s.id = sp.sede_id';
     }
 
     if (citta) {
       params.push(citta);
       where.push(`s.citta = $${params.length}`);
-    }
-
-    if (tipo) {
-      params.push(tipo);
-      where.push(`sp.tipologia = $${params.length}`);
     }
 
     if (servizio) {
@@ -44,7 +39,6 @@ exports.getSedi = async (req, res) => {
 exports.getOpzioni = async (req, res) => {
   try {
     const cittaResult = await pool.query('SELECT DISTINCT citta FROM sedi');
-    const tipoResult = await pool.query('SELECT DISTINCT tipologia FROM spazi');
     const serviziResult = await pool.query('SELECT servizi FROM spazi WHERE servizi IS NOT NULL');
 
     const serviziSet = new Set();
@@ -58,7 +52,7 @@ exports.getOpzioni = async (req, res) => {
 
     res.json({
       citta: cittaResult.rows.map(r => r.citta),
-      tipi: tipoResult.rows.map(r => r.tipologia),
+      tipi: [], // Rimosso il caricamento dei tipi
       servizi: Array.from(serviziSet),
     });
   } catch (err) {
