@@ -76,6 +76,7 @@ exports.effettuaPagamento = async (req, res) => {
 // 2. Storico pagamenti
 exports.storicoPagamenti = async (req, res) => {
   const utente_id = req.utente.id;
+  const limite = parseInt(req.query.limit, 10) || 5;
 
   try {
     const result = await pool.query(
@@ -91,8 +92,9 @@ exports.storicoPagamenti = async (req, res) => {
       JOIN prenotazioni pr ON p.prenotazione_id = pr.id
       JOIN spazi s ON pr.spazio_id = s.id
       WHERE pr.utente_id = $1
-      ORDER BY p.timestamp DESC`,
-      [utente_id]
+      ORDER BY p.timestamp DESC
+      LIMIT $2`,
+      [utente_id, limite]
     );
 
     res.json({ pagamenti: result.rows });

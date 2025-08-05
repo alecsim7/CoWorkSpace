@@ -129,7 +129,7 @@ $(document).ready(function () {
   // Funzione per caricare e visualizzare lo storico pagamenti
   function caricaStoricoPagamenti() {
     $.ajax({
-      url: 'http://localhost:3000/api/pagamenti/storico',
+      url: 'http://localhost:3000/api/pagamenti/storico?limit=5',
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function(res) {
