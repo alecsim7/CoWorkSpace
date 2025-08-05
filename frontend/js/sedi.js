@@ -1,4 +1,17 @@
 $(document).ready(function () {
+  function caricaOpzioni() {
+    $.getJSON('http://localhost:3000/api/sedi/opzioni', function (data) {
+      const cittaList = $('#cittaOptions').empty();
+      (data.citta || []).forEach(c => cittaList.append(`<option value="${c}"></option>`));
+
+      const tipoList = $('#tipoOptions').empty();
+      (data.tipi || []).forEach(t => tipoList.append(`<option value="${t}"></option>`));
+
+      const serviziList = $('#serviziOptions').empty();
+      (data.servizi || []).forEach(s => serviziList.append(`<option value="${s}"></option>`));
+    });
+  }
+
   function caricaSedi() {
     const citta = $('#filtroCitta').val();
     const tipo = $('#filtroTipo').val();
@@ -77,5 +90,6 @@ $(document).ready(function () {
     });
   });
 
+  caricaOpzioni();
   caricaSedi();
 });
