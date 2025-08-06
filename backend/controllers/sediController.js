@@ -39,11 +39,11 @@ exports.getSedi = async (req, res) => {
 exports.getOpzioni = async (req, res) => {
   try {
     const cittaResult = await pool.query('SELECT DISTINCT citta FROM sedi');
-    const serviziResult = await pool.query('SELECT servizi FROM spazi WHERE servizi IS NOT NULL');
+    const serviziResult = await pool.query('SELECT servizi_offerti FROM spazi WHERE servizi_offerti IS NOT NULL');
 
     const serviziSet = new Set();
     serviziResult.rows.forEach(row => {
-      row.servizi
+      row.servizi_offerti
         .split(',')
         .map(s => s.trim())
         .filter(Boolean)
