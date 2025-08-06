@@ -19,8 +19,9 @@ exports.getSedi = async (req, res) => {
     }
 
     if (servizio) {
+      // Try common column names for services
       params.push(`%${servizio}%`);
-      where.push(`sp.servizi ILIKE $${params.length}`);
+      where.push(`(sp.servizi ILIKE $${params.length} OR sp.servizi_offerti ILIKE $${params.length} OR sp.services ILIKE $${params.length})`);
     }
 
     if (where.length > 0) {
@@ -39,15 +40,31 @@ exports.getSedi = async (req, res) => {
 exports.getOpzioni = async (req, res) => {
   try {
     const cittaResult = await pool.query('SELECT DISTINCT citta FROM sedi');
-    const serviziResult = await pool.query('SELECT servizi_offerti FROM spazi WHERE servizi_offerti IS NOT NULL');
+    
+    // Try to get services from different possible column names
+    let serviziResult = { rows: [] };
+    const possibleColumns = ['servizi', 'servizi_offerti', 'services'];
+    
+    for (const column of possibleColumns) {
+      try {
+        serviziResult = await pool.query(`SELECT ${column} FROM spazi WHERE ${column} IS NOT NULL`);
+        break; // If successful, exit the loop
+      } catch (columnErr) {
+        // Column doesn't exist, try next one
+        continue;
+      }
+    }
 
     const serviziSet = new Set();
     serviziResult.rows.forEach(row => {
-      row.servizi_offerti
-        .split(',')
-        .map(s => s.trim())
-        .filter(Boolean)
-        .forEach(s => serviziSet.add(s));
+      const servizi = Object.values(row)[0]; // Get the first (and only) column value
+      if (servizi) {
+        servizi
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+          .forEach(s => serviziSet.add(s));
+      }
     });
 
     res.json({

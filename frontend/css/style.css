@@ -125,7 +125,7 @@ main.container {
 }
 
 #listaPrenotazioni li.list-group-item > div {
-  font-size: 1.15rem;
+  font-size: 0.95rem;
   color: #333;
 }
 
