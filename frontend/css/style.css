@@ -514,14 +514,3 @@ button.btn-lg {
     flex-direction: column;
   }
 }
-
-.navbar-dashboard {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.navbar-dashboard .navbar-brand img {
-  height: 50px; /* Imposta un'altezza di base desiderata */
-  max-height: 100%; /* Assicura che l'immagine si adatti e non superi l'altezza del suo contenitore */
-  width: auto; /* Mantiene le proporzioni corrette */
-}
