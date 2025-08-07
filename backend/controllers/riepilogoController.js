@@ -1,7 +1,11 @@
 const pool = require('../db');
 
 exports.getRiepilogoPrenotazioni = async (req, res) => {
-  const gestoreId = req.params.id;
+  const gestoreId = parseInt(req.params.id, 10);
+
+  if (req.utente.id !== gestoreId) {
+    return res.status(403).json({ message: 'Accesso negato' });
+  }
 
   try {
     // Query che aggrega il numero di prenotazioni per ogni spazio gestito dal gestore
