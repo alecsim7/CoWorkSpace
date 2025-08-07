@@ -40,7 +40,22 @@ exports.getSedi = async (req, res) => {
 exports.getOpzioni = async (req, res) => {
   try {
     const cittaResult = await pool.query('SELECT DISTINCT citta FROM sedi');
-    
+
+    // Try to get distinct types from possible column names
+    let tipiResult = { rows: [] };
+    const tipoColumns = ['tipo_spazio', 'tipo'];
+    for (const column of tipoColumns) {
+      try {
+        tipiResult = await pool.query(
+          `SELECT DISTINCT ${column} AS tipo FROM spazi WHERE ${column} IS NOT NULL`
+        );
+        break; // If successful, exit the loop
+      } catch (columnErr) {
+        // Column doesn't exist, try next one
+        continue;
+      }
+    }
+
     // Try to get services from different possible column names
     let serviziResult = { rows: [] };
     const possibleColumns = ['servizi', 'servizi_offerti', 'services'];
@@ -69,7 +84,7 @@ exports.getOpzioni = async (req, res) => {
 
     res.json({
       citta: cittaResult.rows.map(r => r.citta),
-      tipi: [], // Rimosso il caricamento dei tipi
+      tipi: tipiResult.rows.map(r => r.tipo),
       servizi: Array.from(serviziSet),
     });
   } catch (err) {
