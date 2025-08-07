@@ -25,9 +25,13 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=coworkspace
 JWT_SECRET=supersegreto
+# Chiave segreta Stripe per i pagamenti
+STRIPE_SECRET_KEY=sk_test_...
 ```
 
 Adatta i valori alle tue impostazioni locali.
+
+Per il frontend è inoltre necessario esporre la chiave pubblicabile Stripe (`STRIPE_PUBLISHABLE_KEY`) come variabile globale `window.STRIPE_PUBLISHABLE_KEY` nelle pagine che effettuano pagamenti.
 
 ## Avvio del database
 
