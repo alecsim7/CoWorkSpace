@@ -62,8 +62,14 @@
 - POST   /api/login               → Login utente
 
 👤 Utente:
-- GET    /api/utente/:id          → Profilo utente
+- GET    /api/utente/me           → Profilo dell'utente autenticato
 - GET    /api/prenotazioni        → Prenotazioni utente
+
+Esempio richiesta profilo autenticato:
+
+```bash
+curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/api/utente/me
+```
 
 🏢 Sedi e spazi:
 - GET    /api/sedi                → Elenco sedi

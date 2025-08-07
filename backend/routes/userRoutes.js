@@ -7,6 +7,12 @@ const validate = require('../middleware/validateInput');
 // DEPRECATO: la rotta /profilo/:id è stata sostituita da /api/utente/me
 router.get('/profilo/:id', userController.getProfilo);
 
+router.get(
+  '/utente/me',
+  authMiddleware.verificaToken,
+  userController.getProfiloAutenticato
+);
+
 router.put(
   '/utente/me',
   authMiddleware.verificaToken,
