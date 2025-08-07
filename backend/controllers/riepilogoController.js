@@ -10,7 +10,7 @@ exports.getRiepilogoPrenotazioni = async (req, res) => {
   try {
     // Query che aggrega il numero di prenotazioni per ogni spazio gestito dal gestore
     const result = await pool.query(
-      `SELECT 
+      `SELECT
          sedi.nome AS nome_sede,
          spazi.nome AS nome_spazio,
          spazi.image_url,
@@ -24,7 +24,12 @@ exports.getRiepilogoPrenotazioni = async (req, res) => {
       [gestoreId]
     );
 
-    res.json({ riepilogo: result.rows });
+    const riepilogo = result.rows.map(r => ({
+      ...r,
+      totale_prenotazioni: parseInt(r.totale_prenotazioni, 10) || 0,
+    }));
+
+    res.json({ riepilogo });
   } catch (err) {
     console.error('Errore recupero riepilogo prenotazioni:', err);
     res.status(500).json({ message: 'Errore del server' });

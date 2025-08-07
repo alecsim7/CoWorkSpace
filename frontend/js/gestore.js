@@ -84,45 +84,45 @@ $(document).ready(function () {
 
   caricaSpazi();
 
-  // Visualizza riepilogo prenotazioni aggregato
-  function caricaRiepilogo() {
-    $.ajax({
-      url: `${API_BASE}/riepilogo/${utente.id}`,
-      method: 'GET',
-      headers: { Authorization: `Bearer ${token}` },
-      success: function (data) {
-        console.log("Riepilogo dati ricevuti:", data);
-        const container = $('#riepilogoContainer');
-        container.empty();
+    // Visualizza riepilogo prenotazioni aggregato per ogni spazio
+    function caricaRiepilogo() {
+      $.ajax({
+        url: `${API_BASE}/riepilogo/${utente.id}`,
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` },
+        success: function (data) {
+          const container = $('#riepilogoContainer');
+          container.empty();
 
-        if (!data.riepilogo || !Array.isArray(data.riepilogo) || data.riepilogo.length === 0) {
-          container.html('<div class="alert alert-info">Nessuna prenotazione registrata nei tuoi spazi.</div>');
-          return;
-        }
+          if (!data.riepilogo || !Array.isArray(data.riepilogo) || data.riepilogo.length === 0) {
+            container.html('<div class="alert alert-info">Nessuna prenotazione registrata nei tuoi spazi.</div>');
+            return;
+          }
 
-        data.riepilogo.forEach(r => {
-          container.append(`
-            <div class="card mb-2">
-              <div class="row g-0 align-items-center">
-                <div class="col-md-3 text-center p-2">
-                  ${r.image_url ? `<img src="${r.image_url}" class="spazio-thumb" alt="${r.nome_spazio || 'Spazio'}" />` : ''}
-                </div>
-                <div class="col-md-9">
-                  <div class="card-body">
-                    🏢 <strong>${r.nome_sede || 'N/D'}</strong> – 🪑 ${r.nome_spazio || 'N/D'}<br>
-                    📊 Prenotazioni totali: ${r.totale_prenotazioni || 0}
+          data.riepilogo.forEach(r => {
+            const count = Number(r.totale_prenotazioni) || 0;
+            container.append(`
+              <div class="card mb-2">
+                <div class="row g-0 align-items-center">
+                  <div class="col-md-3 text-center p-2">
+                    ${r.image_url ? `<img src="${r.image_url}" class="spazio-thumb" alt="${r.nome_spazio || 'Spazio'}" />` : ''}
+                  </div>
+                  <div class="col-md-9">
+                    <div class="card-body">
+                      🏢 <strong>${r.nome_sede || 'N/D'}</strong> – 🪑 ${r.nome_spazio || 'N/D'}<br>
+                      📊 Prenotazioni totali: ${count}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          `);
-        });
-      },
-      error: function () {
-        $('#riepilogoContainer').html('<div class="alert alert-danger">Errore nel caricamento del riepilogo.</div>');
-      }
-    });
-  }
+            `);
+          });
+        },
+        error: function () {
+          $('#riepilogoContainer').html('<div class="alert alert-danger">Errore nel caricamento del riepilogo.</div>');
+        }
+      });
+    }
 
   caricaRiepilogo();
 
