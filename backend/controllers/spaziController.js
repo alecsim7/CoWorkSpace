@@ -6,7 +6,7 @@ exports.getSpaziPerSede = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT id, sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi
+      `SELECT id, sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi, image_url
        FROM spazi WHERE sede_id = $1`,
       [sede_id]
     );
@@ -19,15 +19,16 @@ exports.getSpaziPerSede = async (req, res) => {
 
 // Aggiunta nuovo spazio (gestore)
 exports.aggiungiSpazio = async (req, res) => {
-  const {
-    sede_id,
-    nome,
-    descrizione,
-    prezzo_orario,
-    capienza,
-    tipo_spazio,
-    servizi,
-  } = req.body;
+    const {
+      sede_id,
+      nome,
+      descrizione,
+      prezzo_orario,
+      capienza,
+      tipo_spazio,
+      servizi,
+      image_url,
+    } = req.body;
 
 const tipiValidi = ['scrivania', 'ufficio', 'sala'];
 
@@ -54,15 +55,15 @@ if (!tipiValidi.includes(tipo_spazio)) {
   return res.status(400).json({ message: 'Tipo di spazio non valido' });
 }
 
-  try {
-    const result = await pool.query(
-      `INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi]
-    );
-    res.status(201).json(result.rows[0]);
-  } catch (err) {
-    console.error('Errore inserimento spazio:', err);
-    res.status(500).json({ message: 'Errore server durante inserimento spazio' });
-  }
+    try {
+      const result = await pool.query(
+        `INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi, image_url)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+        [sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi, image_url]
+      );
+      res.status(201).json(result.rows[0]);
+    } catch (err) {
+      console.error('Errore inserimento spazio:', err);
+      res.status(500).json({ message: 'Errore server durante inserimento spazio' });
+    }
 };

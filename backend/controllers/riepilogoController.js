@@ -6,9 +6,10 @@ exports.getRiepilogoPrenotazioni = async (req, res) => {
   try {
     // Query che recupera le prenotazioni per tutti gli spazi gestiti dal gestore
     const result = await pool.query(`
-      SELECT 
+      SELECT
         sedi.nome AS nome_sede,
         spazi.nome AS nome_spazio,
+        spazi.image_url,
         prenotazioni.data,
         prenotazioni.orario_inizio,
         prenotazioni.orario_fine,

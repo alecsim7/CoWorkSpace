@@ -18,7 +18,7 @@ exports.getSediGestite = async (req, res) => {
 
 // 2. Aggiungi spazio in una sede
 exports.aggiungiSpazio = async (req, res) => {
-  const { sede_id, nome, descrizione, prezzo_orario, capienza, servizi } = req.body;
+  const { sede_id, nome, descrizione, prezzo_orario, capienza, servizi, image_url } = req.body;
 
   if (!sede_id || !nome || prezzo_orario === undefined || capienza === undefined || !servizi) {
     return res.status(400).json({ message: 'Tutti i campi sono obbligatori.' });
@@ -34,8 +34,8 @@ exports.aggiungiSpazio = async (req, res) => {
 
   try {
     const result = await pool.query(
-      'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, servizi) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [sede_id, nome, descrizione, prezzo_orario, capienza, servizi]
+      'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, servizi, image_url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [sede_id, nome, descrizione, prezzo_orario, capienza, servizi, image_url]
     );
     res.status(201).json({ spazio: result.rows[0] });
   } catch (err) {

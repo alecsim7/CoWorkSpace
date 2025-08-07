@@ -25,7 +25,8 @@ CREATE TABLE spazi (
   prezzo_orario NUMERIC(6,2) NOT NULL,
   capienza INTEGER NOT NULL CHECK (capienza > 0),
   tipo_spazio VARCHAR(20) CHECK (tipo_spazio IN ('scrivania', 'ufficio', 'sala')) NOT NULL,
-  servizi TEXT
+  servizi TEXT,
+  image_url TEXT
 );
 
 -- Disponibilita
