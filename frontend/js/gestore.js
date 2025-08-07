@@ -181,7 +181,7 @@ $(document).ready(function () {
     }
 
     $.ajax({
-      url: 'http://localhost:3000/api/spazi',
+      url: '/api/spazi',
       method: 'POST',
       contentType: 'application/json',
       headers: { Authorization: `Bearer ${token}` },
