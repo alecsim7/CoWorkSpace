@@ -45,9 +45,25 @@ Adatta i valori alle tue impostazioni locali.
    ```bash
    cd backend
    npm install
-   npm start # oppure node server.js
+   npm start
    ```
 2. L'API sarà disponibile su `http://localhost:3000` (o sulla porta configurata).
+
+## Endpoint principali
+
+| Metodo | Endpoint                 | Descrizione                                      |
+|--------|--------------------------|--------------------------------------------------|
+| POST   | `/api/register`          | Registrazione di un nuovo utente                 |
+| POST   | `/api/login`             | Login e generazione di token/sessione            |
+| GET    | `/api/utente/me`         | Recupera i dati del profilo dell’utente loggato |
+| PUT    | `/api/utente/me`         | Aggiorna i dati del proprio profilo utente       |
+| GET    | `/api/sedi`              | Visualizza tutte le sedi disponibili             |
+| GET    | `/api/spazi/:sede_id`    | Visualizza gli spazi all’interno di una sede    |
+| POST   | `/api/prenotazioni`      | Crea una nuova prenotazione                      |
+| GET    | `/api/prenotazioni`      | Elenca le prenotazioni dell’utente loggato       |
+| DELETE | `/api/prenotazioni/:id`  | Annulla una prenotazione                         |
+| POST   | `/api/pagamento`         | Esegue il pagamento di una prenotazione          |
+| GET    | `/api/pagamenti/storico` | Restituisce lo storico pagamenti dell'utente    |
 
 La specifica completa delle API è disponibile in [docs/api-spec.md](docs/api-spec.md).
 
