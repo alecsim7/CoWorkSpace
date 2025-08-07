@@ -76,6 +76,15 @@
                 <input type="text" id="nomeSpazio" class="form-control form-lg" placeholder="Es: Sala Riunioni Grande" required />
               </div>
               <div class="mb-3">
+                <label for="tipoSpazio" class="form-label">Tipo di Spazio</label>
+                <select id="tipoSpazio" class="form-select form-lg" required>
+                  <option value="">-- Seleziona il tipo --</option>
+                  <option value="scrivania">Scrivania</option>
+                  <option value="ufficio">Ufficio</option>
+                  <option value="sala">Sala</option>
+                </select>
+              </div>
+              <div class="mb-3">
                 <label for="descrizioneSpazio" class="form-label">Descrizione</label>
                 <textarea id="descrizioneSpazio" class="form-control form-lg" rows="3" placeholder="Descrivi lo spazio..." required></textarea>
               </div>
