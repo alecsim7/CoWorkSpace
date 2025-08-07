@@ -189,6 +189,7 @@ $(document).ready(function () {
       success: function () {
         $('#alertGestore').html(`<div class="alert alert-success">✅ Spazio aggiunto con successo!</div>`);
         $('#formSpazio')[0].reset();
+        caricaSpazi();
       },
       error: function (xhr) {
         $('#alertGestore').html(`<div class="alert alert-danger">❌ Errore: ${xhr.responseJSON?.message || 'Impossibile aggiungere lo spazio'}</div>`);
