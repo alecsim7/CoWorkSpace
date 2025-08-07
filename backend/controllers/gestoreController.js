@@ -81,7 +81,7 @@ exports.aggiungiDisponibilita = async (req, res) => {
 
   try {
     const result = await pool.query(
-      'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      'INSERT INTO disponibilita (spazio_id, data, orario_inizio, orario_fine) VALUES ($1, $2, $3, $4) RETURNING *',
       [id, data, orario_inizio, orario_fine]
     );
     res.status(201).json({ disponibilita: result.rows[0] });
