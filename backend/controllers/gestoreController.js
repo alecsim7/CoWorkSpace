@@ -150,17 +150,21 @@ exports.getRiepilogoPrenotazioni = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT COUNT(*) AS totale_prenotazioni,
-              MIN(p.data) AS prima_prenotazione,
-              MAX(p.data) AS ultima_prenotazione
-       FROM prenotazioni p
-       JOIN spazi s ON p.spazio_id = s.id
+      `SELECT 
+         sede.nome AS nome_sede,
+         s.nome AS nome_spazio,
+         s.image_url,
+         COUNT(p.id) AS totale_prenotazioni
+       FROM spazi s
        JOIN sedi sede ON s.sede_id = sede.id
-       WHERE sede.gestore_id = $1`,
+       LEFT JOIN prenotazioni p ON p.spazio_id = s.id
+       WHERE sede.gestore_id = $1
+       GROUP BY s.id, sede.nome, s.nome, s.image_url
+       ORDER BY sede.nome, s.nome`,
       [gestore_id]
     );
 
-    res.json({ riepilogo: result.rows[0] });
+    res.json({ riepilogo: result.rows });
   } catch (err) {
     console.error('Errore nel riepilogo prenotazioni:', err);
     res.status(500).json({ message: 'Errore del server' });

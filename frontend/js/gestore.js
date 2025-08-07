@@ -75,7 +75,7 @@ $(document).ready(function () {
 
   caricaSpazi();
 
-  // Visualizza riepilogo prenotazioni
+  // Visualizza riepilogo prenotazioni aggregato
   function caricaRiepilogo() {
     $.ajax({
       url: `http://localhost:3000/api/riepilogo/${utente.id}`,
@@ -101,8 +101,7 @@ $(document).ready(function () {
                 <div class="col-md-9">
                   <div class="card-body">
                     🏢 <strong>${r.nome_sede || 'N/D'}</strong> – 🪑 ${r.nome_spazio || 'N/D'}<br>
-                    📅 ${r.data || 'N/D'} ⏰ ${r.orario_inizio || 'N/D'} - ${r.orario_fine || 'N/D'}<br>
-                    👤 Prenotato da: ${r.nome_utente || 'N/D'}
+                    📊 Prenotazioni totali: ${r.totale_prenotazioni || 0}
                   </div>
                 </div>
               </div>
