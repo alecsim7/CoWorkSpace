@@ -9,6 +9,4 @@ router.put('/spazi/:id', verificaToken, gestoreController.modificaSpazio);
 router.delete('/spazi/:id', verificaToken, gestoreController.eliminaSpazio);
 router.post('/spazi/:id/disponibilita', verificaToken, gestoreController.aggiungiDisponibilita);
 router.get('/prenotazioni/:gestore_id', verificaToken, gestoreController.visualizzaPrenotazioniRicevute);
-router.get('/riepilogo/:gestore_id', verificaToken, gestoreController.getRiepilogoPrenotazioni);
-
 module.exports = router;

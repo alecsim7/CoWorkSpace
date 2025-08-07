@@ -143,26 +143,3 @@ exports.visualizzaPrenotazioniRicevute = async (req, res) => {
     res.status(500).json({ message: 'Errore del server' });
   }
 };
-
-// 7. Riepilogo prenotazioni per gestore (NUOVA funzione)
-exports.getRiepilogoPrenotazioni = async (req, res) => {
-  const { gestore_id } = req.params;
-
-  try {
-    const result = await pool.query(
-      `SELECT COUNT(*) AS totale_prenotazioni,
-              MIN(p.data) AS prima_prenotazione,
-              MAX(p.data) AS ultima_prenotazione
-       FROM prenotazioni p
-       JOIN spazi s ON p.spazio_id = s.id
-       JOIN sedi sede ON s.sede_id = sede.id
-       WHERE sede.gestore_id = $1`,
-      [gestore_id]
-    );
-
-    res.json({ riepilogo: result.rows[0] });
-  } catch (err) {
-    console.error('Errore nel riepilogo prenotazioni:', err);
-    res.status(500).json({ message: 'Errore del server' });
-  }
-};
