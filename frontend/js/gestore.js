@@ -175,8 +175,8 @@ $(document).ready(function () {
       return;
     }
 
-    if (!servizi || !servizi.trim()) {
-      $('#alertGestore').html(`<div class="alert alert-warning">⚠️ Inserisci i servizi offerti nello spazio.</div>`);
+    if (!servizi || servizi.length === 0) {
+      $('#alertGestore').html(`<div class="alert alert-warning">⚠️ Seleziona almeno un servizio.</div>`);
       return;
     }
 
@@ -185,7 +185,7 @@ $(document).ready(function () {
       method: 'POST',
       contentType: 'application/json',
       headers: { Authorization: `Bearer ${token}` },
-      data: JSON.stringify({ sede_id, nome, tipo_spazio, descrizione, servizi, prezzo_orario, capienza }),
+      data: JSON.stringify({ sede_id, nome, tipo_spazio, descrizione, servizi: servizi.join(','), prezzo_orario, capienza }),
       success: function () {
         $('#alertGestore').html(`<div class="alert alert-success">✅ Spazio aggiunto con successo!</div>`);
         $('#formSpazio')[0].reset();
