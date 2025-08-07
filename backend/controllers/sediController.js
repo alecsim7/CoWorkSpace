@@ -108,10 +108,14 @@ exports.getOpzioni = async (req, res) => {
 // Recupera sedi di un gestore
 exports.getSediGestore = async (req, res) => {
   const { id } = req.params;
+  const requestedId = parseInt(id, 10);
+  if (req.utente.id !== requestedId) {
+    return res.status(403).json({ message: 'Accesso negato' });
+  }
   try {
     const result = await pool.query(
       'SELECT id, nome, citta FROM sedi WHERE gestore_id = $1',
-      [id]
+      [requestedId]
     );
     res.json(result.rows);
   } catch (err) {
