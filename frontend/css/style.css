@@ -431,11 +431,6 @@ button.btn-lg {
   margin-bottom: 10px;
 }
 
-.spazio-img {
-  height: 160px;
-  object-fit: cover;
-}
-
 .card-icons i {
   margin-right: 0.5rem;
   font-size: 1.2rem;
