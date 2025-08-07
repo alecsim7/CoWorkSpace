@@ -1,6 +1,7 @@
 $(document).ready(function () {
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente'));
+  const API_BASE = '/api';
 
   if (!token || !utente || utente.ruolo !== 'gestore') {
     alert("Accesso non autorizzato. Effettua il login come gestore.");
@@ -11,7 +12,7 @@ $(document).ready(function () {
   // Carica sedi del gestore
   function caricaSedi() {
     $.ajax({
-      url: `http://localhost:3000/api/sedi/gestore/${utente.id}`,
+      url: `${API_BASE}/sedi/gestore/${utente.id}`,
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function (data) {
@@ -32,7 +33,7 @@ $(document).ready(function () {
   // Carica spazi del gestore con immagini
   function caricaSpazi() {
     $.ajax({
-      url: `http://localhost:3000/api/sedi/gestore/${utente.id}`,
+      url: `${API_BASE}/sedi/gestore/${utente.id}`,
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function (sedi) {
@@ -46,7 +47,7 @@ $(document).ready(function () {
 
         sedi.forEach(sede => {
           $.ajax({
-            url: `http://localhost:3000/api/spazi/${sede.id}`,
+            url: `${API_BASE}/spazi/${sede.id}`,
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` },
             success: function (spazi) {
@@ -86,7 +87,7 @@ $(document).ready(function () {
   // Visualizza riepilogo prenotazioni aggregato
   function caricaRiepilogo() {
     $.ajax({
-      url: `http://localhost:3000/api/riepilogo/${utente.id}`,
+      url: `${API_BASE}/riepilogo/${utente.id}`,
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function (data) {
@@ -134,7 +135,7 @@ $(document).ready(function () {
     const indirizzo = $('#indirizzoSede').val();
 
     $.ajax({
-      url: 'http://localhost:3000/api/sedi',
+      url: `${API_BASE}/sedi`,
       method: 'POST',
       contentType: 'application/json',
       headers: { Authorization: `Bearer ${token}` },
@@ -188,7 +189,7 @@ $(document).ready(function () {
     }
 
     $.ajax({
-      url: '/api/spazi',
+      url: `${API_BASE}/spazi`,
       method: 'POST',
       contentType: 'application/json',
       headers: { Authorization: `Bearer ${token}` },
