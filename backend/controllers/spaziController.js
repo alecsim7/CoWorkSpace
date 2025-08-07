@@ -60,6 +60,17 @@ exports.aggiungiSpazio = async (req, res) => {
 
     if (sede.rows.length === 0) {
       return res.status(404).json({ message: 'Sede non trovata' });
+    try {
+      const imageUrlSafe = image_url || null;
+      const result = await pool.query(
+        `INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi, image_url)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+        [sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi, imageUrlSafe]
+      );
+      res.status(201).json(result.rows[0]);
+    } catch (err) {
+      console.error('Errore inserimento spazio:', err);
+      res.status(500).json({ message: 'Errore server durante inserimento spazio' });
     }
 
     if (sede.rows[0].gestore_id !== req.utente.id) {
