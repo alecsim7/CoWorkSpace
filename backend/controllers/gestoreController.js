@@ -18,9 +18,26 @@ exports.getSediGestite = async (req, res) => {
 
 // 2. Aggiungi spazio in una sede
 exports.aggiungiSpazio = async (req, res) => {
-  const { sede_id, nome, descrizione, prezzo_orario, capienza, servizi } = req.body;
+  const {
+    sede_id,
+    nome,
+    descrizione,
+    prezzo_orario,
+    capienza,
+    tipo_spazio,
+    servizi,
+  } = req.body;
 
-  if (!sede_id || !nome || prezzo_orario === undefined || capienza === undefined || !servizi) {
+  const tipiValidi = ['scrivania', 'ufficio', 'sala'];
+
+  if (
+    !sede_id ||
+    !nome ||
+    prezzo_orario === undefined ||
+    capienza === undefined ||
+    !tipo_spazio ||
+    !servizi
+  ) {
     return res.status(400).json({ message: 'Tutti i campi sono obbligatori.' });
   }
 
@@ -32,10 +49,14 @@ exports.aggiungiSpazio = async (req, res) => {
     return res.status(400).json({ message: 'Capienza non valida.' });
   }
 
+  if (!tipiValidi.includes(tipo_spazio)) {
+    return res.status(400).json({ message: 'Tipo di spazio non valido.' });
+  }
+
   try {
     const result = await pool.query(
-      'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, servizi) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [sede_id, nome, descrizione, prezzo_orario, capienza, servizi]
+      'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi]
     );
     res.status(201).json({ spazio: result.rows[0] });
   } catch (err) {
