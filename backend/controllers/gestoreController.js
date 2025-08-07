@@ -21,6 +21,27 @@ exports.aggiungiSpazio = async (req, res) => {
   const { sede_id, nome, descrizione, prezzo_orario, capienza, servizi, image_url } = req.body;
 
   if (!sede_id || !nome || prezzo_orario === undefined || capienza === undefined || !servizi) {
+    
+  const {
+    sede_id,
+    nome,
+    descrizione,
+    prezzo_orario,
+    capienza,
+    tipo_spazio,
+    servizi,
+  } = req.body;
+
+  const tipiValidi = ['scrivania', 'ufficio', 'sala'];
+
+  if (
+    !sede_id ||
+    !nome ||
+    prezzo_orario === undefined ||
+    capienza === undefined ||
+    !tipo_spazio ||
+    !servizi
+  ) {
     return res.status(400).json({ message: 'Tutti i campi sono obbligatori.' });
   }
 
@@ -32,10 +53,19 @@ exports.aggiungiSpazio = async (req, res) => {
     return res.status(400).json({ message: 'Capienza non valida.' });
   }
 
+  if (!tipiValidi.includes(tipo_spazio)) {
+    return res.status(400).json({ message: 'Tipo di spazio non valido.' });
+  }
+
   try {
     const result = await pool.query(
+
       'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, servizi, image_url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
       [sede_id, nome, descrizione, prezzo_orario, capienza, servizi, image_url]
+
+      'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi]
+
     );
     res.status(201).json({ spazio: result.rows[0] });
   } catch (err) {
@@ -81,7 +111,7 @@ exports.aggiungiDisponibilita = async (req, res) => {
 
   try {
     const result = await pool.query(
-      'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      'INSERT INTO disponibilita (spazio_id, data, orario_inizio, orario_fine) VALUES ($1, $2, $3, $4) RETURNING *',
       [id, data, orario_inizio, orario_fine]
     );
     res.status(201).json({ disponibilita: result.rows[0] });
