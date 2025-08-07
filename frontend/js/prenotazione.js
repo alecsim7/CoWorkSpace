@@ -121,6 +121,7 @@ $(document).ready(function () {
                 </div>
                 <p class="mb-1"><i class="bi bi-geo-alt-fill me-1"></i><strong>Sede:</strong> ${spazio.nome_sede}</p>
                 <p class="mb-1"><strong>Prezzo orario:</strong> €${prezzoFormattato}</p>
+                <p class="mb-1"><strong>Posti liberi:</strong> ${spazio.posti_liberi}</p>
                 <p><strong>Prezzo totale per la fascia selezionata:</strong> €${prezzoTotale}</p>
                 <button class="btn btn-primary btn-lg mt-auto w-100 btnPrenota" data-id="${spazio.spazio_id}" data-nome="${spazio.nome_spazio}">Prenota</button>
               </div>
@@ -173,7 +174,8 @@ $(document).ready(function () {
       if (!res.ok) throw result;
       const importo = parseFloat(result.importo ?? result.prenotazione?.importo);
       const msgImporto = isNaN(importo) ? '' : ` Importo: €${importo.toFixed(2)}`;
-      $('#prenotazioneAlert').html(`<div class="alert alert-success">Prenotazione per <strong>${nome_spazio}</strong> registrata!${msgImporto}</div>`);
+      const msgPosti = typeof result.posti_liberi === 'number' ? ` Posti liberi rimanenti: ${result.posti_liberi}` : '';
+      $('#prenotazioneAlert').html(`<div class="alert alert-success">Prenotazione per <strong>${nome_spazio}</strong> registrata!${msgImporto}${msgPosti}</div>`);
       $('#formRicerca')[0].reset();
       $('#risultatiSpazi').empty();
     } catch (err) {

@@ -24,28 +24,22 @@ exports.ricercaDisponibilita = async (req, res) => {
     // DEBUG: Mostra i parametri ricevuti
     console.log('Parametri ricerca disponibilità:', { data, orario_inizio, orario_fine });
 
-    // Rimuovi il join con disponibilita se vuoi mostrare tutti gli spazi non prenotati
     const result = await pool.query(
-      `SELECT DISTINCT s.id AS spazio_id,
+      `SELECT s.id AS spazio_id,
               s.nome AS nome_spazio,
               s.descrizione,
               s.prezzo_orario,
-              sede.nome AS nome_sede
+              sede.nome AS nome_sede,
+              s.capienza - COALESCE(COUNT(p.id), 0) AS posti_liberi
        FROM spazi s
        JOIN sedi sede ON s.sede_id = sede.id
-       WHERE s.id NOT IN (
-           SELECT spazio_id FROM prenotazioni
-           WHERE data = $1
-           AND NOT (
-             orario_fine <= $2 OR
-             orario_inizio >= $3
-           )
-         )`,
+       LEFT JOIN prenotazioni p ON p.spazio_id = s.id
+           AND p.data = $1
+           AND NOT (p.orario_fine <= $2 OR p.orario_inizio >= $3)
+       GROUP BY s.id, s.nome, s.descrizione, s.prezzo_orario, s.capienza, sede.nome
+       HAVING (s.capienza - COALESCE(COUNT(p.id), 0)) > 0`,
       [data, orario_inizio, orario_fine]
     );
-
-    // DEBUG: Mostra il risultato della query
-    console.log('Spazi disponibili trovati:', result.rows);
 
     res.json({ risultati: result.rows });
   } catch (err) {
