@@ -1,6 +1,6 @@
 $(document).ready(function () {
   function caricaOpzioni() {
-    $.getJSON('http://localhost:3000/api/sedi/opzioni', function (data) {
+    $.getJSON('/api/sedi/opzioni', function (data) {
       const cittaList = $('#cittaOptions').empty();
       (data.citta || []).forEach(c => cittaList.append(`<option value="${c}"></option>`));
 
@@ -21,7 +21,7 @@ $(document).ready(function () {
     if (tipo) params.tipo = tipo;
     if (servizio) params.servizio = servizio;
     const query = $.param(params);
-    const url = query ? `http://localhost:3000/api/sedi?${query}` : 'http://localhost:3000/api/sedi';
+    const url = query ? '/api/sedi?' + query : '/api/sedi';
 
     $.getJSON(url, function (sedi) {
       const container = $('#listaSedi');
@@ -67,7 +67,7 @@ $(document).ready(function () {
       return;
     }
 
-    $.getJSON(`http://localhost:3000/api/sedi/${id}`, function (sede) {
+    $.getJSON('/api/sedi/' + id, function (sede) {
       if (!sede || !sede.spazi || sede.spazi.length === 0) {
         dettagliDiv.html('<div class="text-muted">Nessuno spazio disponibile.</div>');
       } else {
