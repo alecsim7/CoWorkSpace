@@ -22,9 +22,10 @@ CREATE TABLE spazi (
   sede_id INTEGER NOT NULL REFERENCES sedi(id) ON DELETE CASCADE,
   nome VARCHAR(100) NOT NULL,
   descrizione TEXT,
+  prezzo_orario NUMERIC(6,2) NOT NULL,
+  capienza INTEGER NOT NULL CHECK (capienza > 0),
   tipo_spazio VARCHAR(20) CHECK (tipo_spazio IN ('scrivania', 'ufficio', 'sala')) NOT NULL,
-  servizi TEXT,
-  prezzo_orario NUMERIC(6,2) NOT NULL
+  servizi TEXT
 );
 
 -- Disponibilita

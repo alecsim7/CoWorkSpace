@@ -29,10 +29,30 @@ exports.aggiungiSpazio = async (req, res) => {
     servizi,
   } = req.body;
 
-  const tipiValidi = ['scrivania', 'ufficio', 'sala'];
-  if (!tipo_spazio || !tipiValidi.includes(tipo_spazio)) {
-    return res.status(400).json({ message: 'Tipo di spazio non valido' });
-  }
+const tipiValidi = ['scrivania', 'ufficio', 'sala'];
+
+if (
+  !sede_id ||
+  !nome ||
+  prezzo_orario === undefined ||
+  capienza === undefined ||
+  !tipo_spazio ||
+  !servizi
+) {
+  return res.status(400).json({ message: 'Tutti i campi sono obbligatori.' });
+}
+
+if (isNaN(prezzo_orario) || prezzo_orario < 0) {
+  return res.status(400).json({ message: 'Prezzo orario non valido.' });
+}
+
+if (isNaN(capienza) || capienza <= 0) {
+  return res.status(400).json({ message: 'Capienza non valida.' });
+}
+
+if (!tipiValidi.includes(tipo_spazio)) {
+  return res.status(400).json({ message: 'Tipo di spazio non valido' });
+}
 
   try {
     const result = await pool.query(
