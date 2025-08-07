@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const sediController = require('../controllers/sediController');
-const { verificaToken } = require('../middleware/authMiddleware');
+const { verificaToken, verificaGestore } = require('../middleware/authMiddleware');
 
 // Aggiungi sede (protetto)
 router.post('/', verificaToken, sediController.aggiungiSede);
 
 // Recupera sedi per gestore (protetto)
-router.get('/gestore/:id', verificaToken, sediController.getSediGestore);
+router.get('/gestore/:id', verificaToken, verificaGestore, sediController.getSediGestore);
 
 // Recupera liste di opzioni pubbliche
 router.get('/opzioni', sediController.getOpzioni);
