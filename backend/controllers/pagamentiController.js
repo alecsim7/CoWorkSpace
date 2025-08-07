@@ -1,8 +1,9 @@
 const pool = require('../db');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // 1. Registra pagamento
 exports.effettuaPagamento = async (req, res) => {
-  const { prenotazione_id, metodo } = req.body;
+  const { prenotazione_id, metodo, token } = req.body;
   const utente_id = req.utente.id;
 
   const metodiValidi = ['paypal', 'satispay', 'carta', 'bancomat'];
@@ -52,6 +53,26 @@ exports.effettuaPagamento = async (req, res) => {
     if (pagRes.rows.length > 0) {
       await pool.query('ROLLBACK');
       return res.status(400).json({ message: 'Prenotazione già pagata' });
+    }
+
+    // Se il metodo è carta utilizziamo Stripe per eseguire il pagamento
+    if (metodo === 'carta') {
+      if (!token) {
+        await pool.query('ROLLBACK');
+        return res.status(400).json({ message: 'Token di pagamento mancante' });
+      }
+
+      const charge = await stripe.charges.create({
+        amount: Math.round(importo * 100), // in centesimi
+        currency: 'eur',
+        source: token,
+        description: `Prenotazione ${prenotazione_id}`,
+      });
+
+      if (charge.status !== 'succeeded') {
+        await pool.query('ROLLBACK');
+        return res.status(400).json({ message: 'Pagamento non riuscito' });
+      }
     }
 
     await pool.query(

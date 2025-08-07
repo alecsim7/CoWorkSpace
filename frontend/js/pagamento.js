@@ -2,6 +2,10 @@ $(document).ready(function () {
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente'));
 
+  const stripeKey = window.STRIPE_PUBLISHABLE_KEY;
+  const stripe = stripeKey ? Stripe(stripeKey) : null;
+  let card;
+
   if (!token || !utente) {
     alert("Effettua il login per accedere al pagamento.");
     window.location.href = "index.html";
@@ -45,6 +49,24 @@ $(document).ready(function () {
       $('#formPagamento').hide();
     }
   }
+
+  if (stripe) {
+    const elements = stripe.elements();
+    card = elements.create('card');
+  }
+
+  $('#metodo').change(function() {
+    if ($(this).val() === 'carta' && stripe) {
+      $('#card-element').removeClass('d-none');
+      if (!card._mounted) {
+        card.mount('#card-element');
+        card._mounted = true;
+      }
+    } else {
+      $('#card-element').addClass('d-none');
+      $('#card-errors').text('');
+    }
+  }).trigger('change');
 
   // Gestione cambio prenotazione
   $('#prenotazione').change(function() {
@@ -181,16 +203,28 @@ $(document).ready(function () {
   caricaStoricoPagamenti();
 
   // Gestione submit form pagamento
-  $('#formPagamento').submit(function (e) {
+  $('#formPagamento').submit(async function (e) {
     e.preventDefault();
 
     // Mostra spinner e disabilita il bottone
     const $submitBtn = $(this).find('button[type="submit"]');
     $submitBtn.prop('disabled', true);
     $('#paymentSpinner').removeClass('d-none');
-    
+
     const prenotazione_id = parseInt($('#prenotazione').val());
     const metodo = $('#metodo').val();
+
+    let tokenStripe = null;
+    if (metodo === 'carta' && stripe) {
+      const result = await stripe.createToken(card);
+      if (result.error) {
+        $('#card-errors').text(result.error.message);
+        $submitBtn.prop('disabled', false);
+        $('#paymentSpinner').addClass('d-none');
+        return;
+      }
+      tokenStripe = result.token.id;
+    }
 
     $.ajax({
         url: 'http://localhost:3000/api/pagamenti/pagamento',
@@ -198,7 +232,7 @@ $(document).ready(function () {
       contentType: 'application/json',
 
       headers: { Authorization: `Bearer ${token}` },
-      data: JSON.stringify({ prenotazione_id, metodo }),
+      data: JSON.stringify({ prenotazione_id, metodo, token: tokenStripe }),
 
       success: function (res) {
         $('#alertPagamento').html(`
