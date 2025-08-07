@@ -13,19 +13,33 @@ async function resolveTipoColumn() {
   return result.rows[0]?.column_name;
 }
 
+// Helper to resolve which column stores services information.
+// Looks for one of: servizi, servizi_offerti, services.
+// Returns the found column name or undefined if none exists.
+async function resolveServiziColumn() {
+  const result = await pool.query(
+    `SELECT column_name FROM information_schema.columns
+     WHERE table_name = 'spazi'
+       AND column_name IN ('servizi', 'servizi_offerti', 'services')
+     LIMIT 1`
+  );
+  return result.rows[0]?.column_name;
+}
+
 // Recupera sedi con filtri opzionali per città, tipo spazio e servizi
 exports.getSedi = async (req, res) => {
   try {
     const { citta, servizio, tipo } = req.query;
 
-    // Determine the column name for the type of space
+    // Determine the column names for the type of space and services
     const tipoColumn = await resolveTipoColumn();
+    const serviziColumn = await resolveServiziColumn();
 
     let query = 'SELECT DISTINCT s.* FROM sedi s';
     const where = [];
     const params = [];
 
-    if (servizio || (tipo && tipoColumn)) {
+    if ((servizio && serviziColumn) || (tipo && tipoColumn)) {
       query += ' JOIN spazi sp ON s.id = sp.sede_id';
     }
 
@@ -34,10 +48,9 @@ exports.getSedi = async (req, res) => {
       where.push(`s.citta = $${params.length}`);
     }
 
-    if (servizio) {
-      // Try common column names for services
+    if (servizio && serviziColumn) {
       params.push(`%${servizio}%`);
-      where.push(`(sp.servizi ILIKE $${params.length} OR sp.servizi_offerti ILIKE $${params.length} OR sp.services ILIKE $${params.length})`);
+      where.push(`sp.${serviziColumn} ILIKE $${params.length}`);
     }
 
     if (tipo && tipoColumn) {
@@ -71,14 +84,20 @@ exports.getOpzioni = async (req, res) => {
       tipi = tipiResult.rows.map(r => r.tipo);
     }
 
-    const serviziResult = await pool.query(
-      "SELECT DISTINCT trim(unnest(string_to_array(servizi, ','))) AS servizio FROM spazi WHERE servizi IS NOT NULL"
-    );
+    const serviziColumn = await resolveServiziColumn();
+    let servizi = [];
+    if (serviziColumn) {
+      const serviziResult = await pool.query(
+        `SELECT DISTINCT trim(unnest(string_to_array(${serviziColumn}, ','))) AS servizio
+         FROM spazi WHERE ${serviziColumn} IS NOT NULL`
+      );
+      servizi = serviziResult.rows.map(r => r.servizio);
+    }
 
     res.json({
       citta: cittaResult.rows.map(r => r.citta),
       tipi,
-      servizi: serviziResult.rows.map(r => r.servizio),
+      servizi,
     });
   } catch (err) {
     console.error('Errore nel recupero opzioni sedi:', err);
