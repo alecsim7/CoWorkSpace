@@ -1,16 +1,19 @@
 $(document).ready(function () {
+  // Recupera token e dati utente dal localStorage
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente'));
 
+  // Controllo accesso: solo admin può accedere
   if (!token || !utente || utente.ruolo !== 'admin') {
     alert("Accesso negato. Solo admin possono entrare.");
     window.location.href = "index.html";
     return;
   }
 
+  // Mostra il nome dell'admin nella dashboard
   $('#adminNome').text(utente.nome);
 
-  // Carica utenti da backend
+  // Funzione per caricare la lista utenti dal backend
   function caricaUtenti() {
     $.ajax({
       url: 'http://localhost:3000/api/admin/utenti',
@@ -21,6 +24,7 @@ $(document).ready(function () {
         if (utenti.length === 0) {
           $('#listaUtenti').append('<li class="list-group-item">Nessun utente trovato.</li>');
         } else {
+          // Per ogni utente, aggiungi un elemento alla lista con pulsante elimina
           utenti.forEach(u => {
             $('#listaUtenti').append(`
               <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -39,7 +43,7 @@ $(document).ready(function () {
     });
   }
 
-  // Carica sedi da backend
+  // Funzione per caricare la lista sedi dal backend
   function caricaSedi() {
     $.ajax({
       url: 'http://localhost:3000/api/admin/sedi',
@@ -50,6 +54,7 @@ $(document).ready(function () {
         if (sedi.length === 0) {
           $('#listaSedi').append('<li class="list-group-item">Nessuna sede trovata.</li>');
         } else {
+          // Per ogni sede, aggiungi un elemento alla lista con pulsante elimina
           sedi.forEach(s => {
             $('#listaSedi').append(`
               <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -68,7 +73,7 @@ $(document).ready(function () {
     });
   }
 
-  // Evento elimina utente
+  // Gestione evento elimina utente
   $('#listaUtenti').on('click', '.eliminaUtente', function () {
     const id = $(this).data('id');
     if (confirm('Sei sicuro di voler eliminare questo utente?')) {
@@ -77,7 +82,7 @@ $(document).ready(function () {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
         success: function () {
-          caricaUtenti();
+          caricaUtenti(); // Ricarica la lista dopo eliminazione
         },
         error: function () {
           alert('Errore durante l\'eliminazione dell\'utente');
@@ -86,7 +91,7 @@ $(document).ready(function () {
     }
   });
 
-  // Evento elimina sede
+  // Gestione evento elimina sede
   $('#listaSedi').on('click', '.eliminaSede', function () {
     const id = $(this).data('id');
     if (confirm('Sei sicuro di voler eliminare questa sede?')) {
@@ -95,7 +100,7 @@ $(document).ready(function () {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
         success: function () {
-          caricaSedi();
+          caricaSedi(); // Ricarica la lista dopo eliminazione
         },
         error: function () {
           alert('Errore durante l\'eliminazione della sede');
@@ -104,11 +109,11 @@ $(document).ready(function () {
     }
   });
 
-  // Carica dati all’avvio
+  // Carica dati all’avvio della pagina
   caricaUtenti();
   caricaSedi();
 
-  // Logout
+  // Gestione logout
   $('#logoutBtn').click(function () {
     localStorage.removeItem('token');
     localStorage.removeItem('utente');

@@ -1,5 +1,5 @@
 $(function () {
-  // Mostra form login
+  // Mostra il form di login
   $('#btnShowLogin').click(function () {
     $('.forms-wrapper').show();
     $('#loginSection').show();
@@ -8,7 +8,7 @@ $(function () {
     $('#registerAlert').hide();
   });
 
-  // Mostra form registrazione
+  // Mostra il form di registrazione
   $('#btnShowRegister').click(function () {
     $('.forms-wrapper').show();
     $('#registerSection').show();
@@ -17,31 +17,34 @@ $(function () {
     $('#registerAlert').hide();
   });
 
-  // Login reale con chiamata AJAX
+  // Gestione login con chiamata AJAX
   $('#loginForm').submit(function (e) {
     e.preventDefault();
 
+    // Recupera email e password dal form
     const email = $('#loginEmail').val().trim();
     const password = $('#loginPassword').val();
 
     $('#loginAlert').remove();
 
+    // Controllo campi obbligatori
     if (!email || !password) {
       $('#loginForm').prepend('<div id="loginAlert" class="alert alert-warning">Inserisci email e password</div>');
       return;
     }
 
+    // Chiamata AJAX per login
     $.ajax({
       url: 'http://localhost:3000/api/login', 
       method: 'POST',
       contentType: 'application/json',
       data: JSON.stringify({ email, password }),
       success: function (response) {
-        // Salva token e utente
+        // Salva token e utente nel localStorage
         localStorage.setItem('token', response.token);
         localStorage.setItem('utente', JSON.stringify(response.utente));
 
-        // Redirect in base al ruolo
+        // Redirect in base al ruolo dell'utente
         const ruolo = (response.utente.ruolo || '').toLowerCase();
         if (ruolo === 'gestore') {
           window.location.href = 'gestore.html';
@@ -52,16 +55,18 @@ $(function () {
         }
       },
       error: function (xhr) {
+        // Mostra errore in caso di login fallito
         const msg = xhr.responseJSON?.message || 'Errore nel login.';
         $('#loginForm').prepend(`<div id="loginAlert" class="alert alert-danger">${msg}</div>`);
       }
     });
   });
 
-  // Registrazione (esempio, puoi migliorare)
+  // Gestione registrazione utente
   $('#registerForm').submit(function (e) {
     e.preventDefault();
 
+    // Recupera dati dal form
     const nome = $('#regNome').val().trim();
     const email = $('#regEmail').val().trim();
     const password = $('#regPassword').val();
@@ -69,22 +74,26 @@ $(function () {
 
     $('#registerAlert').remove();
 
+    // Controllo campi obbligatori
     if (!nome || !email || !password) {
       $('#registerForm').prepend('<div id="registerAlert" class="alert alert-warning">Compila tutti i campi.</div>');
       return;
     }
 
+    // Chiamata AJAX per registrazione
     $.ajax({
       url: 'http://localhost:3000/api/register',
       method: 'POST',
       contentType: 'application/json',
       data: JSON.stringify({ nome, email, password, ruolo }),
       success: function () {
+        // Mostra messaggio e passa al login
         alert('Registrazione effettuata! Ora effettua il login.');
         $('#registerSection').hide();
         $('#loginSection').show();
       },
       error: function (xhr) {
+        // Mostra errore in caso di registrazione fallita
         const msg = xhr.responseJSON?.message || 'Errore nella registrazione.';
         $('#registerForm').prepend(`<div id="registerAlert" class="alert alert-danger">${msg}</div>`);
       }
@@ -102,11 +111,13 @@ $(function () {
   function aggiornaMenu() {
     const utente = JSON.parse(localStorage.getItem('utente'));
     if (utente && utente.nome) {
+      // Utente loggato: mostra navbar e nome
       $('#authButtons').hide();
       $('#mainNavbar').addClass('show');
       $('#nomeUtente').text(utente.nome);
       $('#ruoloUtente').text(utente.ruolo ? `(${utente.ruolo})` : '');
     } else {
+      // Utente non loggato: mostra solo pulsanti di autenticazione
       $('#authButtons').show();
       $('#mainNavbar').removeClass('show');
       $('#nomeUtente').text('');
@@ -114,5 +125,6 @@ $(function () {
     }
   }
 
+  // Aggiorna menu all'avvio
   aggiornaMenu();
 });

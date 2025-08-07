@@ -83,7 +83,7 @@
   - DELETE /api/prenotazioni/:id          → Annulla prenotazione (solo proprietario)
 
 💳 Pagamento:
-  - POST   /api/pagamento                 → Pagamento prenotazione (`prenotazione_id`, `metodo`; importo letto dalla prenotazione)
+  - POST   /api/pagamenti/pagamento       → Pagamento prenotazione (`prenotazione_id`, `metodo`; importo letto dalla prenotazione)
 
 🛠️ Admin:
 - GET    /api/admin/utenti              → Lista utenti
