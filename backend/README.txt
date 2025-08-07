@@ -73,8 +73,8 @@
 - DELETE /api/spazi/:id           → Elimina spazio
 
 📅 Disponibilità:
-- POST   /api/spazi/:id/disponibilita   → Aggiungi disponibilità
-- POST   /api/disponibilita/ricerca     → Ricerca spazi disponibili
+- POST   /api/disponibilita            → Aggiungi disponibilità
+- GET    /api/disponibilita/:spazio_id → Visualizza disponibilità di uno spazio
 
 📆 Prenotazioni:
   - POST   /api/prenotazioni              → Crea prenotazione (l'utente è dedotto dal token, l'importo è calcolato)

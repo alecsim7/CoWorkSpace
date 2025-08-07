@@ -59,7 +59,7 @@ Filtri disponibili su `/api/sedi`:
 | Metodo | Endpoint                           | Descrizione                                     |
 |--------|------------------------------------|-------------------------------------------------|
 | GET    | `/api/spazi/:sede_id`              | Visualizza gli spazi all’interno di una sede    |
-| GET    | `/api/spazi/:id/disponibilita`     | Visualizza la disponibilità per uno spazio      |
+| GET    | `/api/disponibilita/:spazio_id`    | Visualizza la disponibilità per uno spazio      |
 
 ---
 
@@ -98,7 +98,9 @@ Filtri disponibili su `/api/sedi`:
 | POST   | `/api/spazi`                         | Aggiunge uno spazio a una sede (gestore)         |
 | PUT    | `/api/spazi/:id`                     | Modifica uno spazio esistente                    |
 | DELETE | `/api/spazi/:id`                     | Elimina uno spazio                               |
-| POST   | `/api/spazi/:id/disponibilita`       | Aggiunge disponibilità a uno spazio              |
+| POST   | `/api/disponibilita`                 | Aggiunge disponibilità a uno spazio              |
+
+**Body POST /api/disponibilita:** `spazio_id`, `data`, `orario_inizio`, `orario_fine`
 
 ---
 
