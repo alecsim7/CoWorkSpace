@@ -159,6 +159,7 @@ $(document).ready(function () {
     const tipo_spazio = $('#tipoSpazio').val();
     const descrizione = $('#descrizioneSpazio').val();
     const servizi = $('#serviziSpazio').val();
+    const serviziStr = Array.isArray(servizi) ? servizi.join(',') : servizi || '';
     const prezzo_orario = parseFloat($('#prezzoOrario').val());
     const capienza = parseInt($('#capienza').val());
 
@@ -192,7 +193,7 @@ $(document).ready(function () {
       method: 'POST',
       contentType: 'application/json',
       headers: { Authorization: `Bearer ${token}` },
-      data: JSON.stringify({ sede_id, nome, tipo_spazio, descrizione, servizi: servizi.join(','), prezzo_orario, capienza }),
+      data: JSON.stringify({ sede_id, nome, tipo_spazio, descrizione, servizi: serviziStr, prezzo_orario, capienza }),
       success: function () {
         $('#alertGestore').html(`<div class="alert alert-success">✅ Spazio aggiunto con successo!</div>`);
         $('#formSpazio')[0].reset();
