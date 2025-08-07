@@ -4,7 +4,7 @@ const sediController = require('../controllers/sediController');
 const { verificaToken, verificaGestore } = require('../middleware/authMiddleware');
 
 // Aggiungi sede (protetto)
-router.post('/', verificaToken, sediController.aggiungiSede);
+router.post('/', verificaToken, verificaGestore, sediController.aggiungiSede);
 
 // Recupera sedi per gestore (protetto)
 router.get('/gestore/:id', verificaToken, verificaGestore, sediController.getSediGestore);

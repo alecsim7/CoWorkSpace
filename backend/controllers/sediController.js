@@ -127,6 +127,11 @@ exports.getSediGestore = async (req, res) => {
 // Aggiunta nuova sede
 exports.aggiungiSede = async (req, res) => {
   const { nome, citta, indirizzo, gestore_id } = req.body;
+  const gestoreId = parseInt(gestore_id, 10);
+
+  if (req.utente.id !== gestoreId) {
+    return res.status(403).json({ message: 'Accesso negato' });
+  }
 
   try {
     const result = await pool.query(
