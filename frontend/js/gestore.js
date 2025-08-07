@@ -149,6 +149,7 @@ $(document).ready(function () {
 
     const sede_id = $('#selezionaSede').val();
     const nome = $('#nomeSpazio').val();
+    const tipo_spazio = $('#tipoSpazio').val();
     const descrizione = $('#descrizioneSpazio').val();
     const servizi = $('#serviziSpazio').val();
     const prezzo_orario = parseFloat($('#prezzoOrario').val());
@@ -169,6 +170,11 @@ $(document).ready(function () {
       return;
     }
 
+    if (!tipo_spazio) {
+      $('#alertGestore').html(`<div class="alert alert-warning">⚠️ Seleziona il tipo di spazio.</div>`);
+      return;
+    }
+
     if (!servizi || !servizi.trim()) {
       $('#alertGestore').html(`<div class="alert alert-warning">⚠️ Inserisci i servizi offerti nello spazio.</div>`);
       return;
@@ -179,7 +185,7 @@ $(document).ready(function () {
       method: 'POST',
       contentType: 'application/json',
       headers: { Authorization: `Bearer ${token}` },
-      data: JSON.stringify({ sede_id, nome, descrizione, servizi, prezzo_orario, capienza }),
+      data: JSON.stringify({ sede_id, nome, tipo_spazio, descrizione, servizi, prezzo_orario, capienza }),
       success: function () {
         $('#alertGestore').html(`<div class="alert alert-success">✅ Spazio aggiunto con successo!</div>`);
         $('#formSpazio')[0].reset();
