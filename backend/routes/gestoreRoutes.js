@@ -10,5 +10,4 @@ router.delete('/spazi/:id', verificaToken, verificaGestore, gestoreController.el
 router.post('/spazi/:id/disponibilita', verificaToken, verificaGestore, gestoreController.aggiungiDisponibilita);
 router.get('/prenotazioni/:gestore_id', verificaToken, verificaGestore, gestoreController.visualizzaPrenotazioniRicevute);
 router.get('/riepilogo/:gestore_id', verificaToken, verificaGestore, gestoreController.getRiepilogoPrenotazioni);
-
 module.exports = router;
