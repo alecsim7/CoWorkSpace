@@ -152,22 +152,35 @@ exports.prenotazioniNonPagate = async (req, res) => {
 
 // ✅ Elimina una prenotazione dell'utente
 exports.eliminaPrenotazione = async (req, res) => {
+  console.log('Richiesta eliminazione prenotazione ricevuta:', req.params.id, req.utente?.id); // Debug
+
   const { id } = req.params;
-  const utente_id = req.utente.id;
+  const utenteId = req.utente.id;
 
   try {
+    // Verifica che la prenotazione appartenga all'utente
     const result = await pool.query(
-      'DELETE FROM prenotazioni WHERE id = $1 AND utente_id = $2 RETURNING id',
-      [id, utente_id]
+      'SELECT id FROM prenotazioni WHERE id = $1 AND utente_id = $2',
+      [id, utenteId]
     );
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ message: 'Prenotazione non trovata' });
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Prenotazione non trovata o accesso negato' });
     }
+
+    // Log per debug
+    console.log(`Elimino pagamenti per prenotazione ${id}`);
+    const deletePagamenti = await pool.query('DELETE FROM pagamenti WHERE prenotazione_id = $1 RETURNING *', [id]);
+    console.log('Pagamenti eliminati:', deletePagamenti.rowCount);
+
+    // Log per debug
+    console.log(`Elimino prenotazione ${id}`);
+    const deletePrenotazione = await pool.query('DELETE FROM prenotazioni WHERE id = $1 RETURNING *', [id]);
+    console.log('Prenotazione eliminata:', deletePrenotazione.rowCount);
 
     res.json({ message: 'Prenotazione eliminata' });
   } catch (err) {
     console.error('Errore eliminazione prenotazione:', err);
-    res.status(500).json({ message: 'Errore del server' });
+    res.status(500).json({ message: 'Errore del server', error: err.message, stack: err.stack });
   }
 };
