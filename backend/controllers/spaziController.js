@@ -56,10 +56,11 @@ if (!tipiValidi.includes(tipo_spazio)) {
 }
 
     try {
+      const imageUrlSafe = image_url || null;
       const result = await pool.query(
         `INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi, image_url)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-        [sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi, image_url]
+        [sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi, imageUrlSafe]
       );
       res.status(201).json(result.rows[0]);
     } catch (err) {
