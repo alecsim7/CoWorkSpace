@@ -171,7 +171,7 @@ $(document).ready(function () {
     }
 
     if (!tipo_spazio) {
-      $('#alertGestore').html(`<div class="alert alert-warning">⚠️ Seleziona il tipo di spazio.</div>`);
+      $('#alertGestore').html(`<div class="alert alert-warning">⚠️ Seleziona il tipo di spazio (scrivania, ufficio o sala).</div>`);
       return;
     }
 
