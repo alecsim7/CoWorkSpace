@@ -1,26 +1,6 @@
 const pool = require('../db');
 
-// 1. Visualizza sedi gestite da un gestore
-exports.getSediGestite = async (req, res) => {
-  const { gestore_id } = req.params;
-
-  if (req.utente.id !== parseInt(gestore_id)) {
-    return res.status(403).json({ message: 'Accesso negato' });
-  }
-
-  try {
-    const result = await pool.query(
-      'SELECT * FROM sedi WHERE gestore_id = $1',
-      [gestore_id]
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Errore visualizzazione sedi:', err);
-    res.status(500).json({ message: 'Errore del server' });
-  }
-};
-
-// 2. Modifica spazio
+// 1. Modifica spazio
 exports.modificaSpazio = async (req, res) => {
   const { id } = req.params;
   if (req.utente.id !== parseInt(id)) {
@@ -40,7 +20,7 @@ exports.modificaSpazio = async (req, res) => {
   }
 };
 
-// 3. Elimina spazio
+// 2. Elimina spazio
 exports.eliminaSpazio = async (req, res) => {
   const { id } = req.params;
 
@@ -57,7 +37,7 @@ exports.eliminaSpazio = async (req, res) => {
   }
 };
 
-// 4. Aggiungi disponibilità a uno spazio
+// 3. Aggiungi disponibilità a uno spazio
 exports.aggiungiDisponibilita = async (req, res) => {
   const { id } = req.params;
 
@@ -78,7 +58,7 @@ exports.aggiungiDisponibilita = async (req, res) => {
   }
 };
 
-// 5. Visualizza prenotazioni ricevute per il gestore
+// 4. Visualizza prenotazioni ricevute per il gestore
 exports.visualizzaPrenotazioniRicevute = async (req, res) => {
   const { gestore_id } = req.params;
 
@@ -105,7 +85,7 @@ exports.visualizzaPrenotazioniRicevute = async (req, res) => {
   }
 };
 
-// 6. Riepilogo prenotazioni per gestore (NUOVA funzione)
+// 5. Riepilogo prenotazioni per gestore (NUOVA funzione)
 exports.getRiepilogoPrenotazioni = async (req, res) => {
   const { gestore_id } = req.params;
 

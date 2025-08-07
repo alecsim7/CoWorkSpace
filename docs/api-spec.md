@@ -94,7 +94,7 @@ Filtri disponibili su `/api/sedi`:
 
 | Metodo | Endpoint                             | Descrizione                                      |
 |--------|--------------------------------------|--------------------------------------------------|
-| GET    | `/api/dashboard/sedi`                | Visualizza sedi gestite dal gestore loggato      |
+| GET    | `/api/sedi/gestore/:id`              | Visualizza sedi gestite dal gestore loggato      |
 | POST   | `/api/spazi`                         | Aggiunge uno spazio a una sede (gestore)         |
 | PUT    | `/api/spazi/:id`                     | Modifica uno spazio esistente                    |
 | DELETE | `/api/spazi/:id`                     | Elimina uno spazio                               |
