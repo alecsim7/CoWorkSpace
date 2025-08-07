@@ -1,4 +1,8 @@
 const pool = require('../db');
+const spaziController = require('./spaziController');
+
+// 0. Aggiungi spazio (riusa la logica del controller degli spazi)
+exports.aggiungiSpazio = spaziController.aggiungiSpazio;
 
 // 1. Modifica spazio
 exports.modificaSpazio = async (req, res) => {
