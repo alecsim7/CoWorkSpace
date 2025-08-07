@@ -3,13 +3,13 @@ const pool = require('../db');
 // Recupera sedi con filtri opzionali per città, tipo spazio e servizi
 exports.getSedi = async (req, res) => {
   try {
-    const { citta, servizio } = req.query;
+    const { citta, servizio, tipo } = req.query;
 
     let query = 'SELECT DISTINCT s.* FROM sedi s';
     const where = [];
     const params = [];
 
-    if (servizio) {
+    if (servizio || tipo) {
       query += ' JOIN spazi sp ON s.id = sp.sede_id';
     }
 
@@ -22,6 +22,11 @@ exports.getSedi = async (req, res) => {
       // Try common column names for services
       params.push(`%${servizio}%`);
       where.push(`(sp.servizi ILIKE $${params.length} OR sp.servizi_offerti ILIKE $${params.length} OR sp.services ILIKE $${params.length})`);
+    }
+
+    if (tipo) {
+      params.push(tipo);
+      where.push(`sp.tipo_spazio = $${params.length}`);
     }
 
     if (where.length > 0) {
