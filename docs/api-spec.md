@@ -24,6 +24,25 @@ Le rotte che richiedono autenticazione devono includere un token/sessione nel cl
 | GET    | `/api/utente/me`  | Recupera i dati del profilo dell’utente loggato |
 | PUT    | `/api/utente/me`  | Aggiorna i dati del proprio profilo utente   |
 
+**Esempio GET `/api/utente/me`:**
+
+```bash
+curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/api/utente/me
+```
+
+Risposta:
+
+```json
+{
+  "utente": {
+    "id": 1,
+    "nome": "Mario Rossi",
+    "email": "mario@example.com",
+    "ruolo": "utente"
+  }
+}
+```
+
 **Body PUT /api/utente/me:**
 
 - `nome` e/o `password` (almeno uno dei due campi)

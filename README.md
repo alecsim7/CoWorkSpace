@@ -67,6 +67,12 @@ Adatta i valori alle tue impostazioni locali.
 
 La specifica completa delle API è disponibile in [docs/api-spec.md](docs/api-spec.md).
 
+### Esempio: recupero profilo autenticato
+
+```bash
+curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/api/utente/me
+```
+
 ## Avvio del frontend
 
 Le pagine statiche sono nella cartella `frontend`.
