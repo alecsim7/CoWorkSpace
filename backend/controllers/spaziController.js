@@ -5,6 +5,7 @@ exports.getSpaziPerSede = async (req, res) => {
   const { sede_id } = req.params;
 
   try {
+    console.log('Recupero spazi per sede:', sede_id); // Debug
     const result = await pool.query(
       `SELECT id, sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi, image_url
        FROM spazi WHERE sede_id = $1`,
@@ -13,7 +14,20 @@ exports.getSpaziPerSede = async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error('Errore nel recupero spazi:', err);
-    res.status(500).json({ message: 'Errore del server' });
+    res.status(500).json({ message: 'Errore del server', error: err.message, stack: err.stack });
+  }
+};
+
+// Restituisce tutti gli spazi
+exports.getAllSpazi = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi, image_url FROM spazi`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Errore caricamento spazi:', err);
+    res.status(500).json({ message: 'Errore del server', error: err.message, stack: err.stack });
   }
 };
 
@@ -75,7 +89,7 @@ exports.aggiungiSpazio = async (req, res) => {
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('Errore inserimento spazio:', err);
-    res.status(500).json({ message: 'Errore server durante inserimento spazio' });
+    res.status(500).json({ message: 'Errore server durante inserimento spazio', error: err.message, stack: err.stack });
   }
 };
 

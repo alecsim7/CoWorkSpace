@@ -2,8 +2,6 @@ const pool = require('../db');
 const spaziController = require('./spaziController');
 
 // 0. Aggiungi spazio (riusa la logica del controller degli spazi)
-exports.aggiungiSpazio = spaziController.aggiungiSpazio;
-
 exports.aggiungiSpazio = async (req, res) => {
   const {
     sede_id,
@@ -17,6 +15,9 @@ exports.aggiungiSpazio = async (req, res) => {
   } = req.body;
 
   const tipiValidi = ['scrivania', 'ufficio', 'sala'];
+
+  // Log dei parametri ricevuti per debug
+  console.log('Ricevuto:', req.body);
 
   if (
     !sede_id ||
@@ -70,7 +71,8 @@ exports.aggiungiSpazio = async (req, res) => {
     return res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('Errore inserimento spazio:', err);
-    return res.status(500).json({ message: 'Errore server durante inserimento spazio' });
+    // Risposta dettagliata per debug
+    return res.status(500).json({ message: 'Errore server durante inserimento spazio', error: err.message, stack: err.stack });
   }
 };
 
@@ -99,7 +101,7 @@ exports.modificaSpazio = async (req, res) => {
     res.json({ spazio: result.rows[0] });
   } catch (err) {
     console.error('Errore modifica spazio:', err);
-    res.status(500).json({ message: 'Errore del server' });
+    res.status(500).json({ message: 'Errore del server', error: err.message, stack: err.stack });
   }
 };
 
@@ -123,7 +125,7 @@ exports.eliminaSpazio = async (req, res) => {
     res.json({ message: 'Spazio eliminato' });
   } catch (err) {
     console.error('Errore eliminazione spazio:', err);
-    res.status(500).json({ message: 'Errore del server' });
+    res.status(500).json({ message: 'Errore del server', error: err.message, stack: err.stack });
   }
 };
 
@@ -151,7 +153,7 @@ exports.aggiungiDisponibilita = async (req, res) => {
     res.status(201).json({ disponibilita: result.rows[0] });
   } catch (err) {
     console.error('Errore aggiunta disponibilità:', err);
-    res.status(500).json({ message: 'Errore del server' });
+    res.status(500).json({ message: 'Errore del server', error: err.message, stack: err.stack });
   }
 };
 
@@ -178,7 +180,22 @@ exports.visualizzaPrenotazioniRicevute = async (req, res) => {
     res.json({ prenotazioniRicevute: result.rows });
   } catch (err) {
     console.error('Errore prenotazioni ricevute:', err);
-    res.status(500).json({ message: 'Errore del server' });
+    res.status(500).json({ message: 'Errore del server', error: err.message, stack: err.stack });
   }
 };
 
+// 5. Ottieni tutti gli spazi
+exports.getAllSpazi = async (req, res) => {
+  console.log('Chiamata ricevuta per getAllSpazi'); // Debug
+  try {
+    // Stampa info sulla connessione
+    console.log('Pool config:', pool.options || pool); // Debug
+    const result = await pool.query(
+      `SELECT id, sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi, image_url FROM spazi`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Errore caricamento spazi:', err);
+    res.status(500).json({ message: 'Errore del server', error: err.message, stack: err.stack });
+  }
+};
