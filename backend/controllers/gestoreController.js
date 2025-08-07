@@ -107,33 +107,3 @@ exports.visualizzaPrenotazioniRicevute = async (req, res) => {
   }
 };
 
-// 5. Riepilogo prenotazioni per gestore (NUOVA funzione)
-exports.getRiepilogoPrenotazioni = async (req, res) => {
-  const { gestore_id } = req.params;
-
-  if (req.utente.id !== parseInt(gestore_id)) {
-    return res.status(403).json({ message: 'Accesso negato' });
-  }
-
-  try {
-    const result = await pool.query(
-      `SELECT 
-         sede.nome AS nome_sede,
-         s.nome AS nome_spazio,
-         s.image_url,
-         COUNT(p.id) AS totale_prenotazioni
-       FROM spazi s
-       JOIN sedi sede ON s.sede_id = sede.id
-       LEFT JOIN prenotazioni p ON p.spazio_id = s.id
-       WHERE sede.gestore_id = $1
-       GROUP BY s.id, sede.nome, s.nome, s.image_url
-       ORDER BY sede.nome, s.nome`,
-      [gestore_id]
-    );
-
-    res.json({ riepilogo: result.rows });
-  } catch (err) {
-    console.error('Errore nel riepilogo prenotazioni:', err);
-    res.status(500).json({ message: 'Errore del server' });
-  }
-};
