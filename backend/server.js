@@ -26,10 +26,10 @@ const pagamentiRoutes = require('./routes/pagamentiRoutes');
 
 app.use('/api/prenotazioni', prenotazioniRoutes);
 app.use('/api/pagamenti', pagamentiRoutes);
+app.use('/api/riepilogo', require('./routes/riepilogoRoutes'));
 app.use('/api', require('./routes/gestoreRoutes'));        // Dashboard gestore
 app.use('/api/admin', require('./routes/adminRoutes'));    // Area admin
 app.use('/api', require('./routes/disponibilitaRoutes'));
-app.use('/api/riepilogo', require('./routes/riepilogoRoutes'));
 
 
 // Avvio server
