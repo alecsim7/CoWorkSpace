@@ -82,7 +82,7 @@ Filtri disponibili su `/api/sedi`:
 
 | Metodo | Endpoint                 | Descrizione                                                         |
 |--------|--------------------------|---------------------------------------------------------------------|
-| POST   | `/api/pagamento`         | Esegue il pagamento di una prenotazione (`prenotazione_id`, `metodo`) – l'importo è letto dalla prenotazione |
+| POST   | `/api/pagamenti/pagamento`         | Esegue il pagamento di una prenotazione (`prenotazione_id`, `metodo`) – l'importo è letto dalla prenotazione |
 | GET    | `/api/pagamenti/storico` | Restituisce lo storico pagamenti dell'utente (parametro opzionale `limit`, default 5) |
 
 **Query params GET `/api/pagamenti/storico`:**
