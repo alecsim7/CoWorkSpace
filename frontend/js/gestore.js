@@ -32,12 +32,13 @@ $(document).ready(function () {
 
   // Carica spazi del gestore con immagini
   function caricaSpazi() {
+    const container = $('#spaziContainer');
+
     $.ajax({
       url: `${API_BASE}/sedi/gestore/${utente.id}`,
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function (sedi) {
-        const container = $('#spaziContainer');
         container.empty();
 
         if (!Array.isArray(sedi) || sedi.length === 0) {
@@ -71,13 +72,13 @@ $(document).ready(function () {
               });
             },
             error: function () {
-              container.append(`<div class="col-12 alert alert-danger">Errore nel caricamento degli spazi per ${sede.nome}.</div>`);
+              container.append(`<div class="col-12"><div class="alert alert-danger">Errore nel caricamento degli spazi per ${sede.nome}.</div></div>`);
             }
           });
         });
       },
       error: function () {
-        $('#spaziContainer').html('<div class="alert alert-danger">Errore nel caricamento degli spazi.</div>');
+        container.html('<div class="alert alert-danger">Errore nel caricamento degli spazi.</div>');
       }
     });
   }
