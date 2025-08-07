@@ -113,7 +113,6 @@ $(document).ready(function () {
         const card = `
           <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm">
-              <img src="https://via.placeholder.com/600x400?text=${encodeURIComponent(spazio.nome_spazio)}" class="spazio-img card-img-top" alt="${spazio.nome_spazio}">
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">${spazio.nome_spazio}</h5>
                 <p class="card-text flex-grow-1">${spazio.descrizione}</p>
