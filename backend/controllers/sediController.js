@@ -46,51 +46,18 @@ exports.getOpzioni = async (req, res) => {
   try {
     const cittaResult = await pool.query('SELECT DISTINCT citta FROM sedi');
 
-    // Try to get distinct types from possible column names
-    let tipiResult = { rows: [] };
-    const tipoColumns = ['tipo_spazio', 'tipo'];
-    for (const column of tipoColumns) {
-      try {
-        tipiResult = await pool.query(
-          `SELECT DISTINCT ${column} AS tipo FROM spazi WHERE ${column} IS NOT NULL`
-        );
-        break; // If successful, exit the loop
-      } catch (columnErr) {
-        // Column doesn't exist, try next one
-        continue;
-      }
-    }
+    const tipiResult = await pool.query(
+      'SELECT DISTINCT tipo_spazio FROM spazi WHERE tipo_spazio IS NOT NULL'
+    );
 
-    // Try to get services from different possible column names
-    let serviziResult = { rows: [] };
-    const possibleColumns = ['servizi', 'servizi_offerti', 'services'];
-    
-    for (const column of possibleColumns) {
-      try {
-        serviziResult = await pool.query(`SELECT ${column} FROM spazi WHERE ${column} IS NOT NULL`);
-        break; // If successful, exit the loop
-      } catch (columnErr) {
-        // Column doesn't exist, try next one
-        continue;
-      }
-    }
-
-    const serviziSet = new Set();
-    serviziResult.rows.forEach(row => {
-      const servizi = Object.values(row)[0]; // Get the first (and only) column value
-      if (servizi) {
-        servizi
-          .split(',')
-          .map(s => s.trim())
-          .filter(Boolean)
-          .forEach(s => serviziSet.add(s));
-      }
-    });
+    const serviziResult = await pool.query(
+      "SELECT DISTINCT trim(unnest(string_to_array(servizi, ','))) AS servizio FROM spazi WHERE servizi IS NOT NULL"
+    );
 
     res.json({
       citta: cittaResult.rows.map(r => r.citta),
-      tipi: tipiResult.rows.map(r => r.tipo),
-      servizi: Array.from(serviziSet),
+      tipi: tipiResult.rows.map(r => r.tipo_spazio),
+      servizi: serviziResult.rows.map(r => r.servizio),
     });
   } catch (err) {
     console.error('Errore nel recupero opzioni sedi:', err);
