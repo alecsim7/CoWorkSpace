@@ -18,12 +18,24 @@ exports.getSediGestite = async (req, res) => {
 
 // 2. Aggiungi spazio in una sede
 exports.aggiungiSpazio = async (req, res) => {
-  const { sede_id, nome, descrizione, prezzo_orario, capienza } = req.body;
+  const { sede_id, nome, descrizione, prezzo_orario, capienza, servizi } = req.body;
+
+  if (!sede_id || !nome || prezzo_orario === undefined || capienza === undefined || !servizi) {
+    return res.status(400).json({ message: 'Tutti i campi sono obbligatori.' });
+  }
+
+  if (isNaN(prezzo_orario) || prezzo_orario < 0) {
+    return res.status(400).json({ message: 'Prezzo orario non valido.' });
+  }
+
+  if (isNaN(capienza) || capienza <= 0) {
+    return res.status(400).json({ message: 'Capienza non valida.' });
+  }
 
   try {
     const result = await pool.query(
-      'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [sede_id, nome, descrizione, prezzo_orario, capienza]
+      'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, servizi) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [sede_id, nome, descrizione, prezzo_orario, capienza, servizi]
     );
     res.status(201).json({ spazio: result.rows[0] });
   } catch (err) {
