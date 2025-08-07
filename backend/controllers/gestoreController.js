@@ -4,6 +4,10 @@ const pool = require('../db');
 exports.getSediGestite = async (req, res) => {
   const { gestore_id } = req.params;
 
+  if (req.utente.id !== parseInt(gestore_id)) {
+    return res.status(403).json({ message: 'Accesso negato' });
+  }
+
   try {
     const result = await pool.query(
       'SELECT * FROM sedi WHERE gestore_id = $1',
@@ -19,6 +23,9 @@ exports.getSediGestite = async (req, res) => {
 // 2. Modifica spazio
 exports.modificaSpazio = async (req, res) => {
   const { id } = req.params;
+  if (req.utente.id !== parseInt(id)) {
+    return res.status(403).json({ message: 'Accesso negato' });
+  }
   const { nome, descrizione } = req.body;
 
   try {
@@ -37,6 +44,10 @@ exports.modificaSpazio = async (req, res) => {
 exports.eliminaSpazio = async (req, res) => {
   const { id } = req.params;
 
+  if (req.utente.id !== parseInt(id)) {
+    return res.status(403).json({ message: 'Accesso negato' });
+  }
+
   try {
     await pool.query('DELETE FROM spazi WHERE id = $1', [id]);
     res.json({ message: 'Spazio eliminato' });
@@ -49,6 +60,10 @@ exports.eliminaSpazio = async (req, res) => {
 // 4. Aggiungi disponibilità a uno spazio
 exports.aggiungiDisponibilita = async (req, res) => {
   const { id } = req.params;
+
+  if (req.utente.id !== parseInt(id)) {
+    return res.status(403).json({ message: 'Accesso negato' });
+  }
   const { data, orario_inizio, orario_fine } = req.body;
 
   try {
@@ -66,6 +81,10 @@ exports.aggiungiDisponibilita = async (req, res) => {
 // 5. Visualizza prenotazioni ricevute per il gestore
 exports.visualizzaPrenotazioniRicevute = async (req, res) => {
   const { gestore_id } = req.params;
+
+  if (req.utente.id !== parseInt(gestore_id)) {
+    return res.status(403).json({ message: 'Accesso negato' });
+  }
 
   try {
     const result = await pool.query(
@@ -89,6 +108,10 @@ exports.visualizzaPrenotazioniRicevute = async (req, res) => {
 // 6. Riepilogo prenotazioni per gestore (NUOVA funzione)
 exports.getRiepilogoPrenotazioni = async (req, res) => {
   const { gestore_id } = req.params;
+
+  if (req.utente.id !== parseInt(gestore_id)) {
+    return res.status(403).json({ message: 'Accesso negato' });
+  }
 
   try {
     const result = await pool.query(
