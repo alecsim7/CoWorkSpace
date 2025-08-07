@@ -18,10 +18,6 @@ exports.getSediGestite = async (req, res) => {
 
 // 2. Aggiungi spazio in una sede
 exports.aggiungiSpazio = async (req, res) => {
-  const { sede_id, nome, descrizione, prezzo_orario, capienza, servizi, image_url } = req.body;
-
-  if (!sede_id || !nome || prezzo_orario === undefined || capienza === undefined || !servizi) {
-    
   const {
     sede_id,
     nome,
@@ -59,13 +55,8 @@ exports.aggiungiSpazio = async (req, res) => {
 
   try {
     const result = await pool.query(
-
-      'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, servizi, image_url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-      [sede_id, nome, descrizione, prezzo_orario, capienza, servizi, image_url]
-
       'INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
       [sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi]
-
     );
     res.status(201).json({ spazio: result.rows[0] });
   } catch (err) {
