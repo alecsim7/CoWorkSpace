@@ -24,3 +24,11 @@ exports.verificaAdmin = (req, res, next) => {
   }
   next();
 };
+
+// Middleware per autorizzazione ruolo gestore
+exports.verificaGestore = (req, res, next) => {
+  if (req.utente?.ruolo !== 'gestore') {
+    return res.status(403).json({ message: 'Accesso negato: solo gestore' });
+  }
+  next();
+};
