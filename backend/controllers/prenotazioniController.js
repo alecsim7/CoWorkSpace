@@ -7,36 +7,38 @@ exports.creaPrenotazione = async (req, res) => {
   try {
     await pool.query('BEGIN');
 
-    // 1. Controlla conflitti orari
-    const conflict = await pool.query(
-      `SELECT * FROM prenotazioni
-       WHERE spazio_id = $1 AND data = $2
-       AND NOT (orario_fine <= $3 OR orario_inizio >= $4)`,
+    // 1. Verifica capienza e prenotazioni esistenti
+    const spazioRes = await pool.query(
+      `SELECT s.prezzo_orario, s.capienza, COUNT(p.id) AS prenotati
+       FROM spazi s
+       LEFT JOIN prenotazioni p ON p.spazio_id = s.id
+         AND p.data = $2
+         AND NOT (p.orario_fine <= $3 OR p.orario_inizio >= $4)
+       WHERE s.id = $1
+       GROUP BY s.prezzo_orario, s.capienza`,
       [spazio_id, data, orario_inizio, orario_fine]
     );
 
-    if (conflict.rows.length > 0) {
-      await pool.query('ROLLBACK');
-      return res.status(400).json({ message: 'Orario già prenotato' });
-    }
-
-    // 2. Calcola importo da pagare
-    const prezzoRes = await pool.query(
-      'SELECT prezzo_orario FROM spazi WHERE id = $1',
-      [spazio_id]
-    );
-
-    if (prezzoRes.rows.length === 0) {
+    if (spazioRes.rows.length === 0) {
       await pool.query('ROLLBACK');
       return res.status(404).json({ message: 'Spazio non trovato' });
+    }
+
+    const { prezzo_orario, capienza, prenotati } = spazioRes.rows[0];
+    const prenotatiCount = Number(prenotati);
+    const posti_liberi = capienza - prenotatiCount;
+
+    if (posti_liberi <= 0) {
+      await pool.query('ROLLBACK');
+      return res.status(400).json({ message: 'Capienza massima raggiunta', posti_liberi: 0 });
     }
 
     const start = new Date(`1970-01-01T${orario_inizio}`);
     const end = new Date(`1970-01-01T${orario_fine}`);
     const ore = (end - start) / (1000 * 60 * 60);
-    const importo = Number(prezzoRes.rows[0].prezzo_orario) * ore;
+    const importo = Number(prezzo_orario) * ore;
 
-    // 3. Inserisci prenotazione (senza colonna importo)
+    // 2. Inserisci prenotazione
     const result = await pool.query(
       `INSERT INTO prenotazioni (utente_id, spazio_id, data, orario_inizio, orario_fine)
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
@@ -45,11 +47,11 @@ exports.creaPrenotazione = async (req, res) => {
 
     await pool.query('COMMIT');
 
-    // Restituisci l'importo calcolato nella risposta, NON nella tabella
     res.status(201).json({
       message: 'Prenotazione effettuata',
       prenotazione: result.rows[0],
-      importo
+      importo,
+      posti_liberi: posti_liberi - 1
     });
 
   } catch (err) {
