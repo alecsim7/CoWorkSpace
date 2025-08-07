@@ -189,6 +189,7 @@ $(document).ready(function () {
       return;
     }
 
+    // Endpoint: POST /api/spazi (gestoreRoutes)
     $.ajax({
       url: `${API_BASE}/spazi`,
       method: 'POST',

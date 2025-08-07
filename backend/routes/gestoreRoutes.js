@@ -4,6 +4,7 @@ const gestoreController = require('../controllers/gestoreController');
 const { verificaToken, verificaGestore } = require('../middleware/authMiddleware');
 
 
+router.post('/spazi', verificaToken, verificaGestore, gestoreController.aggiungiSpazio);
 router.put('/spazi/:id', verificaToken, verificaGestore, gestoreController.modificaSpazio);
 router.delete('/spazi/:id', verificaToken, verificaGestore, gestoreController.eliminaSpazio);
 router.post('/spazi/:id/disponibilita', verificaToken, verificaGestore, gestoreController.aggiungiDisponibilita);
