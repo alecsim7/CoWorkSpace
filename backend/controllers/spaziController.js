@@ -29,6 +29,11 @@ exports.aggiungiSpazio = async (req, res) => {
     servizi,
   } = req.body;
 
+  const tipiValidi = ['scrivania', 'ufficio', 'sala'];
+  if (!tipo_spazio || !tipiValidi.includes(tipo_spazio)) {
+    return res.status(400).json({ message: 'Tipo di spazio non valido' });
+  }
+
   try {
     const result = await pool.query(
       `INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi)
