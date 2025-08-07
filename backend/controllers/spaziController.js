@@ -29,6 +29,25 @@ exports.aggiungiSpazio = async (req, res) => {
     servizi,
   } = req.body;
 
+  if (
+    !sede_id ||
+    !nome ||
+    prezzo_orario === undefined ||
+    capienza === undefined ||
+    !tipo_spazio ||
+    !servizi
+  ) {
+    return res.status(400).json({ message: 'Tutti i campi sono obbligatori.' });
+  }
+
+  if (isNaN(prezzo_orario) || prezzo_orario < 0) {
+    return res.status(400).json({ message: 'Prezzo orario non valido.' });
+  }
+
+  if (isNaN(capienza) || capienza <= 0) {
+    return res.status(400).json({ message: 'Capienza non valida.' });
+  }
+
   try {
     const result = await pool.query(
       `INSERT INTO spazi (sede_id, nome, descrizione, prezzo_orario, capienza, tipo_spazio, servizi)
