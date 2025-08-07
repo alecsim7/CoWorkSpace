@@ -63,6 +63,7 @@ Definisce un'unità prenotabile all'interno di una sede (es. sala, scrivania, uf
 | `capienza`    | INTEGER      | Numero massimo di persone                |
 | `tipo_spazio` | VARCHAR(20)  | Tipo: `scrivania`, `ufficio`, `sala`     |
 | `servizi`     | TEXT         | Servizi inclusi (es. WiFi, stampante)    |
+| `image_url`   | TEXT         | URL immagine rappresentativa dello spazio|
 
 ---
 
