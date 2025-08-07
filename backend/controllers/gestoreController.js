@@ -23,12 +23,20 @@ exports.getSediGestite = async (req, res) => {
 // 2. Modifica spazio
 exports.modificaSpazio = async (req, res) => {
   const { id } = req.params;
-  if (req.utente.id !== parseInt(id)) {
-    return res.status(403).json({ message: 'Accesso negato' });
-  }
   const { nome, descrizione } = req.body;
 
   try {
+    const { rows } = await pool.query(
+      `SELECT sedi.gestore_id
+       FROM spazi JOIN sedi ON spazi.sede_id = sedi.id
+       WHERE spazi.id = $1`,
+      [id]
+    );
+
+    if (rows[0]?.gestore_id !== req.utente.id) {
+      return res.status(403).json({ message: 'Accesso negato' });
+    }
+
     const result = await pool.query(
       'UPDATE spazi SET nome = $1, descrizione = $2 WHERE id = $3 RETURNING *',
       [nome, descrizione, id]
@@ -44,11 +52,18 @@ exports.modificaSpazio = async (req, res) => {
 exports.eliminaSpazio = async (req, res) => {
   const { id } = req.params;
 
-  if (req.utente.id !== parseInt(id)) {
-    return res.status(403).json({ message: 'Accesso negato' });
-  }
-
   try {
+    const { rows } = await pool.query(
+      `SELECT sedi.gestore_id
+       FROM spazi JOIN sedi ON spazi.sede_id = sedi.id
+       WHERE spazi.id = $1`,
+      [id]
+    );
+
+    if (rows[0]?.gestore_id !== req.utente.id) {
+      return res.status(403).json({ message: 'Accesso negato' });
+    }
+
     await pool.query('DELETE FROM spazi WHERE id = $1', [id]);
     res.json({ message: 'Spazio eliminato' });
   } catch (err) {
@@ -60,13 +75,20 @@ exports.eliminaSpazio = async (req, res) => {
 // 4. Aggiungi disponibilità a uno spazio
 exports.aggiungiDisponibilita = async (req, res) => {
   const { id } = req.params;
-
-  if (req.utente.id !== parseInt(id)) {
-    return res.status(403).json({ message: 'Accesso negato' });
-  }
   const { data, orario_inizio, orario_fine } = req.body;
 
   try {
+    const { rows } = await pool.query(
+      `SELECT sedi.gestore_id
+       FROM spazi JOIN sedi ON spazi.sede_id = sedi.id
+       WHERE spazi.id = $1`,
+      [id]
+    );
+
+    if (rows[0]?.gestore_id !== req.utente.id) {
+      return res.status(403).json({ message: 'Accesso negato' });
+    }
+
     const result = await pool.query(
       'INSERT INTO disponibilita (spazio_id, data, orario_inizio, orario_fine) VALUES ($1, $2, $3, $4) RETURNING *',
       [id, data, orario_inizio, orario_fine]
