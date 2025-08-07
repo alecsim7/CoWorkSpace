@@ -45,25 +45,33 @@ $(document).ready(function () {
         }
 
         sedi.forEach(sede => {
-          $.getJSON(`http://localhost:3000/api/spazi/${sede.id}`, function (spazi) {
-            if (!Array.isArray(spazi) || spazi.length === 0) {
-              container.append(`<div class="col-12 alert alert-secondary">Nessuno spazio per ${sede.nome}</div>`);
-              return;
-            }
+          $.ajax({
+            url: `http://localhost:3000/api/spazi/${sede.id}`,
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+            success: function (spazi) {
+              if (!Array.isArray(spazi) || spazi.length === 0) {
+                container.append(`<div class="col-12 alert alert-secondary">Nessuno spazio per ${sede.nome}</div>`);
+                return;
+              }
 
-            spazi.forEach(spazio => {
-              container.append(`
-                <div class="col-md-4">
-                  <div class="card h-100 shadow-sm">
-                    ${spazio.image_url ? `<img src="${spazio.image_url}" class="spazio-thumb card-img-top" alt="${spazio.nome}" />` : ''}
-                    <div class="card-body">
-                      <h5 class="card-title">${spazio.nome}</h5>
-                      <p class="card-text">${spazio.descrizione || ''}</p>
+              spazi.forEach(spazio => {
+                container.append(`
+                  <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                      ${spazio.image_url ? `<img src="${spazio.image_url}" class="spazio-thumb card-img-top" alt="${spazio.nome}" />` : ''}
+                      <div class="card-body">
+                        <h5 class="card-title">${spazio.nome}</h5>
+                        <p class="card-text">${spazio.descrizione || ''}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              `);
-            });
+                `);
+              });
+            },
+            error: function () {
+              container.append(`<div class="col-12 alert alert-danger">Errore nel caricamento degli spazi per ${sede.nome}.</div>`);
+            }
           });
         });
       },
