@@ -56,21 +56,31 @@ app.use('/api/admin', require('./routes/adminRoutes'));    // Area admin
 app.use('/api', require('./routes/disponibilitaRoutes'));
 
 
-// Avvio server HTTPS
-const httpsOptions = {
-  key: fs.readFileSync(process.env.SSL_KEY_PATH || path.join(__dirname, 'cert', 'key.pem')),
-  cert: fs.readFileSync(process.env.SSL_CERT_PATH || path.join(__dirname, 'cert', 'cert.pem')),
-};
+// Avvio server con verifica dei certificati SSL
+const keyPath = process.env.SSL_KEY_PATH || path.join(__dirname, 'cert', 'key.pem');
+const certPath = process.env.SSL_CERT_PATH || path.join(__dirname, 'cert', 'cert.pem');
 
-https.createServer(httpsOptions, app).listen(HTTPS_PORT, () => {
-  console.log(`🚀 Server HTTPS avviato su https://localhost:${HTTPS_PORT}`);
-});
+if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+  const httpsOptions = {
+    key: fs.readFileSync(keyPath),
+    cert: fs.readFileSync(certPath),
+  };
 
-// Redirect HTTP -> HTTPS
-http.createServer((req, res) => {
-  const host = req.headers.host.split(':')[0];
-  res.writeHead(301, { Location: `https://${host}:${HTTPS_PORT}${req.url}` });
-  res.end();
-}).listen(HTTP_PORT, () => {
-  console.log(`➡️ Reindirizzamento HTTP attivo su http://localhost:${HTTP_PORT}`);
-});
+  https.createServer(httpsOptions, app).listen(HTTPS_PORT, () => {
+    console.log(`🚀 Server HTTPS avviato su https://localhost:${HTTPS_PORT}`);
+  });
+
+  // Redirect HTTP -> HTTPS
+  http.createServer((req, res) => {
+    const host = req.headers.host.split(':')[0];
+    res.writeHead(301, { Location: `https://${host}:${HTTPS_PORT}${req.url}` });
+    res.end();
+  }).listen(HTTP_PORT, () => {
+    console.log(`➡️ Reindirizzamento HTTP attivo su http://localhost:${HTTP_PORT}`);
+  });
+} else {
+  console.warn('⚠️  Certificati SSL non trovati. Avvio del solo server HTTP.');
+  http.createServer(app).listen(HTTP_PORT, () => {
+    console.log(`🚀 Server HTTP avviato su http://localhost:${HTTP_PORT}`);
+  });
+}
