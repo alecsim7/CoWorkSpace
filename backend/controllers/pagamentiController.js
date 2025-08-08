@@ -1,7 +1,5 @@
 require('dotenv').config(); // Carica variabili d'ambiente dal file .env
 const pool = require('../db');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const logger = require('../utils/logger');
 const Stripe = require('stripe');
 
 // Controlla che la chiave sia presente
@@ -163,8 +161,6 @@ exports.effettuaPagamento = async (req, res) => {
     });
     console.error('Errore pagamento:', err);
     res.status(500).json({ message: 'Errore del server durante il pagamento' });
-  }
-};
 
 // 2. Storico pagamenti
 exports.storicoPagamenti = async (req, res) => {
@@ -196,5 +192,7 @@ exports.storicoPagamenti = async (req, res) => {
     res
       .status(500)
       .json({ message: 'Errore nel recupero dello storico pagamenti' });
+  }
+};
   }
 };
