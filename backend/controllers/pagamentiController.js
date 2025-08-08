@@ -3,7 +3,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // 1. Registra pagamento
 exports.effettuaPagamento = async (req, res) => {
-  const { prenotazione_id, metodo, token } = req.body;
+  const { prenotazione_id, metodo, paymentIntentId } = req.body;
   const utente_id = req.utente.id;
 
   const metodiValidi = ['paypal', 'satispay', 'carta', 'bancomat'];
@@ -27,7 +27,6 @@ exports.effettuaPagamento = async (req, res) => {
 
     // Calcola importo usando la tabella spazi e orari della prenotazione
     const spazio_id = prenRes.rows[0].spazio_id;
-    const data = prenRes.rows[0].data;
     const orario_inizio = prenRes.rows[0].orario_inizio;
     const orario_fine = prenRes.rows[0].orario_fine;
 
@@ -55,21 +54,27 @@ exports.effettuaPagamento = async (req, res) => {
       return res.status(400).json({ message: 'Prenotazione già pagata' });
     }
 
-    // Se il metodo è carta utilizziamo Stripe per eseguire il pagamento
+    // Se il metodo è carta, utilizziamo Stripe PaymentIntent
     if (metodo === 'carta') {
-      if (!token) {
-        await pool.query('ROLLBACK');
-        return res.status(400).json({ message: 'Token di pagamento mancante' });
+      if (!paymentIntentId) {
+        // Prima fase: creazione del PaymentIntent
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: Math.round(importo * 100), // in centesimi
+          currency: 'eur',
+          description: `Prenotazione ${prenotazione_id}`,
+          metadata: {
+            prenotazione_id: String(prenotazione_id),
+            utente_id: String(utente_id)
+          }
+        });
+
+        await pool.query('COMMIT');
+        return res.status(200).json({ clientSecret: paymentIntent.client_secret });
       }
 
-      const charge = await stripe.charges.create({
-        amount: Math.round(importo * 100), // in centesimi
-        currency: 'eur',
-        source: token,
-        description: `Prenotazione ${prenotazione_id}`,
-      });
-
-      if (charge.status !== 'succeeded') {
+      // Seconda fase: verifica dello stato del PaymentIntent
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      if (paymentIntent.status !== 'succeeded') {
         await pool.query('ROLLBACK');
         return res.status(400).json({ message: 'Pagamento non riuscito' });
       }
