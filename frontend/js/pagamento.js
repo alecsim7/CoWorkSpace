@@ -216,27 +216,64 @@ $(document).ready(function () {
     const prenotazione_id = parseInt($('#prenotazione').val());
     const metodo = $('#metodo').val();
 
-    let tokenStripe = null;
-    if (metodo === 'carta' && stripe) {
-      const result = await stripe.createToken(card);
-      if (result.error) {
-        $('#card-errors').text(result.error.message);
-        $submitBtn.prop('disabled', false);
-        $('#paymentSpinner').addClass('d-none');
-        return;
-      }
-      tokenStripe = result.token.id;
-    }
+    try {
+      if (metodo === 'carta' && stripe) {
+        // Crea il PaymentIntent sul backend
+        const initRes = await $.ajax({
+          url: 'http://localhost:3000/api/pagamenti/pagamento',
+          method: 'POST',
+          contentType: 'application/json',
+          headers: { Authorization: `Bearer ${token}` },
+          data: JSON.stringify({ prenotazione_id, metodo })
+        });
 
-    $.ajax({
-        url: `${API_BASE}/pagamenti/pagamento`,
-      method: 'POST',
-      contentType: 'application/json',
+        // Conferma il pagamento e gestisce eventuali challenge 3D Secure
+        const result = await stripe.confirmCardPayment(initRes.clientSecret, {
+          payment_method: {
+            card: card
+          }
+        });
 
-      headers: { Authorization: `Bearer ${token}` },
-      data: JSON.stringify({ prenotazione_id, metodo, token: tokenStripe }),
+        if (result.error || result.paymentIntent.status !== 'succeeded') {
+          $('#card-errors').text(result.error ? result.error.message : 'Pagamento non riuscito');
+          return;
+        }
 
-      success: function (res) {
+        // Registra il pagamento sul backend
+        const finalRes = await $.ajax({
+          url: 'http://localhost:3000/api/pagamenti/pagamento',
+          method: 'POST',
+          contentType: 'application/json',
+          headers: { Authorization: `Bearer ${token}` },
+          data: JSON.stringify({
+            prenotazione_id,
+            metodo,
+            paymentIntentId: result.paymentIntent.id
+          })
+        });
+
+        $('#alertPagamento').html(`
+          <div class="alert alert-success d-flex align-items-center">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            ${finalRes.message}
+          </div>
+        `);
+        $('#prenotazione option:selected').remove();
+        $('#formPagamento')[0].reset();
+        $('#importoDaPagare').empty();
+        if ($('#prenotazione option').length === 0) {
+          $('#formPagamento').hide();
+        }
+        caricaStoricoPagamenti(); // Aggiorna lo storico
+      } else {
+        const res = await $.ajax({
+          url: 'http://localhost:3000/api/pagamenti/pagamento',
+          method: 'POST',
+          contentType: 'application/json',
+          headers: { Authorization: `Bearer ${token}` },
+          data: JSON.stringify({ prenotazione_id, metodo })
+        });
+
         $('#alertPagamento').html(`
           <div class="alert alert-success d-flex align-items-center">
             <i class="bi bi-check-circle-fill me-2"></i>
@@ -250,21 +287,19 @@ $(document).ready(function () {
           $('#formPagamento').hide();
         }
         caricaStoricoPagamenti(); // Aggiorna lo storico
-      },
-      error: function (xhr) {
-        $('#alertPagamento').html(`
-          <div class="alert alert-danger d-flex align-items-center">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            ${xhr.responseJSON?.message || 'Errore durante il pagamento'}
-          </div>
-        `);
-      },
-      complete: function() {
-        // Nascondi spinner e riabilita il bottone
-        $submitBtn.prop('disabled', false);
-        $('#paymentSpinner').addClass('d-none');
       }
-    });
+    } catch (xhr) {
+      $('#alertPagamento').html(`
+        <div class="alert alert-danger d-flex align-items-center">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          ${xhr.responseJSON?.message || 'Errore durante il pagamento'}
+        </div>
+      `);
+    } finally {
+      // Nascondi spinner e riabilita il bottone
+      $submitBtn.prop('disabled', false);
+      $('#paymentSpinner').addClass('d-none');
+    }
   });
 
   // Logout
