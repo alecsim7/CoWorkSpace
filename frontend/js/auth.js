@@ -1,3 +1,5 @@
+const API_BASE = window.API_BASE || '/api';
+
 $(function () {
   // Mostra il form di login
   $('#btnShowLogin').click(function () {
@@ -35,7 +37,7 @@ $(function () {
 
     // Chiamata AJAX per login
     $.ajax({
-      url: 'http://localhost:3000/api/login', 
+      url: `${API_BASE}/login`,
       method: 'POST',
       contentType: 'application/json',
       data: JSON.stringify({ email, password }),
@@ -82,7 +84,7 @@ $(function () {
 
     // Chiamata AJAX per registrazione
     $.ajax({
-      url: 'http://localhost:3000/api/register',
+      url: `${API_BASE}/register`,
       method: 'POST',
       contentType: 'application/json',
       data: JSON.stringify({ nome, email, password, ruolo }),
