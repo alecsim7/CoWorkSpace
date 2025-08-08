@@ -1,6 +1,7 @@
 require('dotenv').config(); // Carica variabili d'ambiente dal file .env
 const pool = require('../db');
 const Stripe = require('stripe');
+const logger = require('../utils/logger');
 
 // Controlla che la chiave sia presente
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -14,6 +15,8 @@ exports.effettuaPagamento = async (req, res) => {
   const { prenotazione_id, metodo, paymentIntentId } = req.body;
   const utente_id = req.utente.id;
   let importoCalcolato = null;
+  let providerId = null;
+  let stato = null;
 
   const metodiValidi = ['paypal', 'satispay', 'carta', 'bancomat'];
   if (!metodiValidi.includes(metodo)) {
@@ -127,8 +130,8 @@ exports.effettuaPagamento = async (req, res) => {
         return res.status(400).json({ message: 'Pagamento non riuscito' });
       }
 
-      providerId = charge.id;
-      stato = charge.status;
+      providerId = paymentIntent.id;
+      stato = paymentIntent.status;
     }
 
     await pool.query(
@@ -161,6 +164,8 @@ exports.effettuaPagamento = async (req, res) => {
     });
     console.error('Errore pagamento:', err);
     res.status(500).json({ message: 'Errore del server durante il pagamento' });
+  }
+};
 
 // 2. Storico pagamenti
 exports.storicoPagamenti = async (req, res) => {
@@ -192,7 +197,5 @@ exports.storicoPagamenti = async (req, res) => {
     res
       .status(500)
       .json({ message: 'Errore nel recupero dello storico pagamenti' });
-  }
-};
   }
 };

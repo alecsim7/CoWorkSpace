@@ -6,7 +6,4 @@ const { verificaToken } = require('../middleware/authMiddleware'); // 👈 IMPOR
 router.post('/pagamento', verificaToken, pagamentiController.effettuaPagamento); // 👈 OK
 router.get('/storico', verificaToken, pagamentiController.storicoPagamenti);
 
-// Assicurati che la funzione esista e sia esportata correttamente
-router.post('/crea', pagamentiController.creaPagamento); // nomeFunzione deve essere una funzione
-
 module.exports = router;
