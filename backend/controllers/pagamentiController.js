@@ -1,5 +1,13 @@
+require('dotenv').config(); // Carica variabili d'ambiente dal file .env
 const pool = require('../db');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const Stripe = require('stripe');
+
+// Controlla che la chiave sia presente
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('La variabile STRIPE_SECRET_KEY non è definita. Aggiungila al file .env.');
+}
+
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // 1. Registra pagamento
 exports.effettuaPagamento = async (req, res) => {
