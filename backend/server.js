@@ -1,10 +1,16 @@
 const path = require('path');
+const fs = require('fs');
+const http = require('http');
+const https = require('https');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const HTTP_PORT = process.env.PORT || 3000;
+const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
 const PORT = process.env.PORT || 3000;
 const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY;
+
 
 // Middleware
 app.use(cors());
@@ -38,7 +44,21 @@ app.use('/api/admin', require('./routes/adminRoutes'));    // Area admin
 app.use('/api', require('./routes/disponibilitaRoutes'));
 
 
-// Avvio server
-app.listen(PORT, () => {
-  console.log(`🚀 Server avviato su http://localhost:${PORT}`);
+// Avvio server HTTPS
+const httpsOptions = {
+  key: fs.readFileSync(process.env.SSL_KEY_PATH || path.join(__dirname, 'cert', 'key.pem')),
+  cert: fs.readFileSync(process.env.SSL_CERT_PATH || path.join(__dirname, 'cert', 'cert.pem')),
+};
+
+https.createServer(httpsOptions, app).listen(HTTPS_PORT, () => {
+  console.log(`🚀 Server HTTPS avviato su https://localhost:${HTTPS_PORT}`);
+});
+
+// Redirect HTTP -> HTTPS
+http.createServer((req, res) => {
+  const host = req.headers.host.split(':')[0];
+  res.writeHead(301, { Location: `https://${host}:${HTTPS_PORT}${req.url}` });
+  res.end();
+}).listen(HTTP_PORT, () => {
+  console.log(`➡️ Reindirizzamento HTTP attivo su http://localhost:${HTTP_PORT}`);
 });
