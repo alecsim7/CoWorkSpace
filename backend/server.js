@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
+const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY;
 
 // Middleware
 app.use(cors());
@@ -13,6 +14,11 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 // Debug route to test if endpoint is accessible
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Server is running' });
+});
+
+// Configurazione Stripe
+app.get('/config/stripe', (_, res) => {
+  res.json({ publishableKey: STRIPE_PUBLISHABLE_KEY });
 });
 
 // Rotte
