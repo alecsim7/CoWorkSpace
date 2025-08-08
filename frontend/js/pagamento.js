@@ -1,3 +1,5 @@
+const API_BASE = window.API_BASE || '/api';
+
 $(document).ready(function () {
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente'));
@@ -84,7 +86,7 @@ $(document).ready(function () {
 
   // Caricamento prenotazioni
   $.ajax({
-    url: 'http://localhost:3000/api/prenotazioni/non-pagate',
+    url: `${API_BASE}/prenotazioni/non-pagate`,
     method: 'GET',
     headers: { Authorization: `Bearer ${token}` },
     success: function(res) {
@@ -151,7 +153,7 @@ $(document).ready(function () {
   // Funzione per caricare e visualizzare lo storico pagamenti
   function caricaStoricoPagamenti() {
     $.ajax({
-      url: 'http://localhost:3000/api/pagamenti/storico?limit=5',
+      url: `${API_BASE}/pagamenti/storico?limit=5`,
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function(res) {
@@ -227,7 +229,7 @@ $(document).ready(function () {
     }
 
     $.ajax({
-        url: 'http://localhost:3000/api/pagamenti/pagamento',
+        url: `${API_BASE}/pagamenti/pagamento`,
       method: 'POST',
       contentType: 'application/json',
 
