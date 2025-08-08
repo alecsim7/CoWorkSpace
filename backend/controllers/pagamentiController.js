@@ -1,13 +1,30 @@
+require('dotenv').config(); // Carica variabili d'ambiente dal file .env
 const pool = require('../db');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const logger = require('../utils/logger');
+const Stripe = require('stripe');
+
+// Controlla che la chiave sia presente
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('La variabile STRIPE_SECRET_KEY non è definita. Aggiungila al file .env.');
+}
+
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // 1. Registra pagamento
 exports.effettuaPagamento = async (req, res) => {
   const { prenotazione_id, metodo, paymentIntentId } = req.body;
   const utente_id = req.utente.id;
+  let importoCalcolato = null;
 
   const metodiValidi = ['paypal', 'satispay', 'carta', 'bancomat'];
   if (!metodiValidi.includes(metodo)) {
+    logger.warn('Metodo di pagamento non valido', {
+      prenotazione_id,
+      importo: null,
+      metodo,
+      esito: 'metodo_non_valido',
+    });
     return res.status(400).json({ message: 'Metodo di pagamento non valido' });
   }
 
@@ -22,6 +39,12 @@ exports.effettuaPagamento = async (req, res) => {
 
     if (prenRes.rows.length === 0 || prenRes.rows[0].utente_id !== utente_id) {
       await pool.query('ROLLBACK');
+      logger.warn('Prenotazione non trovata', {
+        prenotazione_id,
+        importo: importoCalcolato,
+        metodo,
+        esito: 'prenotazione_non_trovata',
+      });
       return res.status(404).json({ message: 'Prenotazione non trovata' });
     }
 
@@ -36,12 +59,26 @@ exports.effettuaPagamento = async (req, res) => {
     );
     if (prezzoRes.rows.length === 0) {
       await pool.query('ROLLBACK');
+      logger.warn('Spazio non trovato', {
+        prenotazione_id,
+        importo: importoCalcolato,
+        metodo,
+        esito: 'spazio_non_trovato',
+      });
       return res.status(404).json({ message: 'Spazio non trovato' });
     }
     const start = new Date(`1970-01-01T${orario_inizio}`);
     const end = new Date(`1970-01-01T${orario_fine}`);
     const ore = (end - start) / (1000 * 60 * 60);
     const importo = Number(prezzoRes.rows[0].prezzo_orario) * ore;
+    importoCalcolato = importo;
+
+    logger.info('Tentativo pagamento', {
+      prenotazione_id,
+      importo: importoCalcolato,
+      metodo,
+      esito: 'tentativo',
+    });
 
     // Controlla se esiste già un pagamento per questa prenotazione
     const pagRes = await pool.query(
@@ -51,6 +88,12 @@ exports.effettuaPagamento = async (req, res) => {
 
     if (pagRes.rows.length > 0) {
       await pool.query('ROLLBACK');
+      logger.warn('Prenotazione già pagata', {
+        prenotazione_id,
+        importo: importoCalcolato,
+        metodo,
+        esito: 'gia_pagata',
+      });
       return res.status(400).json({ message: 'Prenotazione già pagata' });
     }
 
@@ -70,30 +113,54 @@ exports.effettuaPagamento = async (req, res) => {
 
         await pool.query('COMMIT');
         return res.status(200).json({ clientSecret: paymentIntent.client_secret });
+
       }
 
       // Seconda fase: verifica dello stato del PaymentIntent
       const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
       if (paymentIntent.status !== 'succeeded') {
         await pool.query('ROLLBACK');
+        logger.warn('Pagamento non riuscito', {
+          prenotazione_id,
+          importo: importoCalcolato,
+          metodo,
+          esito: 'fallimento',
+        });
         return res.status(400).json({ message: 'Pagamento non riuscito' });
       }
+
+      providerId = charge.id;
+      stato = charge.status;
     }
 
     await pool.query(
-      `INSERT INTO pagamenti (prenotazione_id, importo, metodo, timestamp)
-       VALUES ($1, $2, $3, NOW())`,
-      [prenotazione_id, importo, metodo]
+      `INSERT INTO pagamenti (prenotazione_id, importo, metodo, provider_id, stato, timestamp)
+       VALUES ($1, $2, $3, $4, $5, NOW())`,
+      [prenotazione_id, importo, metodo, providerId, stato]
     );
 
     await pool.query('COMMIT');
 
+    logger.info('Pagamento riuscito', {
+      prenotazione_id,
+      importo: importoCalcolato,
+      metodo,
+      esito: 'successo',
+    });
+
     res.status(201).json({
       message: 'Pagamento registrato',
-      pagamento: { prenotazione_id, importo, metodo }
+      pagamento: { prenotazione_id, importo, metodo, provider_id: providerId, stato }
     });
   } catch (err) {
     await pool.query('ROLLBACK');
+    logger.error('Errore pagamento', {
+      prenotazione_id,
+      importo: importoCalcolato,
+      metodo,
+      esito: 'errore',
+      error: err.message,
+    });
     console.error('Errore pagamento:', err);
     res.status(500).json({ message: 'Errore del server durante il pagamento' });
   }
