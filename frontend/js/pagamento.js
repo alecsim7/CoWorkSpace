@@ -14,6 +14,14 @@ $(document).ready(function () {
     return;
   }
 
+  if (!stripe) {
+    $('#metodo option[value="carta"]').prop('disabled', true)
+      .text('💳 Carta di Credito (non disponibile)');
+    $('#alertPagamento').html(
+      '<div class="alert alert-warning">Il pagamento con carta non è al momento disponibile.</div>'
+    );
+  }
+
   let prenotazioni = []; // Variabile per memorizzare le prenotazioni
 
   function mostraRiepilogoPrenotazione(prenotazione) {
