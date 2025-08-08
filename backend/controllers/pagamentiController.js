@@ -63,6 +63,9 @@ exports.effettuaPagamento = async (req, res) => {
       return res.status(400).json({ message: 'Prenotazione già pagata' });
     }
 
+    let providerId = null;
+    let stato = null;
+
     // Se il metodo è carta utilizziamo Stripe per eseguire il pagamento
     if (metodo === 'carta') {
       if (!token) {
@@ -81,19 +84,22 @@ exports.effettuaPagamento = async (req, res) => {
         await pool.query('ROLLBACK');
         return res.status(400).json({ message: 'Pagamento non riuscito' });
       }
+
+      providerId = charge.id;
+      stato = charge.status;
     }
 
     await pool.query(
-      `INSERT INTO pagamenti (prenotazione_id, importo, metodo, timestamp)
-       VALUES ($1, $2, $3, NOW())`,
-      [prenotazione_id, importo, metodo]
+      `INSERT INTO pagamenti (prenotazione_id, importo, metodo, provider_id, stato, timestamp)
+       VALUES ($1, $2, $3, $4, $5, NOW())`,
+      [prenotazione_id, importo, metodo, providerId, stato]
     );
 
     await pool.query('COMMIT');
 
     res.status(201).json({
       message: 'Pagamento registrato',
-      pagamento: { prenotazione_id, importo, metodo }
+      pagamento: { prenotazione_id, importo, metodo, provider_id: providerId, stato }
     });
   } catch (err) {
     await pool.query('ROLLBACK');
