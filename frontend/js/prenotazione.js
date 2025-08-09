@@ -1,3 +1,5 @@
+// Base URL for the backend API
+window.API_BASE = 'https://backend.example.com/api';
 const API_BASE = window.API_BASE || '/api';
 
 $(document).ready(function () {
