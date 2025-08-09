@@ -104,3 +104,50 @@ Lo script `frontend/js/prenotazione.js` usa la variabile globale `API_BASE` per 
 ---
 
 Consulta la [specifica API](docs/api-spec.md) e la [documentazione del database](database/README-db.md) per maggiori dettagli sul progetto.
+
+## Running Locally
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) v18+
+- npm
+- [PostgreSQL](https://www.postgresql.org/)
+- Modern web browser
+
+### Start PostgreSQL
+1. Start the PostgreSQL service.
+2. Create the `coworkspace` database and load the schema:
+   ```bash
+   psql -U postgres -c 'CREATE DATABASE coworkspace;'
+   psql -U postgres -d coworkspace -f database/schema.sql
+   ```
+   Infrastructure scripts such as the initial schema and migrations live in [database/schema.sql](database/schema.sql) and [database/migrations](database/migrations/)
+
+### Backend
+```bash
+cd backend
+npm install
+npm start
+```
+The API will be available at `http://localhost:3000`.
+
+### Frontend
+Serve the static frontend:
+```bash
+npx serve frontend
+```
+or open `frontend/index.html` directly in the browser.
+
+## AWS Deployment
+1. **Build Docker image** for the backend:
+   ```bash
+   docker build -t coworkspace-backend ./backend
+   ```
+2. **Deploy** the image to Elastic Beanstalk or an EC2 instance.
+3. **Provision PostgreSQL** using Amazon RDS.
+4. **Upload the frontend** to an S3 bucket and distribute it with CloudFront.
+5. **Configure environment variables** in Elastic Beanstalk/EC2 (database credentials, `JWT_SECRET`, Stripe keys, etc.).
+
+## Scaling & Monitoring
+- CloudWatch alarms track CPU utilization, database connections and HTTP latency.
+- An Auto Scaling group reacts to these alarms to scale out/in.
+- See [docs/monitoring.md](docs/monitoring.md) for detailed metrics, dashboards and logging configuration.
