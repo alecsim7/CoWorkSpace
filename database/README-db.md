@@ -1,6 +1,6 @@
 # 📦 Database – CoWorkSpace
 
-Questo file documenta la struttura del database relazionale utilizzato per la piattaforma **CoWorkSpace**, progettato per la gestione di sedi, spazi condivisi, prenotazioni e pagamenti.
+Questo file documenta la struttura del database relazionale utilizzato per la piattaforma **CoWorkSpace**, progettato per la gestione di sedi, spazi condivisi, prenotazioni e pagamenti. Per evitare ambiguità, i nomi utilizzati in questa documentazione corrispondono esattamente alle tabelle del database.
 
 ---
 
@@ -8,12 +8,12 @@ Questo file documenta la struttura del database relazionale utilizzato per la pi
 
 Il modello ER include le seguenti entità principali:
 
-1. `Utente`
-2. `Sede`
-3. `Spazio`
-4. `Disponibilità`
-5. `Prenotazione`
-6. `Pagamento`
+1. `utenti`
+2. `sedi`
+3. `spazi`
+4. `disponibilita`
+5. `prenotazioni`
+6. `pagamenti`
 
 Le relazioni sono state definite rispettando l'integrità referenziale tramite chiavi esterne.
 
@@ -21,7 +21,7 @@ Le relazioni sono state definite rispettando l'integrità referenziale tramite c
 
 ## 🧱 Struttura delle Tabelle
 
-### 🔹 `Utente`
+### 🔹 `utenti`
 
 Contiene i dati di login e identificazione di tutti gli utenti della piattaforma.
 
@@ -35,7 +35,7 @@ Contiene i dati di login e identificazione di tutti gli utenti della piattaforma
 
 ---
 
-### 🔹 `Sede`
+### 🔹 `sedi`
 
 Rappresenta una sede fisica dove si trovano gli spazi di coworking.
 
@@ -45,18 +45,18 @@ Rappresenta una sede fisica dove si trovano gli spazi di coworking.
 | `nome`        | VARCHAR(100) | Nome della sede                          |
 | `città`       | VARCHAR(100) | Città in cui si trova la sede            |
 | `indirizzo`   | VARCHAR(255) | Indirizzo completo                       |
-| `gestore_id`  | INTEGER      | FK → `Utente(id)` (solo gestori)         |
+| `gestore_id`  | INTEGER      | FK → `utenti(id)` (solo gestori)         |
 
 ---
 
-### 🔹 `Spazio`
+### 🔹 `spazi`
 
 Definisce un'unità prenotabile all'interno di una sede (es. sala, scrivania, ufficio).
 
 | Campo         | Tipo         | Descrizione                              |
 |---------------|--------------|------------------------------------------|
 | `id`          | SERIAL       | Identificativo dello spazio              |
-| `sede_id`     | INTEGER      | FK → `Sede(id)`                          |
+| `sede_id`     | INTEGER      | FK → `sedi(id)`                          |
 | `nome`        | VARCHAR(100) | Nome dello spazio                        |
 | `descrizione` | TEXT         | Descrizione dello spazio                 |
 | `prezzo_orario`  | NUMERIC(6,2) | Prezzo orario dello spazio               |
@@ -67,43 +67,43 @@ Definisce un'unità prenotabile all'interno di una sede (es. sala, scrivania, uf
 
 ---
 
-### 🔹 `Disponibilità`
+### 🔹 `disponibilita`
 
 Contiene le fasce orarie disponibili per ogni spazio.
 
 | Campo        | Tipo   | Descrizione                          |
 |--------------|--------|--------------------------------------|
 | `id`         | SERIAL | Identificativo della disponibilità   |
-| `spazio_id`  | INTEGER| FK → `Spazio(id)`                    |
+| `spazio_id`  | INTEGER| FK → `spazi(id)`                    |
 | `data`       | DATE   | Data della disponibilità             |
 | `orario_inizio` | TIME   | Ora di inizio                        |
 | `orario_fine`   | TIME   | Ora di fine                          |
 
 ---
 
-### 🔹 `Prenotazione`
+### 🔹 `prenotazioni`
 
 Rappresenta una prenotazione effettuata da un utente su uno spazio.
 
 | Campo         | Tipo   | Descrizione                          |
 |---------------|--------|--------------------------------------|
 | `id`          | SERIAL | Identificativo prenotazione          |
-| `utente_id`   | INTEGER| FK → `Utente(id)`                    |
-| `spazio_id`   | INTEGER| FK → `Spazio(id)`                    |
+| `utente_id`   | INTEGER| FK → `utenti(id)`                    |
+| `spazio_id`   | INTEGER| FK → `spazi(id)`                    |
 | `data`        | DATE   | Data della prenotazione              |
 | `orario_inizio`  | TIME   | Ora di inizio                        |
 | `orario_fine`    | TIME   | Ora di fine                          |
 
 ---
 
-### 🔹 `Pagamento`
+### 🔹 `pagamenti`
 
 Dati relativi al pagamento associato a una prenotazione.
 
 | Campo             | Tipo         | Descrizione                          |
 |-------------------|--------------|--------------------------------------|
 | `id`              | SERIAL       | Identificativo del pagamento         |
-| `prenotazione_id` | INTEGER      | FK → `Prenotazione(id)`              |
+| `prenotazione_id` | INTEGER      | FK → `prenotazioni(id)`              |
 | `importo`         | NUMERIC(7,2) | Importo totale                       |
 | `metodo`          | VARCHAR(20)  | Metodo usato (`paypal`, `satispay`, `carta`, `bancomat`) |
 | `timestamp`       | TIMESTAMP    | Data e ora del pagamento             |
@@ -113,11 +113,11 @@ Dati relativi al pagamento associato a una prenotazione.
 
 ## 🧭 Relazioni principali
 
-- Ogni `Gestore` (utente) può gestire più `Sedi`
-- Ogni `Sede` può contenere più `Spazi`
-- Ogni `Spazio` può avere più `Disponibilità` e `Prenotazioni`
-- Ogni `Prenotazione` è collegata a un `Utente` e a uno `Spazio`
-- Ogni `Prenotazione` ha un solo `Pagamento` associato
+- Ogni `gestore` (utente) può gestire più `sedi`
+- Ogni `sede` può contenere più `spazi`
+- Ogni `spazio` può avere più `disponibilita` e `prenotazioni`
+- Ogni `prenotazione` è collegata a un `utente` e a uno `spazio`
+- Ogni `prenotazione` ha un solo `pagamento` associato
 
 ---
 
