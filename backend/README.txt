@@ -39,6 +39,22 @@
    cp .env.example .env
    # modifica .env con le credenziali del tuo database
 
+-------------------------------------------
+🔑 Variabili d'ambiente richieste
+-------------------------------------------
+- `PORT`: Porta HTTP su cui avviare il server (default 3000)
+- `HTTPS_PORT`: Porta HTTPS se si usano certificati SSL (default 3443)
+- `DB_USER`: Utente del database PostgreSQL
+- `DB_PASSWORD`: Password del database
+- `DB_HOST`: Host del database
+- `DB_PORT`: Porta del database (default 5432)
+- `DB_NAME`: Nome del database
+- `JWT_SECRET`: Segreto usato per firmare i token JWT
+- `STRIPE_SECRET_KEY`: Chiave privata Stripe per i pagamenti
+- `STRIPE_PUBLISHABLE_KEY`: Chiave pubblicabile Stripe inviata al client
+- `SSL_KEY_PATH`: Percorso della chiave privata SSL (opzionale)
+- `SSL_CERT_PATH`: Percorso del certificato SSL (opzionale)
+
 5. Avvia PostgreSQL e crea il database:
    psql -U postgres
    CREATE DATABASE coworkspace;
