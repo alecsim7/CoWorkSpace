@@ -134,10 +134,12 @@ exports.effettuaPagamento = async (req, res) => {
       stato = paymentIntent.status;
     }
 
+    // Determina lo stato finale: per carta usiamo quello di Stripe, per altri metodi consideriamo pagato
+    const statoFinale = stato ?? (metodo === 'carta' ? 'succeeded' : 'pagato');
     await pool.query(
       `INSERT INTO pagamenti (prenotazione_id, importo, metodo, provider_id, stato, timestamp)
        VALUES ($1, $2, $3, $4, $5, NOW())`,
-      [prenotazione_id, importo, metodo, providerId, stato]
+      [prenotazione_id, importo, metodo, providerId, statoFinale]
     );
 
     await pool.query('COMMIT');
