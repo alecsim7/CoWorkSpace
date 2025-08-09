@@ -43,10 +43,13 @@
    psql -U postgres
    CREATE DATABASE coworkspace;
 
-6. Esegui il server:
+6. Esegui le migrazioni per creare le tabelle del database:
+   npm run migrate
+
+7. Esegui il server:
    node server.js
 
-7. Il backend sarà disponibile su:
+8. Il backend sarà disponibile su:
    http://localhost:3000
 
 -------------------------------------------
