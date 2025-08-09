@@ -12,10 +12,15 @@
 - Node.js (v18+ consigliato)
 - PostgreSQL
 - Librerie Node installate:
-  - express
-  - pg
-  - cors
   - bcrypt
+  - cors
+  - dotenv
+  - express
+  - express-rate-limit
+  - jsonwebtoken
+  - pg
+  - stripe
+  - winston
 
 -------------------------------------------
 ⚙️ Installazione e Avvio
