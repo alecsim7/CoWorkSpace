@@ -121,6 +121,12 @@ Consulta la [specifica API](docs/api-spec.md) e la [documentazione del database]
    psql -U postgres -d coworkspace -f database/schema.sql
    ```
    Infrastructure scripts such as the initial schema and migrations live in [database/schema.sql](database/schema.sql) and [database/migrations](database/migrations/)
+3. Run application-specific migrations:
+   ```bash
+   cd backend
+   npm run migrate
+   cd ..
+   ```
 
 ### Backend
 ```bash
