@@ -13,7 +13,7 @@ $(document).ready(function () {
     const password = $('#nuovaPassword').val();
 
     $.ajax({
-      url: 'http://localhost:3000/api/utente/me',
+      url: `${API_BASE_URL}/api/utente/me`,
       method: 'PUT',
       contentType: 'application/json',
       headers: { Authorization: `Bearer ${token}` },

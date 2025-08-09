@@ -1,4 +1,4 @@
-const API_BASE = window.API_BASE || '/api';
+const API_BASE = `${API_BASE_URL}/api`;
 
 $(document).ready(function () {
   const token = localStorage.getItem('token');
@@ -228,7 +228,7 @@ $(document).ready(function () {
       if (metodo === 'carta' && stripe) {
         // Crea il PaymentIntent sul backend
         const initRes = await $.ajax({
-          url: 'http://localhost:3000/api/pagamenti/pagamento',
+          url: `${API_BASE}/pagamenti/pagamento`,
           method: 'POST',
           contentType: 'application/json',
           headers: { Authorization: `Bearer ${token}` },
@@ -249,7 +249,7 @@ $(document).ready(function () {
 
         // Registra il pagamento sul backend
         const finalRes = await $.ajax({
-          url: 'http://localhost:3000/api/pagamenti/pagamento',
+          url: `${API_BASE}/pagamenti/pagamento`,
           method: 'POST',
           contentType: 'application/json',
           headers: { Authorization: `Bearer ${token}` },
@@ -275,7 +275,7 @@ $(document).ready(function () {
         caricaStoricoPagamenti(); // Aggiorna lo storico
       } else {
         const res = await $.ajax({
-          url: 'http://localhost:3000/api/pagamenti/pagamento',
+          url: `${API_BASE}/pagamenti/pagamento`,
           method: 'POST',
           contentType: 'application/json',
           headers: { Authorization: `Bearer ${token}` },
