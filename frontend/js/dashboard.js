@@ -20,7 +20,7 @@ $(document).ready(function () {
     console.log('Token inviato:', token); // DEBUG: verifica token
 
     $.ajax({
-      url: 'http://localhost:3000/api/prenotazioni',
+      url: `${API_BASE_URL}/api/prenotazioni`,
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function (data) {
@@ -71,7 +71,7 @@ $(document).ready(function () {
           if (!nuovoFine) return;
 
           $.ajax({
-            url: `http://localhost:3000/api/prenotazioni/${id}`,
+            url: `${API_BASE_URL}/api/prenotazioni/${id}`,
             method: 'PUT',
             contentType: 'application/json',
             headers: { Authorization: `Bearer ${token}` },
@@ -91,7 +91,7 @@ $(document).ready(function () {
           if (!confirm('Sei sicuro di voler annullare questa prenotazione?')) return;
 
           $.ajax({
-            url: `http://localhost:3000/api/prenotazioni/${id}`,
+            url: `${API_BASE_URL}/api/prenotazioni/${id}`,
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` },
             success: function () {

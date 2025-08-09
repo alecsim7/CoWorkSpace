@@ -16,7 +16,7 @@ $(document).ready(function () {
   // Funzione per caricare la lista utenti dal backend
   function caricaUtenti() {
     $.ajax({
-      url: 'http://localhost:3000/api/admin/utenti',
+      url: `${API_BASE_URL}/api/admin/utenti`,
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function (utenti) {
@@ -46,7 +46,7 @@ $(document).ready(function () {
   // Funzione per caricare la lista sedi dal backend
   function caricaSedi() {
     $.ajax({
-      url: 'http://localhost:3000/api/admin/sedi',
+      url: `${API_BASE_URL}/api/admin/sedi`,
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function (sedi) {
@@ -78,7 +78,7 @@ $(document).ready(function () {
     const id = $(this).data('id');
     if (confirm('Sei sicuro di voler eliminare questo utente?')) {
       $.ajax({
-        url: `http://localhost:3000/api/admin/utenti/${id}`,
+        url: `${API_BASE_URL}/api/admin/utenti/${id}`,
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
         success: function () {
@@ -96,7 +96,7 @@ $(document).ready(function () {
     const id = $(this).data('id');
     if (confirm('Sei sicuro di voler eliminare questa sede?')) {
       $.ajax({
-        url: `http://localhost:3000/api/admin/sedi/${id}`,
+        url: `${API_BASE_URL}/api/admin/sedi/${id}`,
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
         success: function () {
