@@ -1,19 +1,23 @@
 $(document).ready(function () {
+  // Recupera token e dati utente dal localStorage
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente') || 'null');
 
+  // Controllo accesso: solo utenti con ruolo 'cliente' possono accedere
   if (!token || !utente || utente.ruolo !== 'cliente') {
     alert('Accesso non autorizzato.');
     window.location.href = 'index.html';
     return;
   }
 
+  // Gestione logout: rimuove token e dati utente dal localStorage
   $('#logoutBtn').click(function () {
     localStorage.removeItem('token');
     localStorage.removeItem('utente');
     window.location.href = 'index.html';
   });
 
+  // Funzione per caricare le prenotazioni dell'utente
   function caricaPrenotazioni() {
     $('#listaPrenotazioni').empty();
 
@@ -26,7 +30,7 @@ $(document).ready(function () {
       success: function (data) {
         console.log('Risposta prenotazioni:', data); // DEBUG: verifica cosa arriva dal backend
 
-        // Controllo struttura risposta
+        // Controlla che la risposta abbia la struttura attesa
         if (!data || !Array.isArray(data.prenotazioni)) {
           $('#listaPrenotazioni').append('<li class="list-group-item text-danger">Risposta inattesa dal server.</li>');
           return;
@@ -38,6 +42,7 @@ $(document).ready(function () {
           return;
         }
 
+        // Per ogni prenotazione, crea un elemento della lista con pulsanti modifica/elimina
         prenotazioni.forEach(p => {
           const dataFormattata = new Date(p.data).toLocaleDateString('it-IT', { year: 'numeric', month: '2-digit', day: '2-digit' });
           const oraInizio = p.orario_inizio ? p.orario_inizio.slice(0, 5) : '';
@@ -57,6 +62,7 @@ $(document).ready(function () {
           `);
         });
 
+        // Gestione pulsante modifica prenotazione
         $('.btnModifica').click(function () {
           const id = $(this).data('id');
           const dataAttuale = $(this).data('data');
@@ -86,6 +92,7 @@ $(document).ready(function () {
           });
         });
 
+        // Gestione pulsante elimina prenotazione
         $('.btnElimina').click(function () {
           const id = $(this).data('id');
           if (!confirm('Sei sicuro di voler annullare questa prenotazione?')) return;
@@ -105,12 +112,14 @@ $(document).ready(function () {
         });
       },
       error: function (xhr) {
+        // Gestione errore AJAX: mostra errore dettagliato
         console.error('Errore AJAX:', xhr.status, xhr.responseText); // DEBUG: errore dettagliato
         $('#listaPrenotazioni').append(`<li class="list-group-item text-danger">Errore nel caricamento (${xhr.status}): ${xhr.responseText}</li>`);
       }
     });
   }
 
+  // Carica le prenotazioni all'avvio della pagina
   caricaPrenotazioni();
 });
 

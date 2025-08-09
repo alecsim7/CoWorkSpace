@@ -1,4 +1,5 @@
 $(document).ready(function () {
+  // Carica le opzioni per i filtri (città, tipo, servizi) dal backend
   function caricaOpzioni() {
     $.getJSON('/api/sedi/opzioni', function (data) {
       const cittaList = $('#cittaOptions').empty();
@@ -12,6 +13,7 @@ $(document).ready(function () {
     });
   }
 
+  // Carica le sedi dal backend, applicando eventuali filtri selezionati
   function caricaSedi() {
     const citta = $('#filtroCitta').val();
     const tipo = $('#filtroTipo').val();
@@ -26,11 +28,13 @@ $(document).ready(function () {
     $.getJSON(url, function (sedi) {
       const container = $('#listaSedi');
       container.empty();
+      // Se non ci sono sedi, mostra messaggio informativo
       if (!sedi || sedi.length === 0) {
         container.append('<div class="col-12"><div class="alert alert-info">Nessuna sede trovata.</div></div>');
         return;
       }
 
+      // Per ogni sede, crea una card con pulsante dettagli
       sedi.forEach(s => {
         const card = $(
           `<div class="col-md-4">
@@ -52,11 +56,13 @@ $(document).ready(function () {
     });
   }
 
+  // Gestione invio form filtri: aggiorna la lista sedi
   $('#formFiltri').submit(function (e) {
     e.preventDefault();
     caricaSedi();
   });
 
+  // Gestione click su pulsante dettagli: mostra/nasconde dettagli degli spazi della sede
   $('#listaSedi').on('click', '.btnDettagli', function () {
     const btn = $(this);
     const id = btn.data('id');
@@ -67,6 +73,7 @@ $(document).ready(function () {
       return;
     }
 
+    // Carica dettagli della sede e mostra gli spazi disponibili
     $.getJSON('/api/sedi/' + id, function (sede) {
       if (!sede || !sede.spazi || sede.spazi.length === 0) {
         dettagliDiv.html('<div class="text-muted">Nessuno spazio disponibile.</div>');
@@ -90,6 +97,7 @@ $(document).ready(function () {
     });
   });
 
+  // Carica opzioni e sedi all'avvio della pagina
   caricaOpzioni();
   caricaSedi();
 });

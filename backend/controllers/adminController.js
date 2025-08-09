@@ -1,6 +1,6 @@
 const pool = require('../db');
 
-// 1. Elenco utenti
+// 1. Elenco utenti: restituisce tutti gli utenti con id, nome, email e ruolo
 exports.getUtenti = async (req, res) => {
   try {
     const result = await pool.query('SELECT id, nome, email, ruolo FROM utenti');
@@ -11,7 +11,7 @@ exports.getUtenti = async (req, res) => {
   }
 };
 
-// 2. Elenco sedi
+// 2. Elenco sedi: restituisce tutte le sedi
 exports.getSedi = async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM sedi');
@@ -22,14 +22,14 @@ exports.getSedi = async (req, res) => {
   }
 };
 
-// 3. Elimina utente
+// 3. Elimina utente: elimina prima le sedi gestite dall'utente, poi elimina l'utente stesso
 exports.eliminaUtente = async (req, res) => {
   const { id } = req.params;
   try {
-    // Elimina sedi gestite dall'utente
+    // Elimina tutte le sedi dove l'utente è gestore
     await pool.query('DELETE FROM sedi WHERE gestore_id = $1', [id]);
 
-    // Ora puoi eliminare l'utente
+    // Elimina l'utente
     await pool.query('DELETE FROM utenti WHERE id = $1', [id]);
     res.json({ message: 'Utente eliminato' });
   } catch (err) {
@@ -38,7 +38,7 @@ exports.eliminaUtente = async (req, res) => {
   }
 };
 
-// 4. Elimina sede
+// 4. Elimina sede: elimina pagamenti, prenotazioni, spazi e infine la sede
 exports.eliminaSede = async (req, res) => {
   const { id } = req.params;
 
@@ -52,7 +52,7 @@ exports.eliminaSede = async (req, res) => {
     );
     const prenotazioneIds = prenotazioniRes.rows.map(r => r.id);
 
-    // Elimina pagamenti associati a queste prenotazioni
+    // Elimina pagamenti associati alle prenotazioni trovate
     if (prenotazioneIds.length > 0) {
       await pool.query(
         `DELETE FROM pagamenti WHERE prenotazione_id = ANY($1::int[])`,
@@ -60,7 +60,7 @@ exports.eliminaSede = async (req, res) => {
       );
     }
 
-    // Elimina prenotazioni associate agli spazi della sede
+    // Elimina le prenotazioni associate agli spazi della sede
     if (prenotazioneIds.length > 0) {
       await pool.query(
         `DELETE FROM prenotazioni WHERE id = ANY($1::int[])`,
@@ -68,10 +68,10 @@ exports.eliminaSede = async (req, res) => {
       );
     }
 
-    // Elimina spazi associati alla sede
+    // Elimina tutti gli spazi associati alla sede
     await pool.query('DELETE FROM spazi WHERE sede_id = $1', [id]);
 
-    // Elimina la sede
+    // Elimina la sede stessa
     await pool.query('DELETE FROM sedi WHERE id = $1', [id]);
 
     res.json({ message: 'Sede eliminata' });

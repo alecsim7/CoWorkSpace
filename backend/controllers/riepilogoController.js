@@ -1,8 +1,11 @@
 const pool = require('../db');
 
+// Restituisce il riepilogo delle prenotazioni per ogni spazio gestito dal gestore
 exports.getRiepilogoPrenotazioni = async (req, res) => {
+  // Ottieni l'id del gestore dai parametri della richiesta
   const gestoreId = parseInt(req.params.id, 10);
 
+  // Controllo che l'utente autenticato sia il gestore richiesto
   if (req.utente.id !== gestoreId) {
     return res.status(403).json({ message: 'Accesso negato' });
   }
@@ -24,13 +27,16 @@ exports.getRiepilogoPrenotazioni = async (req, res) => {
       [gestoreId]
     );
 
+    // Mappa i risultati e assicura che totale_prenotazioni sia un intero
     const riepilogo = result.rows.map(r => ({
       ...r,
       totale_prenotazioni: parseInt(r.totale_prenotazioni, 10) || 0,
     }));
 
+    // Restituisce il riepilogo come JSON
     res.json({ riepilogo });
   } catch (err) {
+    // Logga e restituisce errore in caso di problemi
     console.error('Errore recupero riepilogo prenotazioni:', err);
     res.status(500).json({ message: 'Errore del server' });
   }

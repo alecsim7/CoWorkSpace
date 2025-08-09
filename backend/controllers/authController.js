@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// ✅ Registrazione
+// Registrazione
 exports.register = async (req, res) => {
   const { nome, email, password, ruolo } = req.body;
 
@@ -32,7 +32,7 @@ exports.register = async (req, res) => {
   }
 };
 
-// ✅ Login con generazione JWT
+// Login con generazione JWT
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Password non corretta' });
     }
 
-    // 🔐 Genera token JWT
+    // Genera token JWT
     const token = jwt.sign(
       { id: user.id, ruolo: user.ruolo },
       JWT_SECRET,
@@ -72,7 +72,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// ✅ Logout placeholder
+//Logout placeholder
 exports.logout = (req, res) => {
   // Con JWT il logout si implementa lato client (rimozione token)
   res.json({ message: 'Logout simulato: cancella il token dal client' });

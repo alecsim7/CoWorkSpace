@@ -1,19 +1,23 @@
 const API_BASE = `${API_BASE_URL}/api`;
 
 $(document).ready(function () {
+  // Recupera token e dati utente dal localStorage
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente'));
 
+  // Inizializza Stripe se la chiave pubblica è disponibile
   const stripeKey = window.STRIPE_PUBLISHABLE_KEY;
   const stripe = stripeKey ? Stripe(stripeKey) : null;
   let card;
 
+  // Se utente non loggato, reindirizza
   if (!token || !utente) {
     alert("Effettua il login per accedere al pagamento.");
     window.location.href = "index.html";
     return;
   }
 
+  // Se Stripe non disponibile, disabilita pagamento con carta
   if (!stripe) {
     $('#metodo option[value="carta"]').prop('disabled', true)
       .text('💳 Carta di Credito (non disponibile)');
@@ -22,8 +26,9 @@ $(document).ready(function () {
     );
   }
 
-  let prenotazioni = []; // Variabile per memorizzare le prenotazioni
+  let prenotazioni = []; // Array per memorizzare le prenotazioni
 
+  // Mostra riepilogo della prenotazione selezionata
   function mostraRiepilogoPrenotazione(prenotazione) {
     const riepilogo = `
       <div class="row">
@@ -40,11 +45,13 @@ $(document).ready(function () {
     $('#riepilogoPrenotazione').html(riepilogo);
   }
 
+  // Calcola l'importo da pagare per una prenotazione
   function calcolaImporto(prenotazione) {
     if (!prenotazione.prezzo_orario || !prenotazione.orario_inizio || !prenotazione.orario_fine) {
       return null;
     }
 
+    // Estrae orario di inizio e fine, calcola le ore e moltiplica per il prezzo orario
     const inizio = prenotazione.orario_inizio.slice(0,5);
     const fine = prenotazione.orario_fine.slice(0,5);
     const [hStart, mStart] = inizio.split(':').map(Number);
@@ -53,6 +60,7 @@ $(document).ready(function () {
     return parseFloat(prenotazione.prezzo_orario) * ore;
   }
 
+  // Aggiorna interfaccia se non ci sono prenotazioni da pagare
   function aggiornaInterfaccia() {
     if ($('#prenotazione option').length === 0) {
       $('#alertPagamento').html('<div class="alert alert-info">Nessuna prenotazione da pagare.</div>');

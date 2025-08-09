@@ -1,32 +1,36 @@
-// Base URL for the backend API
+// Base URL per le chiamate API al backend
 window.API_BASE = 'https://backend.example.com/api';
 const API_BASE = window.API_BASE || '/api';
 
 $(document).ready(function () {
+  // Recupera il token di autenticazione dal localStorage
   const token = localStorage.getItem('token');
 
+  // Se non autenticato, mostra avviso e reindirizza
   if (!token) {
     $('#authAlert').html('<div class="alert alert-warning">Effettua il login per accedere alla dashboard.</div>');
     setTimeout(() => { window.location.href = "index.html"; }, 2000);
     return;
   }
 
-  // Logout button
+  // Gestione logout: rimuove token e dati utente dal localStorage
   $('#logoutBtn').click(function () {
     localStorage.removeItem('token');
     localStorage.removeItem('utente');
     window.location.href = "index.html";
   });
 
+  // Mostra spinner di caricamento
   function showSpinner() {
     $('#loadingSpinner').removeClass('d-none');
   }
 
+  // Nasconde spinner di caricamento
   function hideSpinner() {
     $('#loadingSpinner').addClass('d-none');
   }
 
-  // Cerca disponibilità spazi
+  // Gestione ricerca disponibilità spazi tramite form
   $('#formRicerca').submit(async function (e) {
     e.preventDefault();
 
@@ -152,6 +156,7 @@ $(document).ready(function () {
     }
   });
 
+  // Gestione conferma prenotazione tramite modale
   $('#confirmPrenota').click(async function () {
     const info = $('#confirmModal').data('spazio');
     if (!info) return;

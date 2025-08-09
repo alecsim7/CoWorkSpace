@@ -1,8 +1,8 @@
 const pool = require('../db');
 
-// Helper to resolve which column represents the space type.
-// Looks for one of: tipo_spazio, tipo, tipologia.
-// Returns the found column name or undefined if none exists.
+// Helper per trovare la colonna che rappresenta il tipo di spazio.
+// Cerca tra: tipo_spazio, tipo, tipologia.
+// Restituisce il nome della colonna trovata o undefined.
 async function resolveTipoColumn() {
   const result = await pool.query(
     `SELECT column_name FROM information_schema.columns
@@ -13,9 +13,9 @@ async function resolveTipoColumn() {
   return result.rows[0]?.column_name;
 }
 
-// Helper to resolve which column stores services information.
-// Looks for one of: servizi, servizi_offerti, services.
-// Returns the found column name or undefined if none exists.
+// Helper per trovare la colonna che contiene i servizi.
+// Cerca tra: servizi, servizi_offerti, services.
+// Restituisce il nome della colonna trovata o undefined.
 async function resolveServiziColumn() {
   const result = await pool.query(
     `SELECT column_name FROM information_schema.columns
@@ -31,7 +31,7 @@ exports.getSedi = async (req, res) => {
   try {
     const { citta, servizio, tipo } = req.query;
 
-    // Determine the column names for the type of space and services
+    // Determina i nomi delle colonne per tipo spazio e servizi
     const tipoColumn = await resolveTipoColumn();
     const serviziColumn = await resolveServiziColumn();
 
@@ -39,29 +39,35 @@ exports.getSedi = async (req, res) => {
     const where = [];
     const params = [];
 
+    // Se ci sono filtri su servizi o tipo, fai join con tabella spazi
     if ((servizio && serviziColumn) || (tipo && tipoColumn)) {
       query += ' JOIN spazi sp ON s.id = sp.sede_id';
     }
 
+    // Filtro per città
     if (citta) {
       params.push(citta);
       where.push(`s.citta = $${params.length}`);
     }
 
+    // Filtro per servizi
     if (servizio && serviziColumn) {
       params.push(`%${servizio}%`);
       where.push(`sp.${serviziColumn} ILIKE $${params.length}`);
     }
 
+    // Filtro per tipo spazio
     if (tipo && tipoColumn) {
       params.push(tipo);
       where.push(`sp.${tipoColumn} = $${params.length}`);
     }
 
+    // Costruisci la clausola WHERE se ci sono filtri
     if (where.length > 0) {
       query += ' WHERE ' + where.join(' AND ');
     }
 
+    // Esegui la query e restituisci le sedi filtrate
     const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {
@@ -70,11 +76,13 @@ exports.getSedi = async (req, res) => {
   }
 };
 
-// Restituisce liste di valori per filtri pubblici
+// Restituisce liste di valori per filtri pubblici (città, tipi, servizi)
 exports.getOpzioni = async (req, res) => {
   try {
+    // Recupera tutte le città disponibili
     const cittaResult = await pool.query('SELECT DISTINCT citta FROM sedi');
 
+    // Recupera tutti i tipi di spazio disponibili
     const tipoColumn = await resolveTipoColumn();
     let tipi = [];
     if (tipoColumn) {
@@ -84,6 +92,7 @@ exports.getOpzioni = async (req, res) => {
       tipi = tipiResult.rows.map(r => r.tipo);
     }
 
+    // Recupera tutti i servizi disponibili
     const serviziColumn = await resolveServiziColumn();
     let servizi = [];
     if (serviziColumn) {
@@ -94,6 +103,7 @@ exports.getOpzioni = async (req, res) => {
       servizi = serviziResult.rows.map(r => r.servizio);
     }
 
+    // Restituisce le opzioni come JSON
     res.json({
       citta: cittaResult.rows.map(r => r.citta),
       tipi,
@@ -105,14 +115,16 @@ exports.getOpzioni = async (req, res) => {
   }
 };
 
-// Recupera sedi di un gestore
+// Recupera sedi di un gestore (solo se autenticato come gestore)
 exports.getSediGestore = async (req, res) => {
   const { id } = req.params;
   const requestedId = parseInt(id, 10);
+  // Controllo che l'utente sia il gestore richiesto
   if (req.utente.id !== requestedId) {
     return res.status(403).json({ message: 'Accesso negato' });
   }
   try {
+    // Restituisce id, nome e città delle sedi gestite
     const result = await pool.query(
       'SELECT id, nome, citta FROM sedi WHERE gestore_id = $1',
       [requestedId]
@@ -124,16 +136,18 @@ exports.getSediGestore = async (req, res) => {
   }
 };
 
-// Aggiunta nuova sede
+// Aggiunta nuova sede (solo gestore autenticato)
 exports.aggiungiSede = async (req, res) => {
   const { nome, citta, indirizzo, gestore_id } = req.body;
   const gestoreId = parseInt(gestore_id, 10);
 
+  // Controllo che l'utente sia il gestore che sta aggiungendo la sede
   if (req.utente.id !== gestoreId) {
     return res.status(403).json({ message: 'Accesso negato' });
   }
 
   try {
+    // Inserisce la nuova sede e restituisce i dati
     const result = await pool.query(
       'INSERT INTO sedi (nome, citta, indirizzo, gestore_id) VALUES ($1, $2, $3, $4) RETURNING *',
       [nome, citta, indirizzo, gestore_id]
@@ -150,17 +164,21 @@ exports.getSedeById = async (req, res) => {
   const { id } = req.params;
 
   try {
+    // Recupera i dati della sede
     const sedeResult = await pool.query('SELECT * FROM sedi WHERE id = $1', [id]);
 
     if (sedeResult.rows.length === 0) {
       return res.status(404).json({ message: 'Sede non trovata' });
     }
 
+    // Recupera tutti gli spazi associati alla sede
     const spaziResult = await pool.query('SELECT * FROM spazi WHERE sede_id = $1', [id]);
 
+    // Aggiunge gli spazi all'oggetto sede
     const sede = sedeResult.rows[0];
     sede.spazi = spaziResult.rows;
 
+    // Restituisce la sede con i suoi spazi
     res.json(sede);
   } catch (err) {
     console.error('Errore recupero sede:', err);

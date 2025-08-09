@@ -1,6 +1,6 @@
 const pool = require('../db');
 
-// ✅ Crea una prenotazione e calcola l'importo da pagare
+//Crea una prenotazione e calcola l'importo da pagare
 exports.creaPrenotazione = async (req, res) => {
   const { spazio_id, data, orario_inizio, orario_fine } = req.body;
 
@@ -61,7 +61,7 @@ exports.creaPrenotazione = async (req, res) => {
   }
 };
 
-// ✅ Visualizza prenotazioni utente con info su spazi e sedi
+//Visualizza prenotazioni utente con info su spazi e sedi
 exports.visualizzaPrenotazioni = async (req, res) => {
   const utente_id = req.utente.id;
 
@@ -84,7 +84,7 @@ exports.visualizzaPrenotazioni = async (req, res) => {
   }
 };
 
-// ✅ Modifica una prenotazione esistente dell'utente
+//Modifica una prenotazione esistente dell'utente
 exports.modificaPrenotazione = async (req, res) => {
   const { id } = req.params;
   const { data, orario_inizio, orario_fine } = req.body;
@@ -129,7 +129,7 @@ exports.modificaPrenotazione = async (req, res) => {
   }
 };
 
-// ✅ Recupera prenotazioni dell'utente non ancora pagate
+// Recupera prenotazioni dell'utente non ancora pagate
 exports.prenotazioniNonPagate = async (req, res) => {
   const utente_id = req.utente.id;
 
@@ -152,7 +152,7 @@ exports.prenotazioniNonPagate = async (req, res) => {
   }
 };
 
-// ✅ Elimina una prenotazione dell'utente
+//Elimina una prenotazione dell'utente
 exports.eliminaPrenotazione = async (req, res) => {
   console.log('Richiesta eliminazione prenotazione ricevuta:', req.params.id, req.utente?.id); // Debug
 

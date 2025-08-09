@@ -1,15 +1,19 @@
 const path = require('path');
+// Carica le variabili d'ambiente dal file .env nella directory corrente
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const { Pool } = require('pg');
 
+// Elenco delle variabili d'ambiente richieste per la connessione al database
 const requiredEnvVars = ['DB_USER', 'DB_PASSWORD', 'DB_HOST', 'DB_PORT', 'DB_NAME'];
 
+// Controlla che tutte le variabili richieste siano presenti
 requiredEnvVars.forEach((envVar) => {
   if (!process.env[envVar]) {
     throw new Error(`${envVar} is missing`);
   }
 });
 
+// Crea il pool di connessione PostgreSQL usando le variabili d'ambiente
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,

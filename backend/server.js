@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
+// Carica variabili d'ambiente dal file .env
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
@@ -12,35 +13,37 @@ const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
 const PORT = process.env.PORT || 3000;
 const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY;
 
-
-// Rate limiting
+// Rate limiting per endpoint di autenticazione
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000, // 15 minuti
   max: 100
 });
 
+// Rate limiting per endpoint di pagamento
 const paymentLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100
 });
 
-// Middleware
+// Middleware globali
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Debug route to test if endpoint is accessible
+// Route di debug per testare il server
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Server is running' });
 });
 
-// Configurazione Stripe
+// Route per ottenere la chiave pubblica Stripe
 app.get('/config/stripe', (_, res) => {
   res.json({ publishableKey: STRIPE_PUBLISHABLE_KEY });
 });
 
-// Rotte
+// Route principale per la homepage
 app.get('/', (_, res) => res.sendFile(path.join(__dirname, '../frontend/index.html')));
+
+// Rotte API
 app.use('/api', authLimiter, require('./routes/authRoutes'));           // Login, registrazione, logout
 app.use('/api', require('./routes/userRoutes'));           // Profilo utente
 app.use('/api/sedi', require('./routes/sediRoutes'));
@@ -55,22 +58,23 @@ app.use('/api', require('./routes/gestoreRoutes'));        // Dashboard gestore
 app.use('/api/admin', require('./routes/adminRoutes'));    // Area admin
 app.use('/api', require('./routes/disponibilitaRoutes'));
 
-
-// Avvio server con verifica dei certificati SSL
+// Configurazione percorsi certificati SSL
 const keyPath = process.env.SSL_KEY_PATH || path.join(__dirname, 'cert', 'key.pem');
 const certPath = process.env.SSL_CERT_PATH || path.join(__dirname, 'cert', 'cert.pem');
 
+// Avvio server HTTPS se i certificati sono presenti, altrimenti solo HTTP
 if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
   const httpsOptions = {
     key: fs.readFileSync(keyPath),
     cert: fs.readFileSync(certPath),
   };
 
+  // Avvia server HTTPS
   https.createServer(httpsOptions, app).listen(HTTPS_PORT, () => {
     console.log(`🚀 Server HTTPS avviato su https://localhost:${HTTPS_PORT}`);
   });
 
-  // Redirect HTTP -> HTTPS
+  // Redirect automatico da HTTP a HTTPS
   http.createServer((req, res) => {
     const host = req.headers.host.split(':')[0];
     res.writeHead(301, { Location: `https://${host}:${HTTPS_PORT}${req.url}` });
@@ -79,6 +83,7 @@ if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
     console.log(`➡️ Reindirizzamento HTTP attivo su http://localhost:${HTTP_PORT}`);
   });
 } else {
+  // Se i certificati non sono presenti, avvia solo server HTTP
   console.warn('⚠️  Certificati SSL non trovati. Avvio del solo server HTTP.');
   http.createServer(app).listen(HTTP_PORT, () => {
     console.log(`🚀 Server HTTP avviato su http://localhost:${HTTP_PORT}`);

@@ -1,15 +1,17 @@
 $(document).ready(function () {
+  // Recupera token e dati utente dal localStorage
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente'));
   const API_BASE = '/api';
 
+  // Controllo accesso: solo gestore autenticato può accedere
   if (!token || !utente || utente.ruolo !== 'gestore') {
     alert("Accesso non autorizzato. Effettua il login come gestore.");
     window.location.href = "index.html";
     return;
   }
 
-  // Carica sedi del gestore
+  // Carica le sedi gestite dal gestore
   function caricaSedi() {
     $.ajax({
       url: `${API_BASE}/sedi/gestore/${utente.id}`,
@@ -30,7 +32,7 @@ $(document).ready(function () {
 
   caricaSedi();
 
-  // Carica spazi del gestore con immagini
+  // Carica gli spazi associati alle sedi del gestore, mostrando anche le immagini
   function caricaSpazi() {
     const container = $('#spaziContainer');
 
@@ -46,6 +48,7 @@ $(document).ready(function () {
           return;
         }
 
+        // Per ogni sede, carica gli spazi associati
         sedi.forEach(sede => {
           $.ajax({
             url: `${API_BASE}/spazi/${sede.id}`,
@@ -57,6 +60,7 @@ $(document).ready(function () {
                 return;
               }
 
+              // Mostra ogni spazio come card con immagine e descrizione
               spazi.forEach(spazio => {
                 container.append(`
                   <div class="col-md-4">
@@ -85,49 +89,50 @@ $(document).ready(function () {
 
   caricaSpazi();
 
-    // Visualizza riepilogo prenotazioni aggregato per ogni spazio
-    function caricaRiepilogo() {
-      $.ajax({
-        url: `${API_BASE}/riepilogo/${utente.id}`,
-        method: 'GET',
-        headers: { Authorization: `Bearer ${token}` },
-        success: function (data) {
-          const container = $('#riepilogoContainer');
-          container.empty();
+  // Carica riepilogo prenotazioni aggregato per ogni spazio del gestore
+  function caricaRiepilogo() {
+    $.ajax({
+      url: `${API_BASE}/riepilogo/${utente.id}`,
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+      success: function (data) {
+        const container = $('#riepilogoContainer');
+        container.empty();
 
-          if (!data.riepilogo || !Array.isArray(data.riepilogo) || data.riepilogo.length === 0) {
-            container.html('<div class="alert alert-info">Nessuna prenotazione registrata nei tuoi spazi.</div>');
-            return;
-          }
+        if (!data.riepilogo || !Array.isArray(data.riepilogo) || data.riepilogo.length === 0) {
+          container.html('<div class="alert alert-info">Nessuna prenotazione registrata nei tuoi spazi.</div>');
+          return;
+        }
 
-          data.riepilogo.forEach(r => {
-            const count = Number(r.totale_prenotazioni) || 0;
-            container.append(`
-              <div class="card mb-2">
-                <div class="row g-0 align-items-center">
-                  <div class="col-md-3 text-center p-2">
-                    ${r.image_url ? `<img src="${r.image_url}" class="spazio-thumb" alt="${r.nome_spazio || 'Spazio'}" />` : ''}
-                  </div>
-                  <div class="col-md-9">
-                    <div class="card-body">
-                      🏢 <strong>${r.nome_sede || 'N/D'}</strong> – 🪑 ${r.nome_spazio || 'N/D'}<br>
-                      📊 Prenotazioni totali: ${count}
-                    </div>
+        // Mostra riepilogo per ogni spazio
+        data.riepilogo.forEach(r => {
+          const count = Number(r.totale_prenotazioni) || 0;
+          container.append(`
+            <div class="card mb-2">
+              <div class="row g-0 align-items-center">
+                <div class="col-md-3 text-center p-2">
+                  ${r.image_url ? `<img src="${r.image_url}" class="spazio-thumb" alt="${r.nome_spazio || 'Spazio'}" />` : ''}
+                </div>
+                <div class="col-md-9">
+                  <div class="card-body">
+                    🏢 <strong>${r.nome_sede || 'N/D'}</strong> – 🪑 ${r.nome_spazio || 'N/D'}<br>
+                    📊 Prenotazioni totali: ${count}
                   </div>
                 </div>
               </div>
-            `);
-          });
-        },
-        error: function () {
-          $('#riepilogoContainer').html('<div class="alert alert-danger">Errore nel caricamento del riepilogo.</div>');
-        }
-      });
-    }
+            </div>
+          `);
+        });
+      },
+      error: function () {
+        $('#riepilogoContainer').html('<div class="alert alert-danger">Errore nel caricamento del riepilogo.</div>');
+      }
+    });
+  }
 
   caricaRiepilogo();
 
-  // Aggiungi nuova sede
+  // Gestione invio form per aggiungere una nuova sede
   $('#formSede').submit(function (e) {
     e.preventDefault();
 
@@ -152,7 +157,7 @@ $(document).ready(function () {
     });
   });
 
-  // Aggiungi nuovo spazio
+  // Gestione invio form per aggiungere un nuovo spazio
   $('#formSpazio').submit(function (e) {
     e.preventDefault();
 
@@ -165,6 +170,7 @@ $(document).ready(function () {
     const prezzo_orario = parseFloat($('#prezzoOrario').val());
     const capienza = parseInt($('#capienza').val());
 
+    // Validazione campi obbligatori
     if (!sede_id) {
       $('#alertGestore').html(`<div class="alert alert-warning">⚠️ Seleziona una sede prima di aggiungere uno spazio.</div>`);
       return;
@@ -190,7 +196,7 @@ $(document).ready(function () {
       return;
     }
 
-    // Endpoint: POST /api/spazi (gestoreRoutes)
+    // Invia richiesta per aggiungere lo spazio
     $.ajax({
       url: `${API_BASE}/spazi`,
       method: 'POST',
@@ -208,7 +214,7 @@ $(document).ready(function () {
     });
   });
 
-  // Logout
+  // Gestione logout: rimuove token e dati utente dal localStorage
   $('#logoutBtn').click(function () {
     localStorage.removeItem('token');
     localStorage.removeItem('utente');
