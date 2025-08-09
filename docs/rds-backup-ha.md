@@ -1,15 +1,15 @@
-# RDS Backup and High Availability
+# Backup e Alta Disponibilità RDS
 
-This project uses an AWS RDS PostgreSQL instance. To safeguard data and keep the service available, enable the following features on the database instance:
+Questo progetto utilizza un'istanza AWS RDS PostgreSQL. Per proteggere i dati e mantenere il servizio disponibile, abilita le seguenti funzionalità sull'istanza del database:
 
-## Backup strategy
-- **Automated backups**: Enable automated backups with a 7-day retention period. This provides point-in-time recovery within the retention window.
-- **Manual snapshots**: Create manual snapshots before major changes or releases. Snapshots can be stored indefinitely and used to restore the database or clone environments.
-- **Export to S3 (optional)**: Use `aws rds export-task` to export snapshot data to S3 for long-term archival or cross-account storage.
+## Strategia di backup
+- **Backup automatici**: Abilita i backup automatici con un periodo di conservazione di 7 giorni. Questo permette il ripristino point-in-time entro la finestra di conservazione.
+- **Snapshot manuali**: Crea snapshot manuali prima di modifiche importanti o rilasci. Gli snapshot possono essere conservati indefinitamente e utilizzati per ripristinare il database o clonare ambienti.
+- **Esportazione su S3 (opzionale)**: Usa `aws rds export-task` per esportare i dati degli snapshot su S3 per archiviazione a lungo termine o per la conservazione su altri account.
 
-## High availability options
-- **Multi-AZ deployment**: Deploy the RDS instance with the Multi-AZ option to maintain a synchronous standby in another Availability Zone. During primary node failure or maintenance, RDS automatically fails over to the standby.
-- **Read replicas**: For read-heavy workloads or cross-region redundancy, create read replicas. Promote a replica to primary during a disaster recovery event.
-- **Enhanced monitoring**: Enable Amazon CloudWatch and enhanced monitoring to track failover events and database health.
+## Opzioni di alta disponibilità
+- **Distribuzione Multi-AZ**: Distribuisci l'istanza RDS con l'opzione Multi-AZ per mantenere una replica sincrona in un'altra Availability Zone. In caso di guasto del nodo primario o manutenzione, RDS effettua automaticamente il failover sulla replica.
+- **Replica di lettura**: Per carichi di lavoro con molte letture o per ridondanza tra regioni, crea repliche di lettura. Puoi promuovere una replica a primaria in caso di disaster recovery.
+- **Monitoraggio avanzato**: Abilita Amazon CloudWatch e il monitoraggio avanzato per tracciare eventi di failover e lo stato di salute del database.
 
-Adjust these settings according to production requirements and cost considerations.
+Adatta queste impostazioni in base ai requisiti di produzione e alle considerazioni sui costi.
