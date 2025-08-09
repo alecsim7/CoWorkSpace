@@ -79,6 +79,10 @@ Contiene le fasce orarie disponibili per ogni spazio.
 | `orario_inizio` | TIME   | Ora di inizio                        |
 | `orario_fine`   | TIME   | Ora di fine                          |
 
+Per migliorare le prestazioni delle query di ricerca sono stati creati i seguenti indici:
+- `idx_disponibilita_spazio_data` (`spazio_id`, `data`)
+- `idx_disponibilita_data_orari` (`data`, `orario_inizio`, `orario_fine`)
+
 ---
 
 ### 🔹 `Prenotazione`
