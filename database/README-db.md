@@ -98,7 +98,9 @@ Rappresenta una prenotazione effettuata da un utente su uno spazio.
 
 ### 🔹 `Pagamento`
 
-Dati relativi al pagamento associato a una prenotazione.
+Raccoglie i dati di pagamento associati a una prenotazione,
+inclusi l'identificativo della transazione esterna e lo stato
+del pagamento.
 
 | Campo             | Tipo         | Descrizione                          |
 |-------------------|--------------|--------------------------------------|
@@ -106,6 +108,8 @@ Dati relativi al pagamento associato a una prenotazione.
 | `prenotazione_id` | INTEGER      | FK → `Prenotazione(id)`              |
 | `importo`         | NUMERIC(7,2) | Importo totale                       |
 | `metodo`          | VARCHAR(20)  | Metodo usato (`paypal`, `satispay`, `carta`, `bancomat`) |
+| `provider_id`     | VARCHAR(255) | ID della transazione esterna         |
+| `stato`           | VARCHAR(20)  | Stato del pagamento (es. `succeeded`, `pagato`) |
 | `timestamp`       | TIMESTAMP    | Data e ora del pagamento             |
 
 
