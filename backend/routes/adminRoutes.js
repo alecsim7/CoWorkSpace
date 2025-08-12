@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 
-const { verificaToken } = require('../middleware/authMiddleware');
-const { verificaAdmin } = require('../middleware/adminMiddleware');
+const { verificaToken, verificaAdmin } = require('../middleware/authMiddleware');
 
 router.use(verificaToken, verificaAdmin);
 
