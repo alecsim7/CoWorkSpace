@@ -22,4 +22,15 @@ const pool = new Pool({
   port: Number(process.env.DB_PORT) || 5432,
 });
 
+// Verifica immediatamente la connessione al database
+pool
+  .connect()
+  .then((client) => {
+    client.release();
+  })
+  .catch((err) => {
+    console.error('Errore di connessione al database:', err.message);
+    process.exit(1);
+  });
+
 module.exports = pool;

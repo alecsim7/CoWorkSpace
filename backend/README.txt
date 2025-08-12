@@ -64,6 +64,7 @@
 
 7. Esegui il server:
    node server.js
+   All'avvio viene eseguito un tentativo di connessione al database; se fallisce (es. per problemi di DNS o rete) l'errore viene registrato e il processo termina con codice 1.
 
 8. Il backend sarà disponibile su:
    http://localhost:3000
