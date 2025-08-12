@@ -1,6 +1,7 @@
-const pool = require('./db');
+const pool = require('../db');
 
 // Esegue una query di test per verificare la connessione al database
+// Utilizzo: node scripts/test-db.js
 pool.query('SELECT NOW()', (err, res) => {
   if (err) {
     // Logga errore se la connessione fallisce
