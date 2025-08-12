@@ -1,16 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/validateInput');
-const authMW = require('../middleware/authMiddleware');
+const authController = require('../controllers/authController');
 const validate = require('../middleware/validateInput');
-const validateRegister = (authMW && authMW.validateRegister) ? authMW.validateRegister : (req, res, next) => next();
-const validateLogin = (authMW && authMW.validateLogin) ? authMW.validateLogin : (req, res, next) => next();
 
 // Route per la registrazione utente, con validazione input
-router.post('/register', validateRegister, authController.register);
+router.post('/register', validate.validateRegister, authController.register);
 
 // Route per il login utente, con validazione input
-router.post('/login', validateLogin, authController.login);
+router.post('/login', validate.validateLogin, authController.login);
 
 // Route per il logout utente
 router.get('/logout', authController.logout);
