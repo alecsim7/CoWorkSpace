@@ -39,17 +39,21 @@
             <h5 class="card-title mb-3">Seleziona data e ora</h5>
             <form id="formRicerca">
               <div class="row g-3">
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label for="data" class="form-label">Data</label>
                   <input type="date" id="data" class="form-control form-lg" required />
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label for="orarioInizio" class="form-label">Dalle ore</label>
                   <input type="time" id="orarioInizio" class="form-control form-lg" required />
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <label for="orarioFine" class="form-label">Alle ore</label>
                   <input type="time" id="orarioFine" class="form-control form-lg" required />
+                </div>
+                <div class="col-md-3">
+                  <label for="citta" class="form-label">Città</label>
+                  <input type="text" id="citta" class="form-control form-lg" />
                 </div>
               </div>
               <button type="submit" class="btn btn-primary btn-lg mt-4 w-100">Cerca disponibilità</button>

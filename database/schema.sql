@@ -16,6 +16,9 @@ CREATE TABLE sedi (
   gestore_id INTEGER NOT NULL REFERENCES utenti(id) ON DELETE CASCADE
 );
 
+-- Index to speed up searches by city
+CREATE INDEX IF NOT EXISTS idx_sedi_citta ON sedi (citta);
+
 -- Spazi
 CREATE TABLE spazi (
   id SERIAL PRIMARY KEY,

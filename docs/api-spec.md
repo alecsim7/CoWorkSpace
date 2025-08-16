@@ -79,6 +79,36 @@ Filtri disponibili su `/api/sedi`:
 |--------|------------------------------------|-------------------------------------------------|
 | GET    | `/api/spazi/:sede_id`              | Visualizza gli spazi all’interno di una sede    |
 | GET    | `/api/disponibilita/:spazio_id`    | Visualizza la disponibilità per uno spazio      |
+| POST   | `/api/disponibilita`               | Ricerca spazi disponibili per data/orario/città |
+
+**Body POST `/api/disponibilita`:** `data`, `orario_inizio`, `orario_fine`, `citta` (opzionale)
+
+**Esempio richiesta:**
+```json
+{
+  "data": "2025-03-10",
+  "orario_inizio": "09:00",
+  "orario_fine": "11:00",
+  "citta": "Roma"
+}
+```
+
+**Esempio risposta:**
+```json
+{
+  "risultati": [
+    {
+      "spazio_id": 1,
+      "nome_spazio": "Sala Riunioni",
+      "descrizione": "Sala riunioni attrezzata",
+      "prezzo_orario": 20,
+      "nome_sede": "Sede Centrale",
+      "citta": "Roma",
+      "posti_liberi": 3
+    }
+  ]
+}
+```
 
 ---
 

@@ -23,11 +23,11 @@ exports.visualizzaDisponibilitaSpazio = async (req, res) => {
 
 // Ricerca disponibilità in base a data e intervallo orario
 exports.ricercaDisponibilita = async (req, res) => {
-  const { data, orario_inizio, orario_fine } = req.body;
+  const { data, orario_inizio, orario_fine, citta } = req.body;
 
   try {
     // DEBUG: Mostra i parametri ricevuti per la ricerca
-    console.log('Parametri ricerca disponibilità:', { data, orario_inizio, orario_fine });
+    console.log('Parametri ricerca disponibilità:', { data, orario_inizio, orario_fine, citta });
 
     // Query per trovare spazi disponibili che non hanno prenotazioni sovrapposte
     const result = await pool.query(
@@ -36,15 +36,17 @@ exports.ricercaDisponibilita = async (req, res) => {
               s.descrizione,
               s.prezzo_orario,
               sede.nome AS nome_sede,
+              sede.citta AS citta,
               s.capienza - COALESCE(COUNT(p.id), 0) AS posti_liberi
        FROM spazi s
        JOIN sedi sede ON s.sede_id = sede.id
        LEFT JOIN prenotazioni p ON p.spazio_id = s.id
            AND p.data = $1
            AND NOT (p.orario_fine <= $2 OR p.orario_inizio >= $3)
-       GROUP BY s.id, s.nome, s.descrizione, s.prezzo_orario, s.capienza, sede.nome
+       WHERE ($4::text IS NULL OR sede.citta ILIKE $4)
+       GROUP BY s.id, s.nome, s.descrizione, s.prezzo_orario, s.capienza, sede.nome, sede.citta
        HAVING (s.capienza - COALESCE(COUNT(p.id), 0)) > 0`,
-      [data, orario_inizio, orario_fine]
+      [data, orario_inizio, orario_fine, citta ? `%${citta}%` : null]
     );
 
     // Restituisce i risultati della ricerca
