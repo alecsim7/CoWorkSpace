@@ -1,5 +1,7 @@
 // Base URL per le chiamate API al backend
-window.API_BASE = 'https://backend.example.com/api';
+// Può essere configurato per ambienti diversi impostando la variabile globale `window.API_BASE`
+// (ad esempio tramite un file di configurazione o una variabile d'ambiente)
+window.API_BASE = window.API_BASE || 'https://localhost:3443/api';
 const API_BASE = window.API_BASE || '/api';
 
 $(document).ready(function () {
