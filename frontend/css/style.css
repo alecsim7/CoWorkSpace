@@ -20,7 +20,7 @@ html, body {
   width: fit-content;
   box-sizing: border-box;
   align-items: center;
-  margin: 32px auto 0 auto; /* più giù e centrata */
+  margin: 16px auto 0 auto; /* più giù e centrata */
   display: none; /* Rimuovi se vuoi che sia visibile di default */
   display: flex; /* Assicurati che sia flex */
   gap: 24px; /* spazio tra gli elementi */
@@ -55,7 +55,8 @@ main.container {
   color: #0d6efd;
   font-weight: 800;
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
+  margin-top: 0; /* aggiungi o riduci questo valore */
   font-size: 2.5rem;
 }
 
