@@ -1,7 +1,7 @@
 // backend/middleware/validateInput.js
 function validateRegister(req, res, next) {
-  const { username, email, password } = req.body;
-  if (!username || !email || !password) {
+  const { nome, email, password } = req.body;
+  if (!nome || !email || !password) {
     return res.status(400).json({ error: 'Campi mancanti per la registrazione' });
   }
   next();
@@ -16,8 +16,8 @@ function validateLogin(req, res, next) {
 }
 
 function validateUpdateProfilo(req, res, next) {
-  const { username, email } = req.body;
-  if (!username && !email) {
+  const { nome, email } = req.body;
+  if (!nome && !email) {
     return res.status(400).json({ error: 'Nessun campo da aggiornare' });
   }
   next();
