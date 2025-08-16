@@ -82,6 +82,13 @@ $(function () {
       return;
     }
 
+    // Controllo complessità password
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      $('#registerForm').prepend('<div id="registerAlert" class="alert alert-warning">La password deve contenere almeno 8 caratteri, una lettera maiuscola, un numero e un simbolo</div>');
+      return;
+    }
+
     // Chiamata AJAX per registrazione
     $.ajax({
       url: `${API_BASE}/register`,
