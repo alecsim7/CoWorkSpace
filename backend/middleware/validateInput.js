@@ -4,6 +4,15 @@ function validateRegister(req, res, next) {
   if (!nome || !email || !password) {
     return res.status(400).json({ error: 'Campi mancanti per la registrazione' });
   }
+
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({
+      error:
+        'La password deve contenere almeno 8 caratteri, una lettera maiuscola, un numero e un carattere speciale',
+    });
+  }
+
   next();
 }
 

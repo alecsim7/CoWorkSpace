@@ -14,6 +14,14 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'Email già registrata' });
     }
 
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          'La password deve contenere almeno 8 caratteri, una lettera maiuscola, un numero e un carattere speciale',
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(

@@ -62,6 +62,13 @@ exports.updateProfilo = async (req, res) => {
 
     // Se viene fornita una nuova password, hashala
     if (password) {
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+      if (!passwordRegex.test(password)) {
+        return res.status(400).json({
+          message:
+            'La password deve contenere almeno 8 caratteri, una lettera maiuscola, un numero e un carattere speciale',
+        });
+      }
       hashedPassword = await bcrypt.hash(password, 10);
     } else {
       // Altrimenti recupera la password attuale dal database
