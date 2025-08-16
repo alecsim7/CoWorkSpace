@@ -39,6 +39,7 @@ $(document).ready(function () {
     const data = $('#data').val();
     const orario_inizio = $('#orarioInizio').val();
     const orario_fine = $('#orarioFine').val();
+    const citta = $('#citta').val();
 
     if (!data || !orario_inizio || !orario_fine) {
       $('#prenotazioneAlert').html('<div class="alert alert-warning">Compila tutti i campi</div>');
@@ -62,12 +63,12 @@ $(document).ready(function () {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ data, orario_inizio, orario_fine })
+        body: JSON.stringify({ data, orario_inizio, orario_fine, citta })
       });
       // DEBUG: Mostra la risposta grezza e i parametri
       const responseText = await res.text();
       console.log('Risposta grezza disponibilità:', responseText);
-      console.log('Parametri ricerca:', { data, orario_inizio, orario_fine });
+      console.log('Parametri ricerca:', { data, orario_inizio, orario_fine, citta });
 
       let response;
       try {
@@ -128,6 +129,7 @@ $(document).ready(function () {
                   <i class="bi bi-wifi"></i><i class="bi bi-cup-hot"></i><i class="bi bi-people"></i>
                 </div>
                 <p class="mb-1"><i class="bi bi-geo-alt-fill me-1"></i><strong>Sede:</strong> ${spazio.nome_sede}</p>
+                <p class="mb-1"><strong>Città:</strong> ${spazio.citta || ''}</p>
                 <p class="mb-1"><strong>Prezzo orario:</strong> €${prezzoFormattato}</p>
                 <p class="mb-1"><strong>Posti liberi:</strong> ${spazio.posti_liberi}</p>
                 <p><strong>Prezzo totale per la fascia selezionata:</strong> €${prezzoTotale}</p>
