@@ -25,8 +25,8 @@ function validateLogin(req, res, next) {
 }
 
 function validateUpdateProfilo(req, res, next) {
-  const { nome, email } = req.body;
-  if (!nome && !email) {
+  const { nome, email, password } = req.body;
+  if (!nome && !email && !password) {
     return res.status(400).json({ error: 'Nessun campo da aggiornare' });
   }
   next();
