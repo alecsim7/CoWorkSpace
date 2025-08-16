@@ -15,6 +15,17 @@ Le rotte che richiedono autenticazione devono includere un token/sessione nel cl
 | POST   | `/api/login`     | Login e generazione di token/sessione       |
 | GET    | `/api/logout`    | Logout e distruzione sessione               |
 
+**Body POST `/api/register`:**
+
+- `nome`, `email`, `password`, `ruolo` (opzionale)
+- La password deve contenere almeno 8 caratteri, includendo una lettera maiuscola, una minuscola e un numero.
+
+**Risposte:**
+
+- `201 Created` utente registrato
+- `400 Bad Request` se i dati sono mancanti o se la password non rispetta i requisiti di complessità
+- `500 Internal Server Error`
+
 ---
 
 ## 👤 Utente – Profilo
@@ -46,12 +57,13 @@ Risposta:
 **Body PUT /api/utente/me:**
 
 - `nome` e/o `password` (almeno uno dei due campi)
+- La password deve contenere almeno 8 caratteri, includendo una lettera maiuscola, una minuscola e un numero.
 - richiede token di autenticazione nel header `Authorization`
 
 **Risposte:**
 
 - `200 OK` profilo aggiornato
-- `400 Bad Request` body mancante o non valido
+- `400 Bad Request` body mancante o non valido o password non conforme ai requisiti di complessità
 - `401 Unauthorized` token assente o non valido
 - `500 Internal Server Error`
 

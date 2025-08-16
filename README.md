@@ -69,6 +69,10 @@ Per il frontend è inoltre necessario esporre la chiave pubblicabile Stripe (`ST
 | POST   | `/api/pagamento`         | Esegue il pagamento di una prenotazione          |
 | GET    | `/api/pagamenti/storico` | Restituisce lo storico pagamenti dell'utente    |
 
+### Requisiti password
+
+- La password deve contenere almeno 8 caratteri, includendo una lettera maiuscola, una minuscola e un numero.
+
 La specifica completa delle API è disponibile in [docs/api-spec.md](docs/api-spec.md).
 
 ### Esempio: recupero profilo autenticato
