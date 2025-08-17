@@ -17,8 +17,7 @@ WORKDIR /app
 
 COPY --from=build /app ./
 
-# Crea la cartella logs e assegna i permessi all'utente node
-RUN mkdir -p /app/logs && chown -R node:node /app
+RUN chown -R node:node /app
 
 USER node
 
