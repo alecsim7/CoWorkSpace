@@ -155,7 +155,7 @@ or open `frontend/index.html` directly in the browser.
 2. **Deploy** the image to Elastic Beanstalk or an EC2 instance.
 3. **Provision PostgreSQL** using Amazon RDS.
 4. **Upload the frontend** to an S3 bucket and distribute it with CloudFront.
-5. **Configure environment variables** in Elastic Beanstalk/EC2 (database credentials, `JWT_SECRET`, Stripe keys, etc.).
+5. **Store secrets in Parameter Store or Secrets Manager** and reference them from your ECS task definition or EC2 user data using `aws ssm get-parameter`.
 
 ## Scaling & Monitoring
 - CloudWatch alarms track CPU utilization, database connections and HTTP latency.

@@ -48,13 +48,48 @@ Provisionare manualmente i servizi necessari su AWS tramite CLI:
 4. In alternativa, utilizzare il workflow CI/CD configurato su GitHub Actions che esegue automaticamente build e push ad ogni tag.
 
 ## 🔐 Variabili d'ambiente e segreti
+Archivia le credenziali in **AWS Systems Manager Parameter Store** o **Secrets Manager** invece di inserirle in chiaro nelle impostazioni di ECS/EC2.
+
+Esempio di creazione di un parametro protetto:
+
+```bash
+aws ssm put-parameter \
+  --name /coworkspace/JWT_SECRET \
+  --value 'supersegreto' \
+  --type SecureString
+```
+
+Per leggerlo da un'istanza EC2:
+
+```bash
+aws ssm get-parameter \
+  --name /coworkspace/JWT_SECRET \
+  --with-decryption \
+  --query 'Parameter.Value' \
+  --output text
+```
+
+Nella **task definition** ECS usa la sezione `secrets` per collegare Parametri/Secrets alla container definition:
+
+```json
+"secrets": [
+  { "name": "JWT_SECRET", "valueFrom": "arn:aws:ssm:<REGION>:<ACCOUNT_ID>:parameter/coworkspace/JWT_SECRET" },
+  { "name": "DATABASE_URL", "valueFrom": "arn:aws:ssm:<REGION>:<ACCOUNT_ID>:parameter/coworkspace/DATABASE_URL" },
+  { "name": "STRIPE_SECRET_KEY", "valueFrom": "arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:stripe-key" }
+]
+```
+
+Variabili richieste:
+
 Impostare le variabili necessarie nel servizio di hosting (ad esempio ECS o nei workflow CI/CD) recuperandole da servizi come **AWS Secrets Manager** o **SSM Parameter Store**. Tra le variabili richieste:
+
 
 - `JWT_SECRET`: chiave segreta per la firma dei token.
 - `DATABASE_URL`: stringa di connessione al database PostgreSQL.
 - `STRIPE_SECRET_KEY`: chiave privata per l'integrazione con Stripe.
 
-Gestire i valori sensibili tramite i servizi di segreti ed evitare che vengano commitati nel repository.
+
+In questo modo i valori non vengono mai salvati in chiaro né commitati nel repository.
 
 ## 🔁 Roll-back e snapshot RDS
 1. Prima di ogni rilascio, creare uno **snapshot manuale** dell'istanza RDS:
