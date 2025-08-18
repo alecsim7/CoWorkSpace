@@ -105,3 +105,31 @@ In questo modo i valori non vengono mai salvati in chiaro né commitati nel repo
 3. Valutare l'uso dei **backup automatici** per il ripristino point-in-time.
 
 Seguendo questi passaggi è possibile eseguire un deploy sicuro e ripristinare rapidamente l'ambiente in caso di necessità.
+
+## 🌐 Distribuzione frontend statico con S3 + CloudFront
+
+1. Carica i file statici del frontend nel bucket S3.
+2. Abilita "Static website hosting" nelle proprietà del bucket.
+3. Crea una distribuzione CloudFront con origine il bucket S3 (website endpoint).
+4. Aggiorna la policy del bucket per permettere l’accesso pubblico ai file statici.
+5. Invalida la cache CloudFront dopo ogni deploy del frontend.
+
+# .github/workflows/deploy.yml
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: npm ci
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${{ secrets.ECR_REPOSITORY }}:latest ./backend
+          docker push ${{ secrets.ECR_REPOSITORY }}:latest
+      # ...altri step per ECS, S3, CloudFront...
