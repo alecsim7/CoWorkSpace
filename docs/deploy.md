@@ -132,4 +132,10 @@ jobs:
         run: |
           docker build -t ${{ secrets.ECR_REPOSITORY }}:latest ./backend
           docker push ${{ secrets.ECR_REPOSITORY }}:latest
+      - uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ecs-task-def.json
+          service: ${{ secrets.ECS_SERVICE }}
+          cluster: ${{ secrets.ECS_CLUSTER }}
+          wait-for-service-stability: true
       # ...altri step per ECS, S3, CloudFront...
