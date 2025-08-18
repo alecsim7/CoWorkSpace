@@ -26,7 +26,10 @@ const paymentLimiter = rateLimit({
 });
 
 // Middleware globali
-app.use(cors());
+app.use(cors({
+  origin: 'https://d1qgb2todm35gi.cloudfront.net', // il tuo dominio frontend
+  credentials: true
+}));
 app.use(express.json());
 // RIMUOVI o COMMENTA queste righe:
 // app.use(express.static(path.join(__dirname, '../frontend')));

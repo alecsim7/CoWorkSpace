@@ -1,4 +1,9 @@
-const API_BASE = window.API_BASE || '/api';
+const API_BASE = (() => {
+  if (window.API_BASE) return window.API_BASE; // legacy support
+  const meta = document.querySelector('meta[name="api-base"]');
+  if (meta && meta.content) return meta.content.trim();
+  return '/api';
+})();
 
 $(function () {
   // Mostra il form di login
