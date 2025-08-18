@@ -114,36 +114,3 @@ Seguendo questi passaggi è possibile eseguire un deploy sicuro e ripristinare r
 4. Aggiorna la policy del bucket per permettere l’accesso pubblico ai file statici.
 5. Invalida la cache CloudFront dopo ogni deploy del frontend.
 
-# .github/workflows/deploy.yml
-name: Deploy
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install dependencies
-        run: npm ci
-      - name: Build and push Docker image
-        run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY }}:latest ./backend
-          docker push ${{ secrets.ECR_REPOSITORY }}:latest
-      - uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ecs-task-def.json
-          service: ${{ secrets.ECS_SERVICE }}
-          cluster: ${{ secrets.ECS_CLUSTER }}
-          wait-for-service-stability: true
-      - name: Sync frontend to S3
-        run: aws s3 sync ./frontend s3://${{ secrets.S3_BUCKET }} --delete
-
-      - name: Invalidate CloudFront cache
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
-      # ...altri step per ECS, S3, CloudFront...

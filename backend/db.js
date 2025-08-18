@@ -1,6 +1,10 @@
 const path = require('path');
-// Carica le variabili d'ambiente dal file .env nella directory corrente
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+// Carica le variabili d'ambiente dal file .env SOLO se non siamo in GitHub Actions
+if (!process.env.GITHUB_ACTIONS) {
+  require('dotenv').config({ path: path.join(__dirname, '.env') });
+}
+
 const { Pool } = require('pg');
 
 // Elenco delle variabili d'ambiente richieste per la connessione al database
