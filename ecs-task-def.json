@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "coworkspace-backend",
-      "image": "123456789012.dkr.ecr.eu-north-1.amazonaws.com/coworkspace-backend:${{ env.IMAGE_TAG }}",
+      "image": "coworkspace-backend:latest", // placeholder, verrà sovrascritto dal workflow
       "memory": 512,
       "cpu": 256,
       "essential": true,
@@ -13,8 +13,7 @@
           "hostPort": 3000
         }
       ],
-      "environment": [
-      ]
+      "environment": []
     }
   ]
 }
