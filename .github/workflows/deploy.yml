@@ -28,6 +28,7 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        working-directory: backend
 
       - name: Run tests
         run: echo "No tests"
