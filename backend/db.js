@@ -1,7 +1,7 @@
 const path = require('path');
 
-// Carica le variabili d'ambiente dal file .env SOLO se non siamo in GitHub Actions
-if (!process.env.GITHUB_ACTIONS) {
+// Carica le variabili d'ambiente dal file .env SOLO se non siamo in ambiente CI
+if (!process.env.CI) {
   require('dotenv').config({ path: path.join(__dirname, '.env') });
 }
 
