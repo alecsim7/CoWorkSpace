@@ -48,11 +48,12 @@ jobs:
         working-directory: backend
 
       - name: Deploy to Amazon ECS
-        uses: aws-actions/amazon-ecs-deploy@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           cluster: ${{ secrets.ECS_CLUSTER }}
           service: ${{ secrets.ECS_SERVICE }}
-          image: ${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+          task-definition: ecs-task-def.json
+          wait-for-service-stability: true
 
       - name: Sync frontend to S3
         env:
