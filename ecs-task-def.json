@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "coworkspace-backend",
-      "image": "coworkspace-backend:latest", // placeholder, verrà sovrascritto dal workflow
+      "image": "coworkspace-backend:latest",
       "memory": 512,
       "cpu": 256,
       "essential": true,
