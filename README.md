@@ -1,6 +1,7 @@
 # CoWorkSpace
 
-Piattaforma full-stack per la gestione di spazi di coworking. Il progetto comprende:
+Piattaforma full-stack per la gestione di spazi di coworking. 
+Il progetto comprende:
 
 - **Backend** Node.js/Express con PostgreSQL
 - **Frontend** statico in HTML/CSS/JS
