@@ -27,7 +27,7 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// Verifica immediatamente la connessione al database
+// Verifica immediatamente la connessione al database.
 pool
   .connect()
   .then((client) => {
