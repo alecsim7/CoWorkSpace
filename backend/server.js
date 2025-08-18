@@ -28,7 +28,9 @@ const paymentLimiter = rateLimit({
 // Middleware globali
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../frontend')));
+// RIMUOVI o COMMENTA queste righe:
+// app.use(express.static(path.join(__dirname, '../frontend')));
+// app.get('/', (_, res) => res.sendFile(path.join(__dirname, '../frontend/index.html')));
 
 // Route di debug per testare il server
 app.get('/api/test', (req, res) => {
@@ -41,7 +43,7 @@ app.get('/config/stripe', (_, res) => {
 });
 
 // Route principale per la homepage
-app.get('/', (_, res) => res.sendFile(path.join(__dirname, '../frontend/index.html')));
+// app.get('/', (_, res) => res.sendFile(path.join(__dirname, '../frontend/index.html')));
 
 // Rotte API
 app.use('/api', authLimiter, require('./routes/authRoutes'));           // Login, registrazione, logout
