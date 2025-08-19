@@ -27,7 +27,11 @@ const paymentLimiter = rateLimit({
 
 // Middleware globali
 app.use(cors({
-  origin: 'https://d1qgb2todm35gi.cloudfront.net', // il tuo dominio frontend
+  origin: [
+    'https://d1qgb2todm35gi.cloudfront.net', // dominio frontend
+    'http://localhost:3000',                 // per test locale
+    'http://13.51.159.201:3000'              // per test diretto su EC2
+  ],
   credentials: true
 }));
 app.use(express.json());
