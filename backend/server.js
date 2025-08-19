@@ -69,8 +69,8 @@ app.use('/api/admin', require('./routes/adminRoutes'));    // Area admin
 app.use('/api', require('./routes/disponibilitaRoutes'));
 
 // Configurazione percorsi certificati SSL
-const keyPath = process.env.SSL_KEY_PATH || path.join(__dirname, 'cert', 'key.pem');
-const certPath = process.env.SSL_CERT_PATH || path.join(__dirname, 'cert', 'cert.pem');
+const keyPath = path.join(__dirname, 'cert', 'key.pem');
+const certPath = path.join(__dirname, 'cert', 'cert.pem');
 
 // Avvio server HTTPS se i certificati sono presenti, altrimenti solo HTTP
 if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
