@@ -33,7 +33,7 @@ const paymentLimiter = rateLimit({
 const allowedOrigins = [
   'https://d1qgb2todm35gi.cloudfront.net', // produzione
   'http://localhost:3000',
-  'http://127.0.0.1:49942'                   // sviluppo
+  'http://127.0.0.1:5500'                   // sviluppo
 ];
 
 app.use(cors({
