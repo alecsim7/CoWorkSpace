@@ -108,7 +108,7 @@ Lo script `frontend/js/prenotazione.js` usa la variabile globale `API_BASE` per 
 
 ---
 
-Consulta la [specifica API](docs/api-spec.md) e la [documentazione del database](database/README-db.md) per maggiori dettagli sul progetto.
+Consulta la [specifica API](docs/api-spec.md), la [documentazione del database](database/README-db.md) e la [guida alla compatibilità dei browser](docs/ui-browser-compat.md) per maggiori dettagli sul progetto.
 
 ## Running Locally
 
