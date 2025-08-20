@@ -6,6 +6,28 @@ Tutte le richieste e risposte avvengono in formato `JSON`.
 Le rotte che richiedono autenticazione devono includere un token/sessione nel client.
 
 Per una panoramica del modello dati consulta il [diagramma ER](../database/er_coworkspace.png).
+## ❗ Gestione degli errori
+
+Gli errori sono restituiti con la seguente struttura:
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Campo email obbligatorio",
+    "details": {}
+  }
+}
+```
+
+Codici comuni:
+
+- `VALIDATION_ERROR` – dati non validi o mancanti (`400 Bad Request`)
+- `AUTHENTICATION_ERROR` – token assente o credenziali errate (`401 Unauthorized`)
+- `PERMISSION_DENIED` – permessi insufficienti (`403 Forbidden`)
+- `NOT_FOUND` – risorsa non esistente (`404 Not Found`)
+- `SERVER_ERROR` – errore interno (`500 Internal Server Error`)
+
 
 ---
 
@@ -27,6 +49,32 @@ Per una panoramica del modello dati consulta il [diagramma ER](../database/er_co
 - `201 Created` utente registrato
 - `400 Bad Request` se i dati sono mancanti o se la password non rispetta i requisiti di complessità
 - `500 Internal Server Error`
+
+**Errori POST `/api/register`:**
+- `400 Bad Request`
+  ```json
+  { "error": { "code": "VALIDATION_ERROR", "message": "Email già in uso" } }
+  ```
+- `500 Internal Server Error`
+  ```json
+  { "error": { "code": "SERVER_ERROR", "message": "Errore inatteso" } }
+  ```
+
+**Errori POST `/api/login`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Credenziali non valide" } }
+  ```
+- `500 Internal Server Error`
+  ```json
+  { "error": { "code": "SERVER_ERROR", "message": "Errore inatteso" } }
+  ```
+
+**Errori GET `/api/logout`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token non valido" } }
+  ```
 
 ---
 
@@ -69,6 +117,22 @@ Risposta:
 - `401 Unauthorized` token assente o non valido
 - `500 Internal Server Error`
 
+**Errori GET `/api/utente/me`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token mancante" } }
+  ```
+
+**Errori PUT `/api/utente/me`:**
+- `400 Bad Request`
+  ```json
+  { "error": { "code": "VALIDATION_ERROR", "message": "Nessun campo fornito" } }
+  ```
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token non valido" } }
+  ```
+
 > La precedente rotta `GET /profilo/:id` è **deprecata**.
 
 ---
@@ -84,6 +148,26 @@ Filtri disponibili su `/api/sedi`:
 - `citta`: filtra per città della sede
 - `tipo`: tipologia di spazio (es. scrivania, ufficio, sala)
 - `servizio`: testo da ricercare tra i servizi dello spazio
+
+**Errori GET `/api/sedi`:**
+- `400 Bad Request`
+  ```json
+  { "error": { "code": "VALIDATION_ERROR", "message": "Filtro non valido" } }
+  ```
+- `500 Internal Server Error`
+  ```json
+  { "error": { "code": "SERVER_ERROR", "message": "Errore inatteso" } }
+  ```
+
+**Errori GET `/api/sedi/:id`:**
+- `404 Not Found`
+  ```json
+  { "error": { "code": "NOT_FOUND", "message": "Sede non trovata" } }
+  ```
+- `500 Internal Server Error`
+  ```json
+  { "error": { "code": "SERVER_ERROR", "message": "Errore inatteso" } }
+  ```
 
 ---
 
@@ -123,6 +207,36 @@ Filtri disponibili su `/api/sedi`:
   ]
 }
 ```
+
+**Errori GET `/api/spazi/:sede_id`:**
+- `404 Not Found`
+  ```json
+  { "error": { "code": "NOT_FOUND", "message": "Sede non trovata" } }
+  ```
+- `500 Internal Server Error`
+  ```json
+  { "error": { "code": "SERVER_ERROR", "message": "Errore inatteso" } }
+  ```
+
+**Errori GET `/api/disponibilita/:spazio_id`:**
+- `404 Not Found`
+  ```json
+  { "error": { "code": "NOT_FOUND", "message": "Spazio non trovato" } }
+  ```
+- `500 Internal Server Error`
+  ```json
+  { "error": { "code": "SERVER_ERROR", "message": "Errore inatteso" } }
+  ```
+
+**Errori POST `/api/disponibilita`:**
+- `400 Bad Request`
+  ```json
+  { "error": { "code": "VALIDATION_ERROR", "message": "Parametri non validi" } }
+  ```
+- `500 Internal Server Error`
+  ```json
+  { "error": { "code": "SERVER_ERROR", "message": "Errore inatteso" } }
+  ```
 
 ---
 
@@ -186,6 +300,64 @@ Filtri disponibili su `/api/sedi`:
 > **Nota di sicurezza:** l'ID dell'utente viene dedotto dal token di autenticazione e non va inviato nel body. Qualsiasi `utente_id` manipolato o incluso nella richiesta viene ignorato e la prenotazione sarà sempre associata all'utente autenticato.
 > Solo il proprietario può modificare o eliminare la propria prenotazione.
 
+**Errori POST `/api/prenotazioni`:**
+- `400 Bad Request`
+  ```json
+  { "error": { "code": "VALIDATION_ERROR", "message": "Orario non valido" } }
+  ```
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token mancante" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Accesso negato" } }
+  ```
+
+**Errori GET `/api/prenotazioni`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token non valido" } }
+  ```
+
+**Errori GET `/api/prenotazioni/non-pagate`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token non valido" } }
+  ```
+
+**Errori PUT `/api/prenotazioni/:id`:**
+- `400 Bad Request`
+  ```json
+  { "error": { "code": "VALIDATION_ERROR", "message": "Orari sovrapposti" } }
+  ```
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token mancante" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Prenotazione di altro utente" } }
+  ```
+- `404 Not Found`
+  ```json
+  { "error": { "code": "NOT_FOUND", "message": "Prenotazione non trovata" } }
+  ```
+
+**Errori DELETE `/api/prenotazioni/:id`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token non valido" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Prenotazione di altro utente" } }
+  ```
+- `404 Not Found`
+  ```json
+  { "error": { "code": "NOT_FOUND", "message": "Prenotazione non trovata" } }
+  ```
+
 ---
 
 ## 💳 Pagamenti
@@ -197,6 +369,30 @@ Filtri disponibili su `/api/sedi`:
 
 **Query params GET `/api/pagamenti/storico`:**
 - `limit` (opzionale): numero massimo di pagamenti restituiti (default 5)
+
+**Errori POST `/api/pagamenti/pagamento`:**
+- `400 Bad Request`
+  ```json
+  { "error": { "code": "VALIDATION_ERROR", "message": "Metodo di pagamento non supportato" } }
+  ```
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token mancante" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Prenotazione di altro utente" } }
+  ```
+- `404 Not Found`
+  ```json
+  { "error": { "code": "NOT_FOUND", "message": "Prenotazione non trovata" } }
+  ```
+
+**Errori GET `/api/pagamenti/storico`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token non valido" } }
+  ```
 
 ---
 
@@ -211,6 +407,118 @@ Filtri disponibili su `/api/sedi`:
 | POST   | `/api/disponibilita`                 | Aggiunge disponibilità a uno spazio              |
 
 **Body POST /api/disponibilita:** `spazio_id`, `data`, `orario_inizio`, `orario_fine`
+
+**Errori GET `/api/sedi/gestore/:id`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token mancante" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Non sei gestore di questa sede" } }
+  ```
+
+**Errori POST `/api/spazi`:**
+- `400 Bad Request`
+  ```json
+  { "error": { "code": "VALIDATION_ERROR", "message": "Dati spazio mancanti" } }
+  ```
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token non valido" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Permessi insufficienti" } }
+  ```
+
+**Errori PUT `/api/spazi/:id`:**
+- `400 Bad Request`
+  ```json
+  { "error": { "code": "VALIDATION_ERROR", "message": "Dati non validi" } }
+  ```
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token mancante" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Spazio di altro gestore" } }
+  ```
+- `404 Not Found`
+  ```json
+  { "error": { "code": "NOT_FOUND", "message": "Spazio non trovato" } }
+  ```
+
+**Errori DELETE `/api/spazi/:id`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token non valido" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Spazio di altro gestore" } }
+  ```
+- `404 Not Found`
+  ```json
+  { "error": { "code": "NOT_FOUND", "message": "Spazio non trovato" } }
+  ```
+
+**Errori POST `/api/disponibilita`:**
+- `400 Bad Request`
+  ```json
+  { "error": { "code": "VALIDATION_ERROR", "message": "Dati mancanti" } }
+  ```
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token non valido" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Spazio di altro gestore" } }
+  ```
+
+**Errori GET `/api/gestore/prenotazioni/:gestore_id`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token mancante" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Permessi insufficienti" } }
+  ```
+
+**Errori GET `/api/riepilogo/:id`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token mancante" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Accesso negato" } }
+  ```
+- `404 Not Found`
+  ```json
+  { "error": { "code": "NOT_FOUND", "message": "Spazio non trovato" } }
+  ```
+
+**Errori POST `/api/spazi/:id/disponibilita`:**
+- `400 Bad Request`
+  ```json
+  { "error": { "code": "VALIDATION_ERROR", "message": "Dati mancanti" } }
+  ```
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token non valido" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Spazio di altro gestore" } }
+  ```
+- `404 Not Found`
+  ```json
+  { "error": { "code": "NOT_FOUND", "message": "Spazio non trovato" } }
+  ```
 
 | Metodo | Endpoint                                      | Descrizione                                      |
 |--------|-----------------------------------------------|--------------------------------------------------|
@@ -281,6 +589,54 @@ Filtri disponibili su `/api/sedi`:
 ```json
 { "message": "Sede eliminata" }
 ```
+
+**Errori GET `/api/admin/utenti`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token mancante" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Solo l'amministratore può accedere" } }
+  ```
+
+**Errori GET `/api/admin/sedi`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token non valido" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Solo l'amministratore può accedere" } }
+  ```
+
+**Errori DELETE `/api/admin/utenti/:id`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token mancante" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Solo l'amministratore può eliminare utenti" } }
+  ```
+- `404 Not Found`
+  ```json
+  { "error": { "code": "NOT_FOUND", "message": "Utente non trovato" } }
+  ```
+
+**Errori DELETE `/api/admin/sedi/:id`:**
+- `401 Unauthorized`
+  ```json
+  { "error": { "code": "AUTHENTICATION_ERROR", "message": "Token non valido" } }
+  ```
+- `403 Forbidden`
+  ```json
+  { "error": { "code": "PERMISSION_DENIED", "message": "Solo l'amministratore può eliminare sedi" } }
+  ```
+- `404 Not Found`
+  ```json
+  { "error": { "code": "NOT_FOUND", "message": "Sede non trovata" } }
+  ```
 
 ---
 
