@@ -164,3 +164,60 @@ oppure apri direttamente `frontend/index.html` nel browser.
 - Gli allarmi CloudWatch monitorano l'utilizzo della CPU, le connessioni al database e la latenza HTTP.
 - Un Auto Scaling group reagisce a questi allarmi per scalare orizzontalmente/verticalmente.
 - Consulta [docs/monitoring.md](docs/monitoring.md) per dettagli su metriche, dashboard e configurazione dei log.
+
+## Modalità di Avvio
+
+### 1. Avvio Locale
+
+**Backend**
+```bash
+cd backend
+npm install
+npm start
+```
+L'API sarà disponibile su `http://localhost:3000` (o sulla porta configurata).
+
+**Frontend**
+```bash
+npx serve frontend
+```
+Oppure usa [live-server](https://www.npmjs.com/package/live-server):
+```bash
+npm install -g live-server
+cd frontend
+live-server
+```
+Apri il link mostrato dal terminale (es. `http://127.0.0.1:5500`).
+
+---
+
+### 2. Avvio in Cloud (AWS)
+
+- **Backend:** Deploy dell'immagine Docker su Elastic Beanstalk, ECS o EC2.
+- **Database:** Provisiona PostgreSQL tramite Amazon RDS.
+- **Frontend:** Carica la cartella `frontend` su un bucket S3 e distribuisci con CloudFront.
+- **Secrets:** Usa AWS Parameter Store o Secrets Manager per le variabili sensibili.
+
+---
+
+### 3. Avvio tramite Docker
+
+**Costruisci l'immagine Docker:**
+```bash
+docker build -t coworkspace-backend ./backend
+```
+
+**Avvia il container (usando il file .env o .env.local):**
+```bash
+docker run -p 3001:3001 --env-file ./backend/.env coworkspace-backend
+```
+Oppure per sviluppo locale:
+```bash
+docker run -p 3001:3001 --env-file ./backend/.env.local coworkspace-backend
+```
+
+L'API sarà disponibile su `http://localhost:3001`.
+
+---
+
+Consulta le sezioni dedicate per dettagli su [deploy](#deploy-su-aws), [configurazione](#configurazione-delle-variabili-dambiente) e [scalabilità](#scalabilità-e-monitoraggio).
