@@ -6,6 +6,8 @@ Questo file documenta la struttura del database relazionale utilizzato per la pi
 
 ## 🗂️ Modello Entità-Relazione
 
+![Diagramma ER](er_coworkspace.png)
+
 Il modello ER include le seguenti entità principali:
 
 1. `utenti`
@@ -142,4 +144,15 @@ del pagamento.
 - `schema.sql` – Script completo per la creazione del database PostgreSQL
 - `er_coworkspace.drawio` – Diagramma ER modificabile (apribile con draw.io)
 - `er_coworkspace.png` – Versione immagine del diagramma ER
+
+## 🔄 Aggiornamento del diagramma
+
+Per aggiornare il diagramma ER:
+
+1. Apri `er_coworkspace.drawio` con [draw.io/diagrams.net](https://www.diagrams.net/).
+2. Apporta le modifiche necessarie allo schema.
+3. Esporta il diagramma in formato **PNG** sovrascrivendo `er_coworkspace.png`.
+4. Committa sia il file `.drawio` sia il nuovo `.png`.
+
+Il diagramma e il file `schema.sql` vanno aggiornati **dopo ogni nuova migrazione** che modifica la struttura del database.
 

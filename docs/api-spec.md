@@ -2,8 +2,10 @@
 
 Questa specifica definisce tutte le API REST utilizzate dalla piattaforma **CoWorkSpace**, per la gestione di utenti, sedi, spazi, prenotazioni e pagamenti.
 
-Tutte le richieste e risposte avvengono in formato `JSON`.  
+Tutte le richieste e risposte avvengono in formato `JSON`.
 Le rotte che richiedono autenticazione devono includere un token/sessione nel client.
+
+Per una panoramica del modello dati consulta il [diagramma ER](../database/er_coworkspace.png).
 
 ---
 
