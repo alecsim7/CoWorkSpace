@@ -1,24 +1,57 @@
-const API_BASE = `${API_BASE_URL}/api`;
+// Base API: meta[name="api-base"] nel tuo HTML o default a CloudFront /api
+const API_BASE = (() => {
+  const meta = document.querySelector('meta[name="api-base"]');
+  return (meta && meta.content ? meta.content.trim() : 'https://d1qgb2todm35gi.cloudfront.net/api');
+})();
 
-$(document).ready(function () {
-  // Recupera token e dati utente dal localStorage
+$(document).ready(async function () {
+  // Token/utente
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente'));
 
-  // Inizializza Stripe se la chiave pubblica è disponibile
-  const stripeKey = window.STRIPE_PUBLISHABLE_KEY;
-  const stripe = stripeKey ? Stripe(stripeKey) : null;
-  let card;
-
-  // Se utente non loggato, reindirizza
   if (!token || !utente) {
     alert("Effettua il login per accedere al pagamento.");
     window.location.href = "index.html";
     return;
   }
 
-  // Se Stripe non disponibile, disabilita pagamento con carta
-  if (!stripe) {
+  // Inizializzazione Stripe
+  let stripe = null;
+  let card = null;
+
+  try {
+    // 1) recupera la publishable key dal backend
+    const resp = await fetch(`${API_BASE}/config/stripe`, { credentials: 'omit' });
+    if (!resp.ok) throw new Error(`Stripe config ${resp.status}`);
+    const { publishableKey } = await resp.json();
+
+    // 2) sanity check
+    if (!/^pk_(test|live)_/.test(publishableKey || '')) {
+      throw new Error('Publishable key Stripe non valida o mancante');
+    }
+
+    // 3) inizializza Stripe
+    stripe = Stripe(publishableKey);
+    const elements = stripe.elements();
+    card = elements.create('card');
+
+    // Mostra il widget carta quando selezionato
+    $('#metodo').off('change').on('change', function () {
+      if ($(this).val() === 'carta') {
+        $('#card-element').removeClass('d-none');
+        if (!card._mounted) {
+          card.mount('#card-element');
+          card._mounted = true;
+        }
+      } else {
+        $('#card-element').addClass('d-none');
+        $('#card-errors').text('');
+      }
+    }).trigger('change');
+
+  } catch (e) {
+    console.error('Errore configurazione Stripe:', e);
+    // Disabilita carta se Stripe non disponibile
     $('#metodo option[value="carta"]').prop('disabled', true)
       .text('💳 Carta di Credito (non disponibile)');
     $('#alertPagamento').html(
@@ -26,9 +59,8 @@ $(document).ready(function () {
     );
   }
 
-  let prenotazioni = []; // Array per memorizzare le prenotazioni
+  let prenotazioni = [];
 
-  // Mostra riepilogo della prenotazione selezionata
   function mostraRiepilogoPrenotazione(prenotazione) {
     const riepilogo = `
       <div class="row">
@@ -45,13 +77,8 @@ $(document).ready(function () {
     $('#riepilogoPrenotazione').html(riepilogo);
   }
 
-  // Calcola l'importo da pagare per una prenotazione
   function calcolaImporto(prenotazione) {
-    if (!prenotazione.prezzo_orario || !prenotazione.orario_inizio || !prenotazione.orario_fine) {
-      return null;
-    }
-
-    // Estrae orario di inizio e fine, calcola le ore e moltiplica per il prezzo orario
+    if (!prenotazione.prezzo_orario || !prenotazione.orario_inizio || !prenotazione.orario_fine) return null;
     const inizio = prenotazione.orario_inizio.slice(0,5);
     const fine = prenotazione.orario_fine.slice(0,5);
     const [hStart, mStart] = inizio.split(':').map(Number);
@@ -60,57 +87,14 @@ $(document).ready(function () {
     return parseFloat(prenotazione.prezzo_orario) * ore;
   }
 
-  // Aggiorna interfaccia se non ci sono prenotazioni da pagare
-  function aggiornaInterfaccia() {
-    if ($('#prenotazione option').length === 0) {
-      $('#alertPagamento').html('<div class="alert alert-info">Nessuna prenotazione da pagare.</div>');
-      $('#formPagamento').hide();
-    }
-  }
-
-  if (stripe) {
-    const elements = stripe.elements();
-    card = elements.create('card');
-  }
-
-  $('#metodo').change(function() {
-    if ($(this).val() === 'carta' && stripe) {
-      $('#card-element').removeClass('d-none');
-      if (!card._mounted) {
-        card.mount('#card-element');
-        card._mounted = true;
-      }
-    } else {
-      $('#card-element').addClass('d-none');
-      $('#card-errors').text('');
-    }
-  }).trigger('change');
-
-  // Gestione cambio prenotazione
-  $('#prenotazione').change(function() {
-    const prenotazioneId = parseInt($(this).val());
-    const prenotazione = prenotazioni.find(p => p.id === prenotazioneId);
-    
-    if (prenotazione) {
-      mostraRiepilogoPrenotazione(prenotazione);
-      const importo = calcolaImporto(prenotazione);
-      $('#importoDaPagare').text(
-        importo ? `Importo totale da pagare: €${importo.toFixed(2)}` : 'Importo non disponibile'
-      );
-    }
-  });
-
-  // Caricamento prenotazioni
+  // Carica prenotazioni non pagate
   $.ajax({
     url: `${API_BASE}/prenotazioni/non-pagate`,
     method: 'GET',
     headers: { Authorization: `Bearer ${token}` },
     success: function(res) {
       prenotazioni = res.prenotazioni || [];
-      // DEBUG: Mostra la risposta ricevuta dal backend
-      console.log('Risposta prenotazioni non pagate:', res);
 
-      // NON filtrare per !p.pagamento_id, la query backend già restituisce solo quelle non pagate
       if (prenotazioni.length === 0) {
         $('#alertPagamento').html('<div class="alert alert-info">Nessuna prenotazione da pagare.</div>');
         $('#formPagamento').hide();
@@ -118,18 +102,12 @@ $(document).ready(function () {
       }
 
       prenotazioni.forEach(p => {
-        // DEBUG: Mostra la prenotazione per capire i dati ricevuti
-        console.log('Prenotazione:', p);
-
-        // Usa sempre il calcolo con prezzo_orario, orario_inizio, orario_fine
         let importo = null;
         const prezzoOrario = p.prezzo_orario;
-        // Prendi solo l'orario (es: "09:00:00") dai campi orario_inizio/fine
         const inizio = p.orario_inizio ? p.orario_inizio.slice(0,5) : '';
-        const fine = p.orario_fine ? p.orario_fine.slice(0,5) : '';
+        const fine   = p.orario_fine   ? p.orario_fine.slice(0,5)   : '';
 
         if (prezzoOrario && inizio && fine) {
-          // Calcola le ore come differenza tra orario_inizio e orario_fine
           const [hStart, mStart] = inizio.split(':').map(Number);
           const [hEnd, mEnd] = fine.split(':').map(Number);
           const ore = (hEnd + mEnd/60) - (hStart + mStart/60);
@@ -141,90 +119,40 @@ $(document).ready(function () {
           : 'Importo non disponibile';
         const testo = `#${p.id} - ${p.nome_spazio} ${p.data} ${inizio}-${fine} (${testoImporto})`;
         const dataImporto = (importo !== null && !isNaN(importo) && importo > 0) ? importo : '';
+
         $('#prenotazione').append(
           `<option value="${p.id}" data-importo="${dataImporto}">${testo}</option>`
         );
       });
 
-      $('#prenotazione')
-        .change(function () {
-          const imp = parseFloat(
-            $('#prenotazione option:selected').data('importo')
+      $('#prenotazione').off('change').on('change', function () {
+        const imp = parseFloat($('#prenotazione option:selected').data('importo'));
+        if (!isNaN(imp)) {
+          $('#importoDaPagare').text(`Importo: €${imp.toFixed(2)}`);
+        } else {
+          $('#importoDaPagare').text('Importo non disponibile');
+        }
+        const id = parseInt($(this).val());
+        const pr = prenotazioni.find(p => p.id === id);
+        if (pr) {
+          mostraRiepilogoPrenotazione(pr);
+          const importo = calcolaImporto(pr);
+          $('#importoDaPagare').text(
+            importo ? `Importo totale da pagare: €${importo.toFixed(2)}` : 'Importo non disponibile'
           );
-          if (!isNaN(imp)) {
-            $('#importoDaPagare').text(`Importo: €${imp.toFixed(2)}`);
-          } else {
-            $('#importoDaPagare').text('Importo non disponibile');
-          }
-        })
-        .trigger('change');
+        }
+      }).trigger('change');
     },
     error: function (xhr) {
-      // Mostra dettagli dell'errore per debug
       console.error('Errore AJAX:', xhr.status, xhr.responseText);
       $('#alertPagamento').html(`<div class="alert alert-danger">Errore nel recupero delle prenotazioni. (${xhr.status})</div>`);
     }
   });
 
-  // Funzione per caricare e visualizzare lo storico pagamenti
-  function caricaStoricoPagamenti() {
-    $.ajax({
-      url: `${API_BASE}/pagamenti/storico?limit=5`,
-      method: 'GET',
-      headers: { Authorization: `Bearer ${token}` },
-      success: function(res) {
-        const pagamenti = res.pagamenti || [];
-        const tbody = $('#storicoPagamenti');
-        tbody.empty();
-        
-        if (pagamenti.length === 0) {
-          tbody.append('<tr><td colspan="5" class="text-center">Nessun pagamento effettuato</td></tr>');
-          return;
-        }
-
-        pagamenti.forEach(p => {
-          const data = new Date(p.timestamp).toLocaleString('it-IT', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          });
-          
-          const dataPrenotazione = new Date(p.data_prenotazione).toLocaleDateString('it-IT');
-          
-          tbody.append(`
-            <tr>
-              <td>${data}</td>
-              <td>${p.nome_spazio}</td>
-              <td>${dataPrenotazione} ${p.orario_inizio.slice(0,5)}-${p.orario_fine.slice(0,5)}</td>
-              <td>€${parseFloat(p.importo).toFixed(2)}</td>
-              <td>${p.metodo}</td>
-            </tr>
-          `);
-        });
-      },
-      error: function(xhr) {
-        console.error('Errore caricamento storico:', xhr.status, xhr.responseText);
-        $('#storicoPagamenti').html(`
-          <tr>
-            <td colspan="5" class="text-center text-danger">
-              Errore nel caricamento dello storico pagamenti
-            </td>
-          </tr>
-        `);
-      }
-    });
-  }
-
-  // Carica lo storico all'avvio
-  caricaStoricoPagamenti();
-
-  // Gestione submit form pagamento
-  $('#formPagamento').submit(async function (e) {
+  // Submit pagamento
+  $('#formPagamento').off('submit').on('submit', async function (e) {
     e.preventDefault();
 
-    // Mostra spinner e disabilita il bottone
     const $submitBtn = $(this).find('button[type="submit"]');
     $submitBtn.prop('disabled', true);
     $('#paymentSpinner').removeClass('d-none');
@@ -234,7 +162,7 @@ $(document).ready(function () {
 
     try {
       if (metodo === 'carta' && stripe) {
-        // Crea il PaymentIntent sul backend
+        // 1) Crea PaymentIntent
         const initRes = await $.ajax({
           url: `${API_BASE}/pagamenti/pagamento`,
           method: 'POST',
@@ -243,11 +171,9 @@ $(document).ready(function () {
           data: JSON.stringify({ prenotazione_id, metodo })
         });
 
-        // Conferma il pagamento e gestisce eventuali challenge 3D Secure
+        // 2) Conferma pagamento (3DS se richiesto)
         const result = await stripe.confirmCardPayment(initRes.clientSecret, {
-          payment_method: {
-            card: card
-          }
+          payment_method: { card }
         });
 
         if (result.error || result.paymentIntent.status !== 'succeeded') {
@@ -255,7 +181,7 @@ $(document).ready(function () {
           return;
         }
 
-        // Registra il pagamento sul backend
+        // 3) Registra pagamento sul backend
         const finalRes = await $.ajax({
           url: `${API_BASE}/pagamenti/pagamento`,
           method: 'POST',
@@ -274,14 +200,8 @@ $(document).ready(function () {
             ${finalRes.message}
           </div>
         `);
-        $('#prenotazione option:selected').remove();
-        $('#formPagamento')[0].reset();
-        $('#importoDaPagare').empty();
-        if ($('#prenotazione option').length === 0) {
-          $('#formPagamento').hide();
-        }
-        caricaStoricoPagamenti(); // Aggiorna lo storico
       } else {
+        // Pagamento alternativo (es. cash/bonifico)
         const res = await $.ajax({
           url: `${API_BASE}/pagamenti/pagamento`,
           method: 'POST',
@@ -296,14 +216,18 @@ $(document).ready(function () {
             ${res.message}
           </div>
         `);
-        $('#prenotazione option:selected').remove();
-        $('#formPagamento')[0].reset();
-        $('#importoDaPagare').empty();
-        if ($('#prenotazione option').length === 0) {
-          $('#formPagamento').hide();
-        }
-        caricaStoricoPagamenti(); // Aggiorna lo storico
       }
+
+      // Pulizia UI
+      $('#prenotazione option:selected').remove();
+      $('#formPagamento')[0].reset();
+      $('#importoDaPagare').empty();
+      if ($('#prenotazione option').length === 0) {
+        $('#formPagamento').hide();
+      }
+      // Aggiorna storico
+      caricaStoricoPagamenti();
+
     } catch (xhr) {
       $('#alertPagamento').html(`
         <div class="alert alert-danger d-flex align-items-center">
@@ -312,11 +236,55 @@ $(document).ready(function () {
         </div>
       `);
     } finally {
-      // Nascondi spinner e riabilita il bottone
       $submitBtn.prop('disabled', false);
       $('#paymentSpinner').addClass('d-none');
     }
   });
+
+  // Storico pagamenti
+  function caricaStoricoPagamenti() {
+    $.ajax({
+      url: `${API_BASE}/pagamenti/storico?limit=5`,
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+      success: function(res) {
+        const pagamenti = res.pagamenti || [];
+        const tbody = $('#storicoPagamenti');
+        tbody.empty();
+
+        if (pagamenti.length === 0) {
+          tbody.append('<tr><td colspan="5" class="text-center">Nessun pagamento effettuato</td></tr>');
+          return;
+        }
+
+        pagamenti.forEach(p => {
+          const data = new Date(p.timestamp).toLocaleString('it-IT', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+          });
+          const dataPrenotazione = new Date(p.data_prenotazione).toLocaleDateString('it-IT');
+
+          tbody.append(`
+            <tr>
+              <td>${data}</td>
+              <td>${p.nome_spazio}</td>
+              <td>${dataPrenotazione} ${p.orario_inizio.slice(0,5)}-${p.orario_fine.slice(0,5)}</td>
+              <td>€${parseFloat(p.importo).toFixed(2)}</td>
+              <td>${p.metodo}</td>
+            </tr>
+          `);
+        });
+      },
+      error: function(xhr) {
+        console.error('Errore caricamento storico:', xhr.status, xhr.responseText);
+        $('#storicoPagamenti').html(`
+          <tr><td colspan="5" class="text-center text-danger">
+            Errore nel caricamento dello storico pagamenti
+          </td></tr>
+        `);
+      }
+    });
+  }
 
   // Logout
   $('#logoutBtn').click(function () {
