@@ -1,7 +1,17 @@
 $(document).ready(function () {
-  // Carica le opzioni per i filtri (città, tipo, servizi) dal backend
+  // Aggiorna il meta tag in locale
+  const apiBaseMeta = document.querySelector('meta[name="api-base"]');
+  if (
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    && apiBaseMeta
+  ) {
+    apiBaseMeta.setAttribute('content', 'http://localhost:3001/api');
+  }
+  const API_BASE_URL = apiBaseMeta ? apiBaseMeta.content.trim() : '/api';
+
+  // Carica opzioni per i filtri
   function caricaOpzioni() {
-    $.getJSON('/api/sedi/opzioni', function (data) {
+    $.getJSON(`${API_BASE_URL}/sedi/opzioni`, function (data) {
       const cittaList = $('#cittaOptions').empty();
       (data.citta || []).forEach(c => cittaList.append(`<option value="${c}"></option>`));
 
@@ -13,7 +23,7 @@ $(document).ready(function () {
     });
   }
 
-  // Carica le sedi dal backend, applicando eventuali filtri selezionati
+  // Carica le sedi dal backend
   function caricaSedi() {
     const citta = $('#filtroCitta').val();
     const tipo = $('#filtroTipo').val();
@@ -23,7 +33,7 @@ $(document).ready(function () {
     if (tipo) params.tipo = tipo;
     if (servizio) params.servizio = servizio;
     const query = $.param(params);
-    const url = query ? '/api/sedi?' + query : '/api/sedi';
+    const url = query ? `${API_BASE_URL}/sedi?${query}` : `${API_BASE_URL}/sedi`;
 
     $.getJSON(url, function (sedi) {
       const container = $('#listaSedi');
@@ -74,7 +84,7 @@ $(document).ready(function () {
     }
 
     // Carica dettagli della sede e mostra gli spazi disponibili
-    $.getJSON('/api/sedi/' + id, function (sede) {
+    $.getJSON(`${API_BASE_URL}/sedi/${id}`, function (sede) {
       if (!sede || !sede.spazi || sede.spazi.length === 0) {
         dettagliDiv.html('<div class="text-muted">Nessuno spazio disponibile.</div>');
       } else {

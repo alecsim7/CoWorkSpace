@@ -1,5 +1,15 @@
 $(document).ready(function () {
-  // Recupera token e dati utente dal localStorage
+  // Aggiorna il meta tag in locale
+  const apiBaseMeta = document.querySelector('meta[name="api-base"]');
+  if (
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    && apiBaseMeta
+  ) {
+    apiBaseMeta.setAttribute('content', 'http://localhost:3001/api');
+  }
+  // Leggi il valore aggiornato
+  const API_BASE_URL = apiBaseMeta ? apiBaseMeta.content.trim() : '/api';
+
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente') || 'null');
 
@@ -24,7 +34,7 @@ $(document).ready(function () {
     console.log('Token inviato:', token); // DEBUG: verifica token
 
     $.ajax({
-      url: `${API_BASE_URL}/api/prenotazioni`,
+      url: `${API_BASE_URL}/prenotazioni`, // NON /api/prenotazioni
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function (data) {
@@ -76,8 +86,9 @@ $(document).ready(function () {
           const nuovoFine = prompt('Nuovo orario di fine (HH:MM)', fineAttuale);
           if (!nuovoFine) return;
 
+          // Modifica prenotazione
           $.ajax({
-            url: `${API_BASE_URL}/api/prenotazioni/${id}`,
+            url: `${API_BASE_URL}/prenotazioni/${id}`, // <-- togli /api
             method: 'PUT',
             contentType: 'application/json',
             headers: { Authorization: `Bearer ${token}` },
@@ -97,8 +108,9 @@ $(document).ready(function () {
           const id = $(this).data('id');
           if (!confirm('Sei sicuro di voler annullare questa prenotazione?')) return;
 
+          // Elimina prenotazione
           $.ajax({
-            url: `${API_BASE_URL}/api/prenotazioni/${id}`,
+            url: `${API_BASE_URL}/prenotazioni/${id}`, // <-- togli /api
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` },
             success: function () {

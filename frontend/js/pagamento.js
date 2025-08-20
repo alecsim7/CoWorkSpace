@@ -5,6 +5,17 @@ const API_BASE = (() => {
 })();
 
 $(document).ready(async function () {
+  // Aggiorna il meta tag in locale
+  const apiBaseMeta = document.querySelector('meta[name="api-base"]');
+  if (
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    && apiBaseMeta
+  ) {
+    apiBaseMeta.setAttribute('content', 'http://localhost:3001/api');
+  }
+  // Leggi il valore aggiornato
+  const API_BASE = apiBaseMeta ? apiBaseMeta.content.trim() : '/api';
+
   // Token/utente
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente'));

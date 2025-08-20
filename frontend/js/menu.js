@@ -1,4 +1,14 @@
 $(document).ready(function () {
+  // Aggiorna il meta tag in locale (utile se in futuro aggiungi chiamate AJAX)
+  const apiBaseMeta = document.querySelector('meta[name="api-base"]');
+  if (
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    && apiBaseMeta
+  ) {
+    apiBaseMeta.setAttribute('content', 'http://localhost:3001/api');
+  }
+  const API_BASE_URL = apiBaseMeta ? apiBaseMeta.content.trim() : '/api';
+
   // Recupera dati utente dal localStorage
   const utente = JSON.parse(localStorage.getItem('utente'));
   const menu = $('#menuLinks');

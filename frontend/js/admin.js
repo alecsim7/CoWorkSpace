@@ -1,4 +1,14 @@
 $(document).ready(function () {
+  // Aggiorna il meta tag in locale
+  const apiBaseMeta = document.querySelector('meta[name="api-base"]');
+  if (
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    && apiBaseMeta
+  ) {
+    apiBaseMeta.setAttribute('content', 'http://localhost:3001/api');
+  }
+  const API_BASE_URL = apiBaseMeta ? apiBaseMeta.content.trim() : '/api';
+
   // Recupera token e dati utente dal localStorage
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente'));
@@ -16,7 +26,7 @@ $(document).ready(function () {
   // Funzione per caricare la lista utenti dal backend
   function caricaUtenti() {
     $.ajax({
-      url: `${API_BASE_URL}/api/admin/utenti`,
+      url: `${API_BASE_URL}/admin/utenti`, // <-- togli /api
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function (utenti) {
@@ -46,7 +56,7 @@ $(document).ready(function () {
   // Funzione per caricare la lista sedi dal backend
   function caricaSedi() {
     $.ajax({
-      url: `${API_BASE_URL}/api/admin/sedi`,
+      url: `${API_BASE_URL}/admin/sedi`, // <-- togli /api
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       success: function (sedi) {
@@ -78,7 +88,7 @@ $(document).ready(function () {
     const id = $(this).data('id');
     if (confirm('Sei sicuro di voler eliminare questo utente?')) {
       $.ajax({
-        url: `${API_BASE_URL}/api/admin/utenti/${id}`,
+        url: `${API_BASE_URL}/admin/utenti/${id}`, // <-- togli /api
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
         success: function () {
@@ -96,7 +106,7 @@ $(document).ready(function () {
     const id = $(this).data('id');
     if (confirm('Sei sicuro di voler eliminare questa sede?')) {
       $.ajax({
-        url: `${API_BASE_URL}/api/admin/sedi/${id}`,
+        url: `${API_BASE_URL}/admin/sedi/${id}`, // <-- togli /api
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
         success: function () {

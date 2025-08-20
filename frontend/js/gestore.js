@@ -1,8 +1,17 @@
 $(document).ready(function () {
+  // Aggiorna il meta tag in locale
+  const apiBaseMeta = document.querySelector('meta[name="api-base"]');
+  if (
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    && apiBaseMeta
+  ) {
+    apiBaseMeta.setAttribute('content', 'http://localhost:3001/api');
+  }
+  const API_BASE = apiBaseMeta ? apiBaseMeta.content.trim() : '/api';
+
   // Recupera token e dati utente dal localStorage
   const token = localStorage.getItem('token');
   const utente = JSON.parse(localStorage.getItem('utente'));
-  const API_BASE = '/api';
 
   // Controllo accesso: solo gestore autenticato può accedere
   if (!token || !utente || utente.ruolo !== 'gestore') {

@@ -1,11 +1,13 @@
-const API_BASE = (() => {
-  if (window.API_BASE) return window.API_BASE; // legacy support
-  const meta = document.querySelector('meta[name="api-base"]');
-  if (meta && meta.content) return meta.content.trim();
-  return '/api';
-})();
-
 $(function () {
+  const apiBaseMeta = document.querySelector('meta[name="api-base"]');
+  if (
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    && apiBaseMeta
+  ) {
+    apiBaseMeta.setAttribute('content', 'http://localhost:3001/api');
+  }
+  const API_BASE = apiBaseMeta ? apiBaseMeta.content.trim() : '/api';
+
   // Mostra il form di login
   $('#btnShowLogin').click(function () {
     $('.forms-wrapper').show();

@@ -3,8 +3,19 @@
 // (ad esempio tramite un file di configurazione o una variabile d'ambiente)
 window.API_BASE = window.API_BASE || 'https://localhost:3443/api';
 const API_BASE = window.API_BASE || '/api';
+const API_BASE_URL = document.querySelector('meta[name="api-base"]').content.trim();
 
 $(document).ready(function () {
+  // Aggiorna il meta tag in locale
+  const apiBaseMeta = document.querySelector('meta[name="api-base"]');
+  if (
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    && apiBaseMeta
+  ) {
+    apiBaseMeta.setAttribute('content', 'http://localhost:3001/api');
+  }
+  const API_BASE_URL = apiBaseMeta ? apiBaseMeta.content.trim() : '/api';
+
   // Recupera il token di autenticazione dal localStorage
   const token = localStorage.getItem('token');
 
@@ -57,7 +68,7 @@ $(document).ready(function () {
     showSpinner();
 
     try {
-      const res = await fetch(`${API_BASE}/disponibilita`, {
+      const res = await fetch(`${API_BASE_URL}/disponibilita`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -173,7 +184,7 @@ $(document).ready(function () {
     modal.hide();
     showSpinner();
     try {
-      const res = await fetch(`${API_BASE}/prenotazioni`, {
+      const res = await fetch(`${API_BASE_URL}/prenotazioni`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
