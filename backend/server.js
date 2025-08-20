@@ -41,8 +41,8 @@ app.use(cors({
   credentials: true,
 }));
 
-// Preflight (opzionale, ma aiuta con alcune richieste complesse)
-app.options('*', cors({ origin: allowedOrigins, credentials: true }));
+// Preflight per le route API
+app.options(['/api/*', '/config/*'], cors({ origin: allowedOrigins, credentials: true }));
 
 app.use(express.json());
 
