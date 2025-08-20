@@ -7,6 +7,8 @@ Il progetto comprende:
 - **Frontend** statico in HTML/CSS/JS
 - **Database** PostgreSQL
 
+Il diagramma ER del database è disponibile [qui](database/er_coworkspace.png).
+
 ## Prerequisiti
 
 - [Node.js](https://nodejs.org/) v18+

@@ -5,6 +5,7 @@ Questa specifica definisce tutte le API REST utilizzate dalla piattaforma **CoWo
 Tutte le richieste e risposte avvengono in formato `JSON`.
 Le rotte che richiedono autenticazione devono includere un token/sessione nel client.
 
+Per una panoramica del modello dati consulta il [diagramma ER](../database/er_coworkspace.png).
 ## ❗ Gestione degli errori
 
 Gli errori sono restituiti con la seguente struttura:
@@ -26,6 +27,7 @@ Codici comuni:
 - `PERMISSION_DENIED` – permessi insufficienti (`403 Forbidden`)
 - `NOT_FOUND` – risorsa non esistente (`404 Not Found`)
 - `SERVER_ERROR` – errore interno (`500 Internal Server Error`)
+
 
 ---
 
