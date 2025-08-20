@@ -112,23 +112,23 @@ Lo script `frontend/js/prenotazione.js` usa la variabile globale `API_BASE` per 
 
 Consulta la [specifica API](docs/api-spec.md), la [documentazione del database](database/README-db.md) e la [guida alla compatibilità dei browser](docs/ui-browser-compat.md) per maggiori dettagli sul progetto.
 
-## Running Locally
+## Esecuzione locale
 
-### Prerequisites
+### Prerequisiti
 - [Node.js](https://nodejs.org/) v18+
 - npm
 - [PostgreSQL](https://www.postgresql.org/)
-- Modern web browser
+- Browser web moderno
 
-### Start PostgreSQL
-1. Start the PostgreSQL service.
-2. Create the `coworkspace` database and load the schema:
+### Avvio di PostgreSQL
+1. Avvia il servizio PostgreSQL.
+2. Crea il database `coworkspace` e carica lo schema:
    ```bash
    psql -U postgres -c 'CREATE DATABASE coworkspace;'
    psql -U postgres -d coworkspace -f database/schema.sql
    ```
-   Infrastructure scripts such as the initial schema and migrations live in [database/schema.sql](database/schema.sql) and [database/migrations](database/migrations/)
-3. Run application-specific migrations:
+   Gli script di infrastruttura come lo schema iniziale e le migrazioni si trovano in [database/schema.sql](database/schema.sql) e [database/migrations](database/migrations/)
+3. Esegui le migrazioni specifiche dell'applicazione:
    ```bash
    cd backend
    npm run migrate
@@ -141,26 +141,26 @@ cd backend
 npm install
 npm start
 ```
-The API will be available at `http://localhost:3000`.
+L'API sarà disponibile su `http://localhost:3000`.
 
 ### Frontend
-Serve the static frontend:
+Servi il frontend statico:
 ```bash
 npx serve frontend
 ```
-or open `frontend/index.html` directly in the browser.
+oppure apri direttamente `frontend/index.html` nel browser.
 
-## AWS Deployment
-1. **Build Docker image** for the backend:
+## Deploy su AWS
+1. **Costruisci l'immagine Docker** per il backend:
    ```bash
    docker build -t coworkspace-backend ./backend
    ```
-2. **Deploy** the image to Elastic Beanstalk or an EC2 instance.
-3. **Provision PostgreSQL** using Amazon RDS.
-4. **Upload the frontend** to an S3 bucket and distribute it with CloudFront.
-5. **Store secrets in Parameter Store or Secrets Manager** and reference them from your ECS task definition or EC2 user data using `aws ssm get-parameter`.
+2. **Distribuisci** l'immagine su Elastic Beanstalk o su una istanza EC2.
+3. **Provisiona PostgreSQL** tramite Amazon RDS.
+4. **Carica il frontend** su un bucket S3 e distribuiscilo con CloudFront.
+5. **Memorizza le chiavi segrete in Parameter Store o Secrets Manager** e referenziale dalla definizione del task ECS o tramite user data EC2 usando `aws ssm get-parameter`.
 
-## Scaling & Monitoring
-- CloudWatch alarms track CPU utilization, database connections and HTTP latency.
-- An Auto Scaling group reacts to these alarms to scale out/in.
-- See [docs/monitoring.md](docs/monitoring.md) for detailed metrics, dashboards and logging configuration.
+## Scalabilità e Monitoraggio
+- Gli allarmi CloudWatch monitorano l'utilizzo della CPU, le connessioni al database e la latenza HTTP.
+- Un Auto Scaling group reagisce a questi allarmi per scalare orizzontalmente/verticalmente.
+- Consulta [docs/monitoring.md](docs/monitoring.md) per dettagli su metriche, dashboard e configurazione dei log.

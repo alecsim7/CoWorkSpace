@@ -651,5 +651,5 @@ Filtri disponibili su `/api/sedi`:
 
 ## 📎 Autori e versionamento
 
-- Ultimo aggiornamento: **luglio 2025**
+- Ultimo aggiornamento: **agosto 2025**
 - Autori: *Team CoWorkSpace*
