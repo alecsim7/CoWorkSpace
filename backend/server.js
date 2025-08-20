@@ -42,7 +42,7 @@ app.use(cors({
 }));
 
 // Preflight per le route API
-app.options(['/api/*', '/config/*'], cors({ origin: allowedOrigins, credentials: true }));
+app.options('*', cors({ origin: allowedOrigins, credentials: true }));
 
 app.use(express.json());
 
