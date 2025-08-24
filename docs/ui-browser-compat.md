@@ -51,36 +51,5 @@ I layout principali sono ottimizzati per le seguenti larghezze di viewport:
    - naviga tra tutte le pagine principali (dashboard, prenotazione, pagamento, profilo, admin/gestore);
    - verifica layout e funzionalità ai breakpoint indicati utilizzando gli strumenti di sviluppo del browser.
 
-## Test automatizzati
-
-### Playwright
-
-1. Installare Playwright con i browser di test:
-   ```bash
-   npx playwright install
-   ```
-2. Eseguire la suite di test su tutti i browser supportati:
-   ```bash
-   npx playwright test
-   ```
-   Per un singolo browser:
-   ```bash
-   npx playwright test --browser=chromium # oppure firefox, webkit
-   ```
-
-### Cypress
-
-1. Installare Cypress:
-   ```bash
-   npm install --save-dev cypress
-   ```
-2. Avviare l'interfaccia grafica di Cypress e selezionare il browser desiderato:
-   ```bash
-   npx cypress open
-   ```
-   Esecuzione headless di un singolo browser:
-   ```bash
-   npx cypress run --browser chrome
-   ```
 
 Assicurati che le variabili d'ambiente richieste dal backend e dalla chiave `STRIPE_PUBLISHABLE_KEY` siano impostate quando esegui i test.
