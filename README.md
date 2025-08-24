@@ -11,9 +11,9 @@ Il diagramma ER del database è disponibile [qui](database/er_coworkspace.png).
 
 ## Prerequisiti
 
-- [Node.js](https://nodejs.org/) v18+
-- npm
+- [Node.js](https://nodejs.org/) v18+ e npm
 - [PostgreSQL](https://www.postgresql.org/)
+- [Docker](https://www.docker.com/)
 - Un browser web moderno
 
 ## Configurazione delle variabili d'ambiente
@@ -36,7 +36,26 @@ Adatta i valori alle tue impostazioni locali.
 
 Per il frontend è inoltre necessario esporre la chiave pubblicabile Stripe (`STRIPE_PUBLISHABLE_KEY`) come variabile globale `window.STRIPE_PUBLISHABLE_KEY` nelle pagine che effettuano pagamenti.
 
-## Avvio del database
+## Esecuzione con Docker
+
+1. Costruisci l'immagine del backend:
+   ```bash
+   docker build -t coworkspace-backend ./backend
+   ```
+2. Avvia il container usando il file `.env`:
+   ```bash
+   docker run -p 3001:3001 --env-file ./backend/.env coworkspace-backend
+   ```
+   L'API sarà disponibile su `http://localhost:3001`.
+3. Servi il frontend statico:
+   ```bash
+   npx serve frontend
+   ```
+   oppure apri `frontend/index.html` direttamente nel browser.
+
+## Esecuzione manuale con npm
+
+### Avvio del database
 
 1. Avvia PostgreSQL.
 2. Crea il database `coworkspace` e importa lo schema:
@@ -44,17 +63,44 @@ Per il frontend è inoltre necessario esporre la chiave pubblicabile Stripe (`ST
    psql -U postgres -c 'CREATE DATABASE coworkspace;'
    psql -U postgres -d coworkspace -f database/schema.sql
    ```
-3. Ulteriori dettagli nella documentazione del database: [database/README-db.md](database/README-db.md).
-
-## Avvio del backend
-
-1. Posizionati nella cartella `backend`:
+3. Esegui le migrazioni:
    ```bash
    cd backend
-   npm install
-   npm start
+   npm run migrate
+   cd ..
    ```
-2. L'API sarà disponibile su `http://localhost:3000` (o sulla porta configurata).
+4. Ulteriori dettagli nella documentazione del database: [database/README-db.md](database/README-db.md).
+
+### Backend
+
+```bash
+cd backend
+npm install
+npm start
+```
+L'API sarà disponibile su `http://localhost:3000` (o sulla porta configurata).
+
+### Frontend
+
+Servi il frontend statico:
+```bash
+npx serve frontend
+```
+oppure apri direttamente `frontend/index.html` nel browser.
+
+#### Configurazione dell'endpoint API
+
+Lo script `frontend/js/prenotazione.js` usa la variabile globale `API_BASE` per determinare l'URL delle API. Il valore predefinito è `/api`, ma può essere sovrascritto:
+
+- **Variabile d'ambiente:** imposta `API_BASE` prima di servire il frontend (es. `API_BASE=https://example.com/api npx serve frontend`) e fai in modo che il server esponga tale valore come `window.API_BASE`.
+- **Script inline:** definisci `window.API_BASE` prima di includere `prenotazione.js`:
+
+  ```html
+  <script>
+    window.API_BASE = 'https://example.com/api';
+  </script>
+  <script src="js/prenotazione.js"></script>
+  ```
 
 ## Endpoint principali
 
@@ -84,72 +130,6 @@ La specifica completa delle API è disponibile in [docs/api-spec.md](docs/api-sp
 curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/api/utente/me
 ```
 
-## Avvio del frontend
-
-Le pagine statiche sono nella cartella `frontend`.
-
-- Apri `frontend/index.html` direttamente nel browser, **oppure**
-- Servi la cartella con un server statico:
-  ```bash
-  npx serve frontend
-  ```
-
-### Configurazione dell'endpoint API
-
-Lo script `frontend/js/prenotazione.js` usa la variabile globale `API_BASE` per determinare l'URL delle API. Il valore predefinito è `/api`, ma può essere sovrascritto:
-
-- **Variabile d'ambiente:** imposta `API_BASE` prima di servire il frontend (es. `API_BASE=https://example.com/api npx serve frontend`) e fai in modo che il server esponga tale valore come `window.API_BASE`.
-- **Script inline:** definisci `window.API_BASE` prima di includere `prenotazione.js`:
-
-  ```html
-  <script>
-    window.API_BASE = 'https://example.com/api';
-  </script>
-  <script src="js/prenotazione.js"></script>
-  ```
-
----
-
-Consulta la [specifica API](docs/api-spec.md), la [documentazione del database](database/README-db.md) e la [guida alla compatibilità dei browser](docs/ui-browser-compat.md) per maggiori dettagli sul progetto.
-
-## Esecuzione locale
-
-### Prerequisiti
-- [Node.js](https://nodejs.org/) v18+
-- npm
-- [PostgreSQL](https://www.postgresql.org/)
-- Browser web moderno
-
-### Avvio di PostgreSQL
-1. Avvia il servizio PostgreSQL.
-2. Crea il database `coworkspace` e carica lo schema:
-   ```bash
-   psql -U postgres -c 'CREATE DATABASE coworkspace;'
-   psql -U postgres -d coworkspace -f database/schema.sql
-   ```
-   Gli script di infrastruttura come lo schema iniziale e le migrazioni si trovano in [database/schema.sql](database/schema.sql) e [database/migrations](database/migrations/)
-3. Esegui le migrazioni specifiche dell'applicazione:
-   ```bash
-   cd backend
-   npm run migrate
-   cd ..
-   ```
-
-### Backend
-```bash
-cd backend
-npm install
-npm start
-```
-L'API sarà disponibile su `http://localhost:3000`.
-
-### Frontend
-Servi il frontend statico:
-```bash
-npx serve frontend
-```
-oppure apri direttamente `frontend/index.html` nel browser.
-
 ## Deploy su AWS
 1. **Costruisci l'immagine Docker** per il backend:
    ```bash
@@ -164,60 +144,3 @@ oppure apri direttamente `frontend/index.html` nel browser.
 - Gli allarmi CloudWatch monitorano l'utilizzo della CPU, le connessioni al database e la latenza HTTP.
 - Un Auto Scaling group reagisce a questi allarmi per scalare orizzontalmente/verticalmente.
 - Consulta [docs/monitoring.md](docs/monitoring.md) per dettagli su metriche, dashboard e configurazione dei log.
-
-## Modalità di Avvio
-
-### 1. Avvio Locale
-
-**Backend**
-```bash
-cd backend
-npm install
-npm start
-```
-L'API sarà disponibile su `http://localhost:3000` (o sulla porta configurata).
-
-**Frontend**
-```bash
-npx serve frontend
-```
-Oppure usa [live-server](https://www.npmjs.com/package/live-server):
-```bash
-npm install -g live-server
-cd frontend
-live-server
-```
-Apri il link mostrato dal terminale (es. `http://127.0.0.1:5500`).
-
----
-
-### 2. Avvio in Cloud (AWS)
-
-- **Backend:** Deploy dell'immagine Docker su Elastic Beanstalk, ECS o EC2.
-- **Database:** Provisiona PostgreSQL tramite Amazon RDS.
-- **Frontend:** Carica la cartella `frontend` su un bucket S3 e distribuisci con CloudFront.
-- **Secrets:** Usa AWS Parameter Store o Secrets Manager per le variabili sensibili.
-
----
-
-### 3. Avvio tramite Docker
-
-**Costruisci l'immagine Docker:**
-```bash
-docker build -t coworkspace-backend ./backend
-```
-
-**Avvia il container (usando il file .env o .env.local):**
-```bash
-docker run -p 3001:3001 --env-file ./backend/.env coworkspace-backend
-```
-Oppure per sviluppo locale:
-```bash
-docker run -p 3001:3001 --env-file ./backend/.env.local coworkspace-backend
-```
-
-L'API sarà disponibile su `http://localhost:3001`.
-
----
-
-Consulta le sezioni dedicate per dettagli su [deploy](#deploy-su-aws), [configurazione](#configurazione-delle-variabili-dambiente) e [scalabilità](#scalabilità-e-monitoraggio).
