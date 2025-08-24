@@ -90,7 +90,7 @@ $(document).ready(function () {
         return;
       }
 
-      // AGGIUNGI DEBUG: Mostra eventuali errori dal backend
+      //Mostra eventuali errori dal backend
       if (response.error) {
         $('#prenotazioneAlert').html(`<div class="alert alert-danger">Errore backend: ${response.error}</div>`);
         hideSpinner();
@@ -100,7 +100,7 @@ $(document).ready(function () {
       const spazi = response.risultati || [];
       console.log('Spazi disponibili:', spazi);
 
-      // AGGIUNGI DEBUG: Mostra la risposta backend completa
+      // Mostra la risposta backend completa
       if (spazi.length === 0) {
         $('#prenotazioneAlert').html(
           `<div class="alert alert-warning">
