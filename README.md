@@ -218,6 +218,20 @@ docker run -p 3001:3001 --env-file ./backend/.env.local coworkspace-backend
 
 L'API sarà disponibile su `http://localhost:3001`.
 
+### 4. Avvio con Docker Compose
+
+Avvia backend e database in una sola volta:
+```bash
+docker-compose up
+```
+
+Per eseguire in background:
+```bash
+docker-compose up -d
+```
+
+Il backend sarà disponibile su `http://localhost:3000` e PostgreSQL su `localhost:5432`. I dati del database persistono nel volume `db-data`.
+
 ---
 
 Consulta le sezioni dedicate per dettagli su [deploy](#deploy-su-aws), [configurazione](#configurazione-delle-variabili-dambiente) e [scalabilità](#scalabilità-e-monitoraggio).
