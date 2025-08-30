@@ -7,7 +7,44 @@ Il progetto comprende:
 - **Frontend** statico in HTML/CSS/JS
 - **Database** PostgreSQL
 
+
 Il diagramma ER del database è disponibile [qui](database/er_coworkspace.png).
+
+## Struttura del progetto
+
+La struttura del repository è organizzata come segue:
+
+```
+CoWorkSpace/
+├── backend/                # Backend Node.js/Express
+│   ├── controllers/        # Logica di business (auth, prenotazioni, pagamenti, ecc.)
+│   ├── middleware/         # Middleware (es. autenticazione, validazioni)
+│   ├── models/             # Modelli per la gestione del DB
+│   ├── routes/             # Definizione delle API REST
+│   ├── db/                 # Script e migrazioni del database
+│   ├── server.js           # Entry point del backend
+│   └── package.json        # Configurazione npm per il backend
+│
+├── frontend/               # Frontend statico HTML/CSS/JS
+│   ├── css/                # Stili CSS
+│   ├── js/                 # Script JavaScript (login, prenotazioni, pagamenti, ecc.)
+│   ├── index.html          # Homepage
+│   ├── dashboard.html      # Dashboard utente
+│   ├── gestore.html        # Dashboard gestore
+│   ├── admin.html          # Pannello admin
+│   └── pagamento.html      # Pagina pagamento
+│
+├── database/               # Documentazione e schema del DB
+│   ├── schema.sql          # Script SQL per creare lo schema
+│   ├── er_coworkspace.png  # Diagramma ER del database
+│   └── README-db.md        # Documentazione del database
+│
+├── docs/                   # Documentazione aggiuntiva (API, monitoring, ecc.)
+│
+├── docker-compose.yml      # Configurazione per avviare servizi in locale
+├── README.md               # Documentazione principale del progetto
+└── package.json            # Configurazione npm root (se necessaria)
+```
 
 ## Prerequisiti
 
