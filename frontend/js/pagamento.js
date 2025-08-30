@@ -26,6 +26,9 @@ $(document).ready(async function () {
     return;
   }
 
+  // Carica lo storico dei pagamenti al caricamento della pagina
+  caricaStoricoPagamenti();
+
   // Inizializzazione Stripe
   let stripe = null;
   let card = null;
