@@ -546,3 +546,7 @@ h6 {
   font-weight: 700;
   border-radius: 12px;
 }
+
+body.loading {
+  visibility: hidden;
+}
