@@ -26,6 +26,8 @@ $(document).ready(async function () {
     return;
   }
 
+  $('body').removeClass('loading');
+
   // Carica lo storico dei pagamenti al caricamento della pagina
   caricaStoricoPagamenti();
 
