@@ -1,0 +1,19 @@
+{
+  "family": "coworkspace-task",
+  "containerDefinitions": [
+    {
+      "name": "coworkspace-backend",
+      "image": "coworkspace-backend:latest",
+      "memory": 512,
+      "cpu": 256,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3000
+        }
+      ],
+      "environment": []
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pagamento - CoWorkSpace</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="css/style.css" rel="stylesheet" />
+  <!-- API base per l'ambiente produzione (CloudFront) -->
+  <meta name="api-base" content="https://d1qgb2todm35gi.cloudfront.net/api">
+</head>
+<body class="loading">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm py-3">
+    <div class="container d-flex align-items-center">
+      <a class="navbar-brand fw-bold" href="javascript:void(0)">CoWorkSpace</a>
+
+      <div class="d-flex align-items-center text-white ms-3">
+        <span id="nomeUtente" class="fw-bold"></span>
+        <span id="ruoloUtente" class="ms-2 fst-italic"></span>
+      </div>
+
+      <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul id="menuLinks" class="navbar-nav gap-3"></ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-5">
+    <h1 class="main-title text-center mb-4">Pagamento</h1>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <!-- Card per Pagamento e Riepilogo -->
+        <div class="card shadow-sm mb-5">
+          <div class="card-body p-4 p-md-5">
+            
+            <!-- Riepilogo Prenotazione -->
+            <div class="mb-4" id="riepilogoContainer">
+              <h5 class="card-title">Riepilogo Prenotazione</h5>
+              <div id="riepilogoPrenotazione" class="text-muted">
+                Seleziona una prenotazione per vedere i dettagli.
+              </div>
+            </div>
+
+            <!-- Form di Pagamento -->
+            <form id="formPagamento">
+              <h5 class="card-title">Dettagli Pagamento</h5>
+
+              <div class="mb-3">
+                <label for="prenotazione" class="form-label">Seleziona Prenotazione da Pagare</label>
+                <select id="prenotazione" class="form-select form-lg" required>
+                  <option value="">Caricamento...</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="metodo" class="form-label">Metodo di pagamento</label>
+                <select id="metodo" class="form-select form-lg" required>
+                  <option value="paypal">💳 PayPal</option>
+                  <option value="satispay">📱 SatisPay</option>
+                  <option value="carta">💳 Carta di Credito</option>
+                  <option value="bancomat">💳 Bancomat</option>
+                </select>
+              </div>
+
+              <div id="card-element" class="mb-3 d-none"></div>
+              <div id="card-errors" class="text-danger mb-3"></div>
+
+              <p id="importoDaPagare" class="fw-bold fs-4 text-end"></p>
+
+              <button type="submit" class="btn btn-primary btn-lg w-100 position-relative">
+                Paga Ora
+                <span class="spinner-border spinner-border-sm d-none ms-2" id="paymentSpinner" role="status"></span>
+              </button>
+            </form>
+
+            <div id="alertPagamento" class="mt-4"></div>
+          </div>
+        </div>
+
+        <!-- Storico Pagamenti -->
+        <div class="card shadow-sm">
+          <div class="card-header">
+            <h5 class="mb-0">Storico Pagamenti</h5>
+          </div>
+          <div class="card-body">
+            <p class="text-muted small mb-2">Sono mostrati solo gli ultimi cinque pagamenti.</p>
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Spazio</th>
+                    <th>Prenotazione</th>
+                    <th>Importo</th>
+                    <th>Metodo</th>
+                  </tr>
+                </thead>
+                <tbody id="storicoPagamenti">
+                  <!-- Popolato via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer text-center py-3 bg-light text-muted mt-auto">
+    &copy; 2025 CoWorkSpace. Tutti i diritti riservati.
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://js.stripe.com/v3"></script>
+  <script src="js/config.js"></script>
+  <script src="js/menu.js"></script>
+  <!-- Carica direttamente il JS dei pagamenti: leggerà la chiave da /api/config/stripe -->
+  <script src="js/pagamento.js"></script>
+</body>
+</html>
