@@ -1,4 +1,6 @@
--- Utenti
+-- =========================
+-- Tabella utenti
+-- =========================
 CREATE TABLE utenti (
   id SERIAL PRIMARY KEY,
   nome VARCHAR(100) NOT NULL,
@@ -7,7 +9,9 @@ CREATE TABLE utenti (
   ruolo VARCHAR(20) CHECK (ruolo IN ('cliente', 'gestore', 'admin')) NOT NULL
 );
 
--- Sedi
+-- =========================
+-- Tabella sedi coworking
+-- =========================
 CREATE TABLE sedi (
   id SERIAL PRIMARY KEY,
   nome VARCHAR(100) NOT NULL,
@@ -16,10 +20,12 @@ CREATE TABLE sedi (
   gestore_id INTEGER NOT NULL REFERENCES utenti(id) ON DELETE CASCADE
 );
 
--- Index to speed up searches by city
+-- Index per ricerche rapide per città
 CREATE INDEX IF NOT EXISTS idx_sedi_citta ON sedi (citta);
 
--- Spazi
+-- =========================
+-- Tabella spazi disponibili nelle sedi
+-- =========================
 CREATE TABLE spazi (
   id SERIAL PRIMARY KEY,
   sede_id INTEGER NOT NULL REFERENCES sedi(id) ON DELETE CASCADE,
@@ -32,7 +38,9 @@ CREATE TABLE spazi (
   image_url TEXT
 );
 
--- Disponibilita
+-- =========================
+-- Tabella disponibilità degli spazi
+-- =========================
 CREATE TABLE disponibilita (
   id SERIAL PRIMARY KEY,
   spazio_id INTEGER NOT NULL REFERENCES spazi(id) ON DELETE CASCADE,
@@ -41,11 +49,13 @@ CREATE TABLE disponibilita (
   orario_fine TIME NOT NULL
 );
 
--- Indexes to improve availability searches
+-- Index per ottimizzare le ricerche di disponibilità
 CREATE INDEX IF NOT EXISTS idx_disponibilita_spazio_data ON disponibilita (spazio_id, data);
 CREATE INDEX IF NOT EXISTS idx_disponibilita_data_orari ON disponibilita (data, orario_inizio, orario_fine);
 
--- Prenotazioni
+-- =========================
+-- Tabella prenotazioni degli utenti
+-- =========================
 CREATE TABLE prenotazioni (
   id SERIAL PRIMARY KEY,
   utente_id INTEGER NOT NULL REFERENCES utenti(id) ON DELETE CASCADE,
@@ -55,7 +65,9 @@ CREATE TABLE prenotazioni (
   orario_fine TIME NOT NULL
 );
 
--- Pagamenti
+-- =========================
+-- Tabella pagamenti delle prenotazioni
+-- =========================
 CREATE TABLE pagamenti (
   id SERIAL PRIMARY KEY,
   prenotazione_id INTEGER NOT NULL REFERENCES prenotazioni(id) ON DELETE CASCADE,
