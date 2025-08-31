@@ -52,6 +52,14 @@ app.get('/api/health', (_req, res) => {
   res.status(200).json({ ok: true, ts: Date.now() });
 });
 
+// Compat: accetta le vecchie chiamate POST /login e inoltrale alla rotta reale
+app.use((req, res, next) => {
+  if (req.method === 'POST' && req.path === '/login') {
+    req.url = '/api/auth/login';
+  }
+  next();
+});
+
 /* ==== Rotte di servizio ==== */
 // Healthcheck
 app.get('/api/test', (_req, res) => {
