@@ -67,7 +67,7 @@
    All'avvio viene eseguito un tentativo di connessione al database; se fallisce (es. per problemi di DNS o rete) l'errore viene registrato e il processo termina con codice 1.
 
 8. Il backend sarà disponibile su:
-   http://localhost:3000
+   http://localhost:5500
 
 -------------------------------------------
 🧩 Struttura del backend
@@ -93,7 +93,7 @@
 Esempio richiesta profilo autenticato:
 
 ```bash
-curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/api/utente/me
+curl -H "Authorization: Bearer <TOKEN>" http://localhost:5500/api/utente/me
 ```
 
 🏢 Sedi e spazi:

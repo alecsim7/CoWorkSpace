@@ -1,3 +1,4 @@
+// Importa il pool di connessione al database
 const pool = require('../db');
 
 // Esegue una query di test per verificare la connessione al database
