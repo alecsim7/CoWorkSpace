@@ -152,3 +152,37 @@ jobs:
         env:
           DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
         run: aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
+
+      - name: Prepare SSH key file
+        run: |
+          printf "%s" "${{ secrets.EC2_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+
+      - name: SSH | Login to ECR on EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key_path: key.pem
+          script: |
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
+
+      - name: SSH | Pull image and (re)start backend container on EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key_path: key.pem
+          script: |
+            docker pull ${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+            docker stop backend || true
+            docker rm backend || true
+            docker run -d --name backend \
+              -e DB_HOST=${{ secrets.DB_HOST }} \
+              -e DB_PORT=${{ secrets.DB_PORT }} \
+              -e DB_USER=${{ secrets.DB_USER }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e DB_NAME=${{ secrets.DB_NAME }} \
+              -e DB_SSL=true \
+              -p 3001:3001 \
+              ${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
