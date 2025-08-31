@@ -29,6 +29,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Ensure AWS CLI is installed and show version
+        run: |
+          if ! command -v aws >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y awscli
+          fi
+          aws --version
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -68,10 +79,38 @@ jobs:
         with:
           task-definition: ecs-task-def.json
 
+      - name: Build frontend (if applicable)
+        working-directory: frontend
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+            npm run build || echo "No build script defined, skipping build"
+          else
+            echo "No package.json in frontend, skipping build"
+          fi
+
+      - name: Detect frontend build directory
+        id: fe_dir
+        run: |
+          if [ -d "frontend/dist" ]; then echo "dir=frontend/dist" >> $GITHUB_OUTPUT
+          elif [ -d "frontend/build" ]; then echo "dir=frontend/build" >> $GITHUB_OUTPUT
+          else echo "dir=frontend" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Dry-run S3 sync (no changes)
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: aws s3 sync "${{ steps.fe_dir.outputs.dir }}/" "s3://$S3_BUCKET" --delete --dryrun
+
       - name: Sync frontend to S3
         env:
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
-        run: aws s3 sync frontend/ s3://$S3_BUCKET --delete
+        run: aws s3 sync "${{ steps.fe_dir.outputs.dir }}/" "s3://$S3_BUCKET" --delete
+
+      - name: Verify index.html on S3
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: aws s3 ls "s3://$S3_BUCKET/index.html" || true
 
       - name: Invalidate CloudFront cache
         env:
