@@ -168,7 +168,7 @@ jobs:
             docker pull "$IMAGE"
             # Run the new container using the env file written above
             docker run -d --name "$CONTAINER" \
-              -p 3001:3000 \
+              -p 80:3000 -p 3001:3000 \
               --env-file /home/ec2-user/app/backend/.env \
               "$IMAGE"
             echo "Waiting for service to respond over HTTP..."
