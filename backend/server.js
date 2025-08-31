@@ -47,24 +47,15 @@ app.use(cors({
 
 app.use(express.json());
 
-// Compat alias: inoltra QUALSIASI chiamata a /login verso /api/auth/login
-// Include la preflight CORS (OPTIONS) per evitare 404 prima della POST
-app.options('/login', (_req, res) => res.sendStatus(204));
-app.all('/login', (req, _res, next) => {
-  req.url = '/api/auth/login';
-  next();
-});
-
 // Health endpoint per i controlli di deploy
 app.get('/api/health', (_req, res) => {
   res.status(200).json({ ok: true, ts: Date.now() });
 });
 
-// Compat: accetta le vecchie chiamate POST /login e inoltrale alla rotta reale
-app.use((req, res, next) => {
-  if (req.method === 'POST' && req.path === '/login') {
-    req.url = '/api/auth/login';
-  }
+// Compat alias per vecchie chiamate a /login -> instrada a /api/login
+app.options('/login', (_req, res) => res.sendStatus(204));
+app.all('/login', (req, _res, next) => {
+  req.url = '/api/login';
   next();
 });
 
@@ -82,13 +73,6 @@ app.get('/config/stripe', (_req, res) => {
 // Stripe publishable key dietro /api (per CloudFront /api/*)
 app.get('/api/config/stripe', (_req, res) => {
   res.json({ publishableKey: STRIPE_PUBLISHABLE_KEY });
-});
-
-// Compat alias per vecchie chiamate a /login -> instrada a /api/login
-app.options('/login', (_req, res) => res.sendStatus(204));
-app.all('/login', (req, _res, next) => {
-  req.url = '/api/login';
-  next();
 });
 
 /* ==== Rotte applicative ==== */
