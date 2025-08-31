@@ -74,16 +74,46 @@ jobs:
         run: npm run migrate
         working-directory: backend
 
-      - name: Deploy to Amazon ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+
+      - name: SSH | Login to ECR on EC2
+        uses: appleboy/ssh-action@v0.1.7
         with:
-            task-definition: ecs-task-def.json
-            cluster: YOUR_CLUSTER_NAME
-            service: YOUR_SERVICE_NAME
-            wait-for-service-stability: true
-            force-new-deployment: true
-            image: |
-              YOUR_CONTAINER_NAME=${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            REGISTRY_HOST="$(echo "${{ secrets.ECR_REPOSITORY }}" | cut -d/ -f1)"
+            aws ecr get-login-password --region "${{ secrets.AWS_REGION }}" \
+              | docker login --username AWS --password-stdin "$REGISTRY_HOST"
+
+      - name: SSH | Pull image and (re)start backend container on EC2
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            IMAGE="${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}"
+            CONTAINER="coworkspace-backend"
+            # Stop and remove old container if present
+            docker rm -f "$CONTAINER" || true
+            # Pull the new image
+            docker pull "$IMAGE"
+            # Run the new container (adjust ports/PORT if needed)
+            docker run -d --name "$CONTAINER" \
+              -p 3001:3000 \
+              --env-file /home/ec2-user/app/backend/.env \
+              -e PORT=3000 \
+              "$IMAGE"
+            # Basic health check
+            sleep 3
+            if ! curl -sf http://localhost:3001/api/health >/dev/null; then
+              echo "Health check failed; showing last logs:"
+              docker logs --tail=200 "$CONTAINER" || true
+              exit 1
+            fi
+            echo "Backend container is up and healthy."
 
       - name: Build frontend (if applicable)
         working-directory: frontend
