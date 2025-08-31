@@ -171,6 +171,13 @@ jobs:
               -p 80:3000 -p 3001:3000 \
               --env-file /home/ec2-user/app/backend/.env \
               "$IMAGE"
+            # Verify JWT_SECRET is present inside the container (fail fast if empty)
+            len=$(docker exec "$CONTAINER" /bin/sh -lc 'printf "%s" "$JWT_SECRET" | wc -c' || echo 0)
+            if [ "$len" -le 1 ]; then
+              echo "ERROR: JWT_SECRET is empty inside container. Check GitHub secret JWT_SECRET and /home/ec2-user/app/backend/.env"
+              docker logs --tail=50 "$CONTAINER" || true
+              exit 1
+            fi
             echo "Waiting for service to respond over HTTP..."
             ok_http=false
             for i in {1..30}; do
