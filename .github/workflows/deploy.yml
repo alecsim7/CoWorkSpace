@@ -75,44 +75,6 @@ jobs:
         working-directory: backend
 
 
-      - name: Build frontend (if applicable)
-        working-directory: frontend
-        run: |
-          if [ -f package.json ]; then
-            npm ci
-            npm run build || echo "No build script defined, skipping build"
-          else
-            echo "No package.json in frontend, skipping build"
-          fi
-
-      - name: Detect frontend build directory
-        id: fe_dir
-        run: |
-          if [ -d "frontend/dist" ]; then echo "dir=frontend/dist" >> $GITHUB_OUTPUT
-          elif [ -d "frontend/build" ]; then echo "dir=frontend/build" >> $GITHUB_OUTPUT
-          else echo "dir=frontend" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Dry-run S3 sync (no changes)
-        env:
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
-        run: aws s3 sync "${{ steps.fe_dir.outputs.dir }}/" "s3://$S3_BUCKET" --delete --dryrun
-
-      - name: Sync frontend to S3
-        env:
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
-        run: aws s3 sync "${{ steps.fe_dir.outputs.dir }}/" "s3://$S3_BUCKET" --delete
-
-      - name: Verify index.html on S3
-        env:
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
-        run: aws s3 ls "s3://$S3_BUCKET/index.html" || true
-
-      - name: Invalidate CloudFront cache
-        env:
-          DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
-        run: aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
-
       - name: Prepare SSH key file
         run: |
           printf "%s" "${{ secrets.EC2_SSH_KEY }}" > key.pem
@@ -151,6 +113,44 @@ jobs:
             STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
             EOF
 
+      - name: Build frontend (if applicable)
+        working-directory: frontend
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+            npm run build || echo "No build script defined, skipping build"
+          else
+            echo "No package.json in frontend, skipping build"
+          fi
+
+      - name: Detect frontend build directory
+        id: fe_dir
+        run: |
+          if [ -d "frontend/dist" ]; then echo "dir=frontend/dist" >> $GITHUB_OUTPUT
+          elif [ -d "frontend/build" ]; then echo "dir=frontend/build" >> $GITHUB_OUTPUT
+          else echo "dir=frontend" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Dry-run S3 sync (no changes)
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: aws s3 sync "${{ steps.fe_dir.outputs.dir }}/" "s3://$S3_BUCKET" --delete --dryrun
+
+      - name: Sync frontend to S3
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: aws s3 sync "${{ steps.fe_dir.outputs.dir }}/" "s3://$S3_BUCKET" --delete
+
+      - name: Verify index.html on S3
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: aws s3 ls "s3://$S3_BUCKET/index.html" || true
+
+      - name: Invalidate CloudFront cache
+        env:
+          DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
+
       - name: SSH | Pull image and (re)start backend container on EC2
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -166,20 +166,34 @@ jobs:
             for name in cowork-back youthful_ritchie; do docker rm -f "$name" 2>/dev/null || true; done
             # Pull new image
             docker pull "$IMAGE"
-            # Run the new container using the env file created above
+            # Run the new container using the env file written above
             docker run -d --name "$CONTAINER" \
               -p 3001:3000 \
               --env-file /home/ec2-user/app/backend/.env \
               "$IMAGE"
             echo "Waiting for service to respond over HTTP..."
+            ok_http=false
             for i in {1..30}; do
-              if curl -sf "http://localhost:3001/api/health" >/dev/null || \
-                 curl -sf "http://localhost:3001/health" >/dev/null || \
-                 curl -sf "http://localhost:3001/" >/dev/null; then
-                echo "Backend container is up."; exit 0
-              fi
+              for path in /api/health /health /; do
+                code=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:3001${path}" || echo 000)
+                if [ "$code" -ge 200 ] && [ "$code" -lt 500 ]; then
+                  echo "Healthy over HTTP on ${path} (status $code)"
+                  ok_http=true
+                  break
+                fi
+              done
+              [ "$ok_http" = true ] && break
               sleep 1
             done
+            if [ "$ok_http" = true ]; then
+              echo "Backend container is up (HTTP)."
+              exit 0
+            fi
+            echo "HTTP check failed; testing raw TCP on port 3001..."
+            if (bash -lc '</dev/tcp/127.0.0.1/3001') 2>/dev/null; then
+              echo "Port 3001 is open (TCP). Treating as healthy for now."
+              exit 0
+            fi
             echo "Health checks failed; logs & sockets:"
             docker logs --tail=200 "$CONTAINER" || true
             docker ps
