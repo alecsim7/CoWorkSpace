@@ -164,14 +164,23 @@ jobs:
             # Stop old containers that may confuse checks (optional cleanup)
             docker rm -f "$CONTAINER" 2>/dev/null || true
             for name in cowork-back youthful_ritchie; do docker rm -f "$name" 2>/dev/null || true; done
-            # Pull new image
-            docker pull "$IMAGE"
+            # Resolve JWT from GitHub secret or fallback to the .env on EC2 (so we never pass empty)
+            JWT_FROM_GH='${{ secrets.JWT_SECRET }}'
+            if [ -z "$JWT_FROM_GH" ] || [ "$JWT_FROM_GH" = "''" ]; then
+              JWT_FROM_GH="$(grep -m1 '^JWT_SECRET=' /home/ec2-user/app/backend/.env | cut -d= -f2- || true)"
+            fi
             # Run the new container using the env file written above
             docker run -d --name "$CONTAINER" \
               -p 80:3000 -p 3001:3000 \
               --env-file /home/ec2-user/app/backend/.env \
-              -e JWT_SECRET='${{ secrets.JWT_SECRET }}' \
+              -e JWT_SECRET="$JWT_FROM_GH" \
               "$IMAGE"
+            # Quick local check of what we passed
+            if [ -z "$JWT_FROM_GH" ]; then
+              echo "WARNING: JWT_FROM_GH empty; attempted fallback from /home/ec2-user/app/backend/.env"
+            else
+              echo "JWT_FROM_GH length: $(printf "%s" "$JWT_FROM_GH" | wc -c)"
+            fi
             # Verifica che la variabile JWT_SECRET sia presente all'interno del container.
             # Questo controllo serve per evitare che il backend venga avviato senza la chiave segreta JWT,
             # che è fondamentale per la sicurezza delle autenticazioni e delle sessioni utente.
