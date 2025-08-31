@@ -103,7 +103,7 @@ jobs:
             # Run the new container (adjust ports/PORT if needed)
             docker run -d --name "$CONTAINER" \
               -p 3001:3000 \
-              --env-file /home/ec2-user/app/backend/.env \
+              --env-file /home/ec2-user/app/backend/backend/.env \
               -e PORT=3000 \
               "$IMAGE"
             # Basic health check
