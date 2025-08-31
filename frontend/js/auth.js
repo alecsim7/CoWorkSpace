@@ -1,4 +1,5 @@
 $(function () {
+  // === Imposta API_BASE dinamicamente in locale ===
   const apiBaseMeta = document.querySelector('meta[name="api-base"]');
   if (
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
@@ -8,7 +9,7 @@ $(function () {
   }
   const API_BASE = apiBaseMeta ? apiBaseMeta.content.trim() : '/api';
 
-  // Mostra il form di login
+  // === Mostra il form di login ===
   $('#btnShowLogin').click(function () {
     $('.forms-wrapper').show();
     $('#loginSection').show();
@@ -17,7 +18,7 @@ $(function () {
     $('#registerAlert').hide();
   });
 
-  // Mostra il form di registrazione
+  // === Mostra il form di registrazione ===
   $('#btnShowRegister').click(function () {
     $('.forms-wrapper').show();
     $('#registerSection').show();
@@ -26,7 +27,7 @@ $(function () {
     $('#registerAlert').hide();
   });
 
-  // Gestione login con chiamata AJAX
+  // === Gestione login con chiamata AJAX ===
   $('#loginForm').submit(function (e) {
     e.preventDefault();
 
@@ -71,7 +72,7 @@ $(function () {
     });
   });
 
-  // Gestione registrazione utente
+  // === Gestione registrazione utente ===
   $('#registerForm').submit(function (e) {
     e.preventDefault();
 
@@ -116,14 +117,14 @@ $(function () {
     });
   });
 
-  // Gestione logout globale (da mettere in tutte le pagine protette)
+  // === Gestione logout globale (da mettere in tutte le pagine protette) ===
   $('#logoutBtn').click(function () {
     localStorage.removeItem('token');
     localStorage.removeItem('utente');
     window.location.href = "index.html";
   });
 
-  // Mostra/nascondi menu navbar in base a login
+  // === Mostra/nascondi menu navbar in base a login ===
   function aggiornaMenu() {
     const utente = JSON.parse(localStorage.getItem('utente'));
     if (utente && utente.nome) {
@@ -141,6 +142,6 @@ $(function () {
     }
   }
 
-  // Aggiorna menu all'avvio
+  // === Aggiorna menu all'avvio ===
   aggiornaMenu();
 });

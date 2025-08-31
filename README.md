@@ -83,7 +83,6 @@ Per il frontend è inoltre necessario esporre la chiave pubblicabile Stripe (`ST
    ```bash
    docker run -p 3001:3001 --env-file ./backend/.env coworkspace-backend
    ```
-   L'API sarà disponibile su `http://localhost:3001`.
 3. Servi il frontend statico:
    ```bash
    npx serve frontend
@@ -115,7 +114,6 @@ cd backend
 npm install
 npm start
 ```
-L'API sarà disponibile su `http://localhost:3000` (o sulla porta configurata).
 
 ### Frontend
 
@@ -124,20 +122,6 @@ Servi il frontend statico:
 npx serve frontend
 ```
 oppure apri direttamente `frontend/index.html` nel browser.
-
-#### Configurazione dell'endpoint API
-
-Lo script `frontend/js/prenotazione.js` usa la variabile globale `API_BASE` per determinare l'URL delle API. Il valore predefinito è `/api`, ma può essere sovrascritto:
-
-- **Variabile d'ambiente:** imposta `API_BASE` prima di servire il frontend (es. `API_BASE=https://example.com/api npx serve frontend`) e fai in modo che il server esponga tale valore come `window.API_BASE`.
-- **Script inline:** definisci `window.API_BASE` prima di includere `prenotazione.js`:
-
-  ```html
-  <script>
-    window.API_BASE = 'https://example.com/api';
-  </script>
-  <script src="js/prenotazione.js"></script>
-  ```
 
 ## Endpoint principali
 
@@ -210,14 +194,27 @@ Apri il link mostrato dal terminale (es. `http://127.0.0.1:5500`).
 
 ### 2. Avvio in Cloud (AWS)
 
-- **Backend:** Deploy dell'immagine Docker su Elastic Beanstalk, ECS o EC2.
+- **Backend:** Deploy dell'immagine Docker su EC2.
 - **Database:** Provisiona PostgreSQL tramite Amazon RDS.
 - **Frontend:** Carica la cartella `frontend` su un bucket S3 e distribuisci con CloudFront.
 - **Secrets:** Usa AWS Parameter Store o Secrets Manager per le variabili sensibili.
 
 ---
 
-### 3. Avvio tramite Docker
+### Deploy automatico su AWS tramite CI/CD
+
+Il progetto è integrato con pipeline CI/CD che automatizzano il deploy su AWS. Ad ogni push su main/master:
+- Il backend viene buildato e pubblicato come immagine Docker su Amazon ECR.
+- Il database viene migrato automaticamente su Amazon RDS.
+- Il frontend viene sincronizzato su S3 e distribuito tramite CloudFront.
+- Le variabili sensibili vengono gestite tramite AWS Secrets Manager o Parameter Store.
+- Il tutto viene orchestrato tramite i servizi AWS CodePipeline e CodeBuild.
+
+Questo garantisce che ogni modifica venga testata e rilasciata in modo automatico e sicuro sull'infrastruttura AWS.
+
+---
+
+### 3. Avvio tramite Docker Local
 
 **Avvia il container (usando il file .env o .env.local):**
 ```bash
@@ -232,21 +229,6 @@ docker run --rm --name coworkspace-backend \
 ```bash
 docker stop $(docker ps -q)
 ```
-
-### 4. Avvio con Docker Compose
-
-Avvia backend e database in una sola volta:
-```bash
-docker-compose up
-```
-
-Per eseguire in background:
-```bash
-docker-compose up -d
-```
-
-Il backend sarà disponibile su `http://localhost:3000` e PostgreSQL su `localhost:5432`. I dati del database persistono nel volume `db-data`.
-
 ---
 
 Consulta le sezioni dedicate per dettagli su [deploy](#deploy-su-aws), [configurazione](#configurazione-delle-variabili-dambiente) e [scalabilità](#scalabilità-e-monitoraggio).
