@@ -77,7 +77,13 @@ jobs:
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ecs-task-def.json
+            task-definition: ecs-task-def.json
+            cluster: YOUR_CLUSTER_NAME
+            service: YOUR_SERVICE_NAME
+            wait-for-service-stability: true
+            force-new-deployment: true
+            image: |
+              YOUR_CONTAINER_NAME=${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
 
       - name: Build frontend (if applicable)
         working-directory: frontend
