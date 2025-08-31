@@ -47,6 +47,14 @@ app.use(cors({
 
 app.use(express.json());
 
+// Compat alias: inoltra QUALSIASI chiamata a /login verso /api/auth/login
+// Include la preflight CORS (OPTIONS) per evitare 404 prima della POST
+app.options('/login', (_req, res) => res.sendStatus(204));
+app.all('/login', (req, _res, next) => {
+  req.url = '/api/auth/login';
+  next();
+});
+
 // Health endpoint per i controlli di deploy
 app.get('/api/health', (_req, res) => {
   res.status(200).json({ ok: true, ts: Date.now() });
