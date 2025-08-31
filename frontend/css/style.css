@@ -16,14 +16,14 @@ html, body {
 .navbar {
   box-shadow: 0 3px 8px rgba(0,0,0,0.1);
   border-radius: 10px;
-  padding: 8px 24px;
-  width: fit-content;
+  padding: 16px 32px;       /* più alta e spaziosa */
+  width: 100%;              /* prende tutta la riga */
+  max-width: 1200px;        /* ma non diventa infinita */
   box-sizing: border-box;
   align-items: center;
-  margin: 16px auto 0 auto; /* più giù e centrata */
-  display: none; /* Rimuovi se vuoi che sia visibile di default */
-  display: flex; /* Assicurati che sia flex */
-  gap: 24px; /* spazio tra gli elementi */
+  margin: 24px auto 0 auto; /* più giù e centrata */
+  display: flex;            /* visibile e flex */
+  gap: 32px;                /* più spazio tra gli elementi */
 }
 
 .navbar.show {
