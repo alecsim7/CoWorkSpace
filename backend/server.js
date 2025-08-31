@@ -84,6 +84,13 @@ app.get('/api/config/stripe', (_req, res) => {
   res.json({ publishableKey: STRIPE_PUBLISHABLE_KEY });
 });
 
+// Compat alias per vecchie chiamate a /login -> instrada a /api/login
+app.options('/login', (_req, res) => res.sendStatus(204));
+app.all('/login', (req, _res, next) => {
+  req.url = '/api/login';
+  next();
+});
+
 /* ==== Rotte applicative ==== */
 app.use('/api', authLimiter, require('./routes/authRoutes'));           // login, registrazione, logout
 app.use('/api', require('./routes/userRoutes'));                        // profilo utente
