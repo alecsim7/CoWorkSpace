@@ -44,7 +44,13 @@ app.use(cors({
   credentials: true,
 }));
 
+
 app.use(express.json());
+
+// Health endpoint per i controlli di deploy
+app.get('/api/health', (_req, res) => {
+  res.status(200).json({ ok: true, ts: Date.now() });
+});
 
 /* ==== Rotte di servizio ==== */
 // Healthcheck
