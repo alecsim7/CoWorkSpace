@@ -170,8 +170,12 @@ jobs:
             docker run -d --name "$CONTAINER" \
               -p 80:3000 -p 3001:3000 \
               --env-file /home/ec2-user/app/backend/.env \
+              -e JWT_SECRET='${{ secrets.JWT_SECRET }}' \
               "$IMAGE"
-            # Verify JWT_SECRET is present inside the container (fail fast if empty)
+            # Verifica che la variabile JWT_SECRET sia presente all'interno del container.
+            # Questo controllo serve per evitare che il backend venga avviato senza la chiave segreta JWT,
+            # che è fondamentale per la sicurezza delle autenticazioni e delle sessioni utente.
+            # Se la variabile è vuota, il workflow si interrompe e mostra i log per facilitare il debug.
             len=$(docker exec "$CONTAINER" /bin/sh -lc 'printf "%s" "$JWT_SECRET" | wc -c' || echo 0)
             if [ "$len" -le 1 ]; then
               echo "ERROR: JWT_SECRET is empty inside container. Check GitHub secret JWT_SECRET and /home/ec2-user/app/backend/.env"
