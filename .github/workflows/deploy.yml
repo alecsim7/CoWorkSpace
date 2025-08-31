@@ -153,6 +153,38 @@ jobs:
           DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
         run: aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
 
+      - name: SSH | Pull image and (re)start backend container on EC2
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            IMAGE="${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}"
+            CONTAINER="coworkspace-backend"
+            docker rm -f "$CONTAINER" || true
+            docker pull "$IMAGE"
+            # Run the new container with env vars from secrets (no --env-file needed)
+            docker run -d --name "$CONTAINER" \
+              -p 3001:3000 \
+              -e PORT=3000 \
+              -e DB_HOST='${{ secrets.DB_HOST }}' \
+              -e DB_PORT='${{ secrets.DB_PORT }}' \
+              -e DB_USER='${{ secrets.DB_USER }}' \
+              -e DB_PASSWORD='${{ secrets.DB_PASSWORD }}' \
+              -e DB_NAME='${{ secrets.DB_NAME }}' \
+              -e DB_SSL='true' \
+              "$IMAGE"
+            # Health check
+            sleep 3
+            if ! curl -sf http://localhost:3001/api/health >/dev/null; then
+              echo "Health check failed; showing last logs:"
+              docker logs --tail=200 "$CONTAINER" || true
+              exit 1
+            fi
+            echo "Backend container is up and healthy."
+
       - name: Prepare SSH key file
         run: |
           printf "%s" "${{ secrets.EC2_SSH_KEY }}" > key.pem
