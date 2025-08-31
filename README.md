@@ -172,7 +172,7 @@ curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/api/utente/me
    ```bash
    docker build -t coworkspace-backend ./backend
    ```
-2. **Distribuisci** l'immagine su Elastic Beanstalk o su una istanza EC2.
+2. **Distribuisci** l'immagine su una istanza EC2.
 3. **Provisiona PostgreSQL** tramite Amazon RDS.
 4. **Carica il frontend** su un bucket S3 e distribuiscilo con CloudFront.
 5. **Memorizza le chiavi segrete in Parameter Store o Secrets Manager** e referenziale dalla definizione del task ECS o tramite user data EC2 usando `aws ssm get-parameter`.
@@ -219,21 +219,19 @@ Apri il link mostrato dal terminale (es. `http://127.0.0.1:5500`).
 
 ### 3. Avvio tramite Docker
 
-**Costruisci l'immagine Docker:**
-```bash
-docker build -t coworkspace-backend ./backend
-```
-
 **Avvia il container (usando il file .env o .env.local):**
 ```bash
-docker run -p 3001:3001 --env-file ./backend/.env coworkspace-backend
+cd backend
+docker build -t coworkspace-backend:local .
+docker run --rm --name coworkspace-backend \
+  -p 3001:3000 \
+  --env-file ./.env \
+  coworkspace-backend:local
 ```
-Oppure per sviluppo locale:
+**Comando per chiudere i container Docker:**
 ```bash
-docker run -p 3001:3001 --env-file ./backend/.env.local coworkspace-backend
+docker stop $(docker ps -q)
 ```
-
-L'API sarà disponibile su `http://localhost:3001`.
 
 ### 4. Avvio con Docker Compose
 

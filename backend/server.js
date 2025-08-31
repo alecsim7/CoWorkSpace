@@ -109,6 +109,6 @@ app.use('/api', require('./routes/disponibilitaRoutes'));
 // Avvia il server HTTP sulla porta specificata.
 // HTTPS è gestito da CloudFront, qui solo HTTP interno su 3000.
 http.createServer(app).listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server HTTP avviato su http://0.0.0.0:${PORT}`);
+  console.log(`🚀 Server HTTP avviato`);
   console.log(`⚡ Usa CloudFront per accedere via HTTPS (es. https://d1qgb2todm35gi.cloudfront.net)`);
 });
