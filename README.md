@@ -176,7 +176,7 @@ cd backend
 npm install
 npm start
 ```
-L'API sarà disponibile su `http://localhost:3000` (o sulla porta configurata).
+L'API sarà disponibile su `http://localhost:3001` (o sulla porta configurata).
 
 **Frontend**
 ```bash
