@@ -12,15 +12,14 @@
 - Node.js (v18+ consigliato)
 - PostgreSQL
 - Librerie Node installate:
-  - bcrypt
-  - cors
-  - dotenv
-  - express
-  - express-rate-limit
+  - bcrypt - per la sicurezza delle password
+  - cors - per consentire l'accesso al backend solo da domini autorizzati
+  - dotenv - carica le variabili d’ambiente da un file .env in process.env
+  - express - framework Node.js
+  - express-rate-limit - limita il numero di richieste che un utente può fare in un certo intervallo di tempo
   - jsonwebtoken
-  - pg
-  - stripe
-  - winston
+  - pg - serve per connettersi e fare query al database Postgres
+  - stripe - libreria per integrare i pagamenti online con carta di credito o altri metodi supportati da Stripe
 
 -------------------------------------------
 ⚙️ Installazione e Avvio
