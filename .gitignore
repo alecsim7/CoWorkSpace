@@ -18,6 +18,8 @@ yarn-error.log*
 build/
 dist/
 coverage/
+target/
+*/target/
 
 # Temporary files
 *.tmp
